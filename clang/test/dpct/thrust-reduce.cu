@@ -84,6 +84,7 @@ void thrust_test() {
   thrust::host_vector<int> h_data(data, data + 6);
   int result;
   MyAlloctor thrust_allocator;
+  cudaStream_t stream;
 
   // CHECK:  result = std::reduce(oneapi::dpl::execution::seq, data, data + 6);
   // CHECK-NEXT:  result = std::reduce(oneapi::dpl::execution::seq, data, data + 6);
@@ -104,6 +105,7 @@ void thrust_test() {
   // CHECK-NEXT:  result = std::reduce(oneapi::dpl::execution::seq, h_data.begin(), h_data.begin() + 6, -1, oneapi::dpl::maximum<int>());
   // CHECK-NEXT:  result = std::reduce(oneapi::dpl::execution::seq, h_data.begin(), h_data.begin() + 6, -1, oneapi::dpl::maximum<int>());
   // CHECK-NEXT:  result = std::reduce(oneapi::dpl::execution::make_device_policy(q_ct1), d_data.begin(), d_data.begin() + 6, -1, oneapi::dpl::maximum<int>());
+  // CHECK-NEXT:  result = std::reduce(oneapi::dpl::execution::make_device_policy(*stream), d_data.begin(), d_data.begin() + 6, -1, oneapi::dpl::maximum<int>());
   result = thrust::reduce(thrust::host, data, data + 6);
   result = thrust::reduce(data, data + 6);
   result = thrust::reduce(thrust::host, data, data + 6, 1);
@@ -123,4 +125,5 @@ void thrust_test() {
   result = thrust::reduce(thrust::host, h_data.begin(), h_data.begin() + 6, -1, thrust::maximum<int>());
   result = thrust::reduce(h_data.begin(), h_data.begin() + 6, -1, thrust::maximum<int>());
   result = thrust::reduce(thrust::cuda::par(thrust_allocator), d_data.begin(), d_data.begin() + 6, -1, thrust::maximum<int>());
+  result = thrust::reduce(thrust::cuda::par.on(stream), d_data.begin(), d_data.begin() + 6, -1, thrust::maximum<int>());
 }
