@@ -32,6 +32,11 @@ __global__ void shfl() {
     // CHECK: output = dpct::select_from_sub_group(item_ct1.get_sub_group(), value, offset);
     asm volatile("shfl.idx.b32 %0, %1, %2, 0xFFFFFFFF;" : "=r"(output) : "r"(value), "r"(offset));
 
+   // CHECK: output = dpct::permute_sub_group_by_xor(item_ct1.get_sub_group(), value, offset);
+    asm volatile("shfl.bfly.b32 %0, %1, %2, %3;" : "=r"(output) : "r"(value), "r"(offset),"r"(mask));
+
+    // CHECK: output = dpct::permute_sub_group_by_xor(item_ct1.get_sub_group(), value, offset);
+    asm volatile("shfl.bfly.b32 %0, %1, %2, 0xFFFFFFFF;" : "=r"(output) : "r"(value), "r"(offset));
 }
 
 // clang-format off

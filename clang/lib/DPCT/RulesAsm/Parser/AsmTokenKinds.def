@@ -401,6 +401,7 @@ MODIFIER(warp, ".warp")
 MODIFIER(up, ".up")
 MODIFIER(down, ".down")
 MODIFIER(idx, ".idx")
+MODIFIER(bfly, ".bfly")
 
 #undef LINKAGE
 #undef TARGET
