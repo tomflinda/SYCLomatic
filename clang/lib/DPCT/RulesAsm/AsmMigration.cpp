@@ -1141,7 +1141,33 @@ protected:
       OS() << MapNames::getDpctNamespace() << "shift_sub_group_left("
            << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
            << InputOperand0 << ", " << InputOperand1 << ")";      
-    } 
+    } else if (Inst->hasAttr(InstAttr::idx)) {
+      std::string InputOperand0;
+      if (tryEmitStmt(InputOperand0, Inst->getInputOperand(0)))
+        return SYCLGenError();
+      printf("### InputOperand0: %s\n", InputOperand0.c_str());
+
+      std::string InputOperand1;
+      if (tryEmitStmt(InputOperand1, Inst->getInputOperand(1)))
+        return SYCLGenError();
+      printf("### InputOperand0: %s\n", InputOperand1.c_str());
+
+      std::string InputOperand2;
+      if (tryEmitStmt(InputOperand2, Inst->getInputOperand(2)))
+        return SYCLGenError();
+      printf("### InputOperand2: %s\n", InputOperand2.c_str());
+
+      OS() << MapNames::getDpctNamespace() << "select_from_sub_group("
+           << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
+           << InputOperand0 << ", " << InputOperand1 << ")";      
+    }
+
+
+
+
+
+
+
     endstmt();
     return SYCLGenSuccess();
   }

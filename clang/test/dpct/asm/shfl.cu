@@ -25,6 +25,13 @@ __global__ void shfl() {
 
     // CHECK: output = dpct::shift_sub_group_left(item_ct1.get_sub_group(), value, offset);
     asm volatile("shfl.down.b32 %0, %1, %2, 0xFFFFFFFF;" : "=r"(output) : "r"(value), "r"(offset));
+
+    // CHECK: output = dpct::select_from_sub_group(item_ct1.get_sub_group(), value, offset);
+    asm volatile("shfl.idx.b32 %0, %1, %2, %3;" : "=r"(output) : "r"(value), "r"(offset),"r"(mask));
+
+    // CHECK: output = dpct::select_from_sub_group(item_ct1.get_sub_group(), value, offset);
+    asm volatile("shfl.idx.b32 %0, %1, %2, 0xFFFFFFFF;" : "=r"(output) : "r"(value), "r"(offset));
+
 }
 
 // clang-format off

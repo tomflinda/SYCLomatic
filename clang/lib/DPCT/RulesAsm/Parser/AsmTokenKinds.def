@@ -400,6 +400,7 @@ MODIFIER(sync, ".sync")
 MODIFIER(warp, ".warp")
 MODIFIER(up, ".up")
 MODIFIER(down, ".down")
+MODIFIER(idx, ".idx")
 
 #undef LINKAGE
 #undef TARGET
