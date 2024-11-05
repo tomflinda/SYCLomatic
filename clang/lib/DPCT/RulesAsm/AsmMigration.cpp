@@ -1089,8 +1089,42 @@ protected:
     return SYCLGenSuccess();
   }
 
-  bool handle_add(const InlineAsmInstruction *Inst) override {
-    return HandleAddSub(Inst);
+  bool handle_shfl(const InlineAsmInstruction *Inst) override {
+    printf("entern run handle_shfl...\n");
+    printf("Inst->getNumInputOperands(): %d\n", Inst->getNumInputOperands());
+    printf("Inst->getNumTypes(): %d\n", Inst->getNumTypes());
+    if (Inst->getNumInputOperands() != 3 || Inst->getNumTypes() != 1)
+      return SYCLGenError();
+
+    if (emitStmt(Inst->getOutputOperand()))
+      return SYCLGenError();
+    OS() << " = ";
+
+    // shfl.up.b32 %0, %1, %2, %3;
+    if (Inst->hasAttr(InstAttr::up)) {
+
+      std::string InputOperand0;
+      if (tryEmitStmt(InputOperand0, Inst->getInputOperand(0)))
+        return SYCLGenError();
+      printf("### InputOperand0: %s\n", InputOperand0.c_str());
+
+      std::string InputOperand1;
+      if (tryEmitStmt(InputOperand1, Inst->getInputOperand(1)))
+        return SYCLGenError();
+      printf("### InputOperand0: %s\n", InputOperand1.c_str());
+
+      std::string InputOperand2;
+      if (tryEmitStmt(InputOperand2, Inst->getInputOperand(2)))
+        return SYCLGenError();
+      printf("### InputOperand2: %s\n", InputOperand2.c_str());
+
+      OS() << MapNames::getDpctNamespace() << "shift_sub_group_right("
+           << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
+           << InputOperand0 << ", " << InputOperand1 << ")";
+
+    }
+    endstmt();
+    return SYCLGenSuccess();
   }
 
   bool handle_sub(const InlineAsmInstruction *Inst) override {
@@ -2667,6 +2701,7 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
+  printf("ASM string input: [%s]\n", Buffer.c_str());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
