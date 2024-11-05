@@ -1090,9 +1090,6 @@ protected:
   }
 
   bool handle_shfl(const InlineAsmInstruction *Inst) override {
-    printf("entern run handle_shfl...\n");
-    printf("Inst->getNumInputOperands(): %d\n", Inst->getNumInputOperands());
-    printf("Inst->getNumTypes(): %d\n", Inst->getNumTypes());
     if (Inst->getNumInputOperands() != 3 || Inst->getNumTypes() != 1)
       return SYCLGenError();
 
@@ -1100,93 +1097,26 @@ protected:
       return SYCLGenError();
     OS() << " = ";
 
-    // shfl.up.b32 %0, %1, %2, %3;
+    std::string Op[3];
+    if (tryEmitAllInputOperands(Op, Inst))
+      return SYCLGenError();
+
     if (Inst->hasAttr(InstAttr::up)) {
-
-      std::string InputOperand0;
-      if (tryEmitStmt(InputOperand0, Inst->getInputOperand(0)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand0.c_str());
-
-      std::string InputOperand1;
-      if (tryEmitStmt(InputOperand1, Inst->getInputOperand(1)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand1.c_str());
-
-      std::string InputOperand2;
-      if (tryEmitStmt(InputOperand2, Inst->getInputOperand(2)))
-        return SYCLGenError();
-      printf("### InputOperand2: %s\n", InputOperand2.c_str());
-
-      OS() << MapNames::getDpctNamespace() << "shift_sub_group_right("
-           << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
-           << InputOperand0 << ", " << InputOperand1 << ")";
-
+      // to handle "shfl.up.b32 %0, %1, %2, %3;"
+      OS() << MapNames::getDpctNamespace() << "shift_sub_group_right(";
     } else if (Inst->hasAttr(InstAttr::down)) {
-      std::string InputOperand0;
-      if (tryEmitStmt(InputOperand0, Inst->getInputOperand(0)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand0.c_str());
-
-      std::string InputOperand1;
-      if (tryEmitStmt(InputOperand1, Inst->getInputOperand(1)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand1.c_str());
-
-      std::string InputOperand2;
-      if (tryEmitStmt(InputOperand2, Inst->getInputOperand(2)))
-        return SYCLGenError();
-      printf("### InputOperand2: %s\n", InputOperand2.c_str());
-
-      OS() << MapNames::getDpctNamespace() << "shift_sub_group_left("
-           << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
-           << InputOperand0 << ", " << InputOperand1 << ")";      
+      // to handle "shfl.down.b32 %0, %1, %2, %3;"
+      OS() << MapNames::getDpctNamespace() << "shift_sub_group_left(";
     } else if (Inst->hasAttr(InstAttr::idx)) {
-      std::string InputOperand0;
-      if (tryEmitStmt(InputOperand0, Inst->getInputOperand(0)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand0.c_str());
-
-      std::string InputOperand1;
-      if (tryEmitStmt(InputOperand1, Inst->getInputOperand(1)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand1.c_str());
-
-      std::string InputOperand2;
-      if (tryEmitStmt(InputOperand2, Inst->getInputOperand(2)))
-        return SYCLGenError();
-      printf("### InputOperand2: %s\n", InputOperand2.c_str());
-
-      OS() << MapNames::getDpctNamespace() << "select_from_sub_group("
-           << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
-           << InputOperand0 << ", " << InputOperand1 << ")";      
+      // to handle "shfl.idx.b32 %0, %1, %2, %3;"
+      OS() << MapNames::getDpctNamespace() << "select_from_sub_group(";
     } else if (Inst->hasAttr(InstAttr::bfly)) {
-      std::string InputOperand0;
-      if (tryEmitStmt(InputOperand0, Inst->getInputOperand(0)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand0.c_str());
-
-      std::string InputOperand1;
-      if (tryEmitStmt(InputOperand1, Inst->getInputOperand(1)))
-        return SYCLGenError();
-      printf("### InputOperand0: %s\n", InputOperand1.c_str());
-
-      std::string InputOperand2;
-      if (tryEmitStmt(InputOperand2, Inst->getInputOperand(2)))
-        return SYCLGenError();
-      printf("### InputOperand2: %s\n", InputOperand2.c_str());
-
-      OS() << MapNames::getDpctNamespace() << "permute_sub_group_by_xor("
-           << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), "
-           << InputOperand0 << ", " << InputOperand1 << ")";      
+      // to handle "shfl.bfly.b32 %0, %1, %2, %3;"
+      OS() << MapNames::getDpctNamespace() << "permute_sub_group_by_xor(";
     }
 
-
-
-
-
-
-
+    OS() << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), " << Op[0]
+         << ", " << Op[1] << ")";
 
     endstmt();
     return SYCLGenSuccess();
@@ -2766,7 +2696,6 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
-  printf("ASM string input: [%s]\n", Buffer.c_str());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
