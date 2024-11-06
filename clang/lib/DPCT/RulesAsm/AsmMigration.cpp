@@ -1089,6 +1089,10 @@ protected:
     return SYCLGenSuccess();
   }
 
+  bool handle_add(const InlineAsmInstruction *Inst) override {
+    return HandleAddSub(Inst);
+  }
+
   bool handle_shfl(const InlineAsmInstruction *Inst) override {
     if (Inst->getNumInputOperands() != 3 || Inst->getNumTypes() != 1)
       return SYCLGenError();
