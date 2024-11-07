@@ -1198,6 +1198,14 @@ protected:
   }
 
   bool handle_shfl(const InlineAsmInstruction *Inst) override {
+
+    if (DpctGlobalInfo::useSYCLCompat()) {
+      report(Diagnostics::UNSUPPORT_SYCLCOMPAT, /*UseTextBegin=*/true,
+             GAS->getAsmString()->getString());
+      cutOffMigration();
+      return SYCLGenSuccess();
+    }
+
     if (Inst->getNumInputOperands() == 4 && Inst->getNumTypes() == 1 &&
         Inst->hasAttr(InstAttr::sync)) {
       return HandleShfulSyncOp(Inst);
