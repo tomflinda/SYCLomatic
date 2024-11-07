@@ -1093,69 +1093,69 @@ protected:
     return HandleAddSub(Inst);
   }
 
-  bool HandleShfulSyncOp(const InlineAsmInstruction *Inst) {
+  bool HandleShflSync(const InlineAsmInstruction *Inst) {
 
     if (emitStmt(Inst->getOutputOperand()))
       return SYCLGenError();
     OS() << " = ";
 
-    if (DpctGlobalInfo::useMaskedSubGroupFunction()) {
+    std::string Op[4];
+    if (tryEmitAllInputOperands(Op, Inst))
+      return SYCLGenError();
 
-      std::string Op[4];
-      if (tryEmitAllInputOperands(Op, Inst))
-        return SYCLGenError();
+    OS() << MapNames::getDpctNamespace();
+
+    if (DpctGlobalInfo::useMaskedSubGroupFunction()) {
+      OS() << "experimental::";
       if (Inst->hasAttr(InstAttr::up)) {
         // to handle "shfl.up.b32 %0, %1, %2, %3;"
-        OS() << MapNames::getDpctNamespace()
-             << "experimental::" << "shift_sub_group_right(" << Op[3] << ", ";
+        OS() << "shift_sub_group_right(" << Op[3] << ", ";
       } else if (Inst->hasAttr(InstAttr::down)) {
         // to handle "shfl.down.b32 %0, %1, %2, %3;"
-        OS() << MapNames::getDpctNamespace()
-             << "experimental::" << "shift_sub_group_left(" << Op[3] << ", ";
+        OS() << "shift_sub_group_left(" << Op[3] << ", ";
       } else if (Inst->hasAttr(InstAttr::idx)) {
         // to handle "shfl.sync.idx.b32 %0, %1, %2, %3, %4;"
-        OS() << MapNames::getDpctNamespace()
-             << "experimental::" << "select_from_sub_group(" << Op[3] << ", ";
+        OS() << "select_from_sub_group(" << Op[3] << ", ";
       } else if (Inst->hasAttr(InstAttr::bfly)) {
         // to handle "shfl.bfly.b32 %0, %1, %2, %3;"
-        OS() << MapNames::getDpctNamespace()
-             << "experimental::" << "permute_sub_group_by_xor(" << Op[3]
-             << ", ";
+        OS() << "permute_sub_group_by_xor(" << Op[3] << ", ";
       }
 
       OS() << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), " << Op[0]
            << ", " << Op[1] << ")";
     } else {
-      std::string Op[4];
-      if (tryEmitAllInputOperands(Op, Inst))
-        return SYCLGenError();
-
-      std::string WarningMsg =
+      llvm::StringRef Str =
           ". You can specify "
           "\"--use-experimental-features=masked-sub-group-operation\" to "
-          "use the experimental helper function to migrate inline PTX asm "
+          "use the experimental helper function to migrate inline asm "
           "instruction ";
+
+      auto CommonStr = llvm::Twine(Str)
+                           .concat("\"")
+                           .concat(GAS->getAsmString()->getString())
+                           .concat("\"")
+                           .str();
 
       if (Inst->hasAttr(InstAttr::up)) {
         // to handle "shfl.sync.up.b32 %0, %1, %2, %3, %4;"
         report(Diagnostics::MASK_UNSUPPORTED, true,
-               "shift_sub_group_right" + WarningMsg + "shfl.sync.up.b32");
-        OS() << MapNames::getDpctNamespace() << "shift_sub_group_right(";
+               llvm::Twine("shift_sub_group_right").concat(CommonStr).str());
+        OS() << "shift_sub_group_right(";
       } else if (Inst->hasAttr(InstAttr::down)) {
         // to handle "shfl.sync.down.b32 %0, %1, %2, %3, %4;"
         report(Diagnostics::MASK_UNSUPPORTED, true,
-               "shift_sub_group_left" + WarningMsg + "shfl.sync.down.b32");
-        OS() << MapNames::getDpctNamespace() << "shift_sub_group_left(";
+               llvm::Twine("shift_sub_group_left").concat(CommonStr).str());
+        OS() << "shift_sub_group_left(";
       } else if (Inst->hasAttr(InstAttr::idx)) {
         // to handle "shfl.sync.idx.b32 %0, %1, %2, %3, %4;"
         report(Diagnostics::MASK_UNSUPPORTED, true,
-               "select_from_sub_group" + WarningMsg + "shfl.sync.idx.b32");
-        OS() << MapNames::getDpctNamespace() << "select_from_sub_group(";
+               llvm::Twine("select_from_sub_group").concat(CommonStr).str());
+        OS() << "select_from_sub_group(";
       } else if (Inst->hasAttr(InstAttr::bfly)) {
         // to handle "shfl.sync.bfly.b32 %0, %1, %2, %3, %4;"
         report(Diagnostics::MASK_UNSUPPORTED, true,
-               "permute_sub_group_by_xor" + WarningMsg + "shfl.sync.bfly.b32");
-        OS() << MapNames::getDpctNamespace() << "permute_sub_group_by_xor(";
+               llvm::Twine("permute_sub_group_by_xor").concat(CommonStr).str());
+        OS() << "permute_sub_group_by_xor(";
       }
 
       OS() << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), " << Op[0]
@@ -1163,11 +1163,10 @@ protected:
     }
 
     endstmt();
-
     return SYCLGenSuccess();
   }
 
-  bool HandleShfulNotSyncOp(const InlineAsmInstruction *Inst) {
+  bool HandleShfl(const InlineAsmInstruction *Inst) {
     if (emitStmt(Inst->getOutputOperand()))
       return SYCLGenError();
     OS() << " = ";
@@ -1176,18 +1175,19 @@ protected:
     if (tryEmitAllInputOperands(Op, Inst))
       return SYCLGenError();
 
+    OS() << MapNames::getDpctNamespace();
     if (Inst->hasAttr(InstAttr::up)) {
       // to handle "shfl.up.b32 %0, %1, %2, %3;"
-      OS() << MapNames::getDpctNamespace() << "shift_sub_group_right(";
+      OS() << "shift_sub_group_right(";
     } else if (Inst->hasAttr(InstAttr::down)) {
       // to handle "shfl.down.b32 %0, %1, %2, %3;"
-      OS() << MapNames::getDpctNamespace() << "shift_sub_group_left(";
+      OS() << "shift_sub_group_left(";
     } else if (Inst->hasAttr(InstAttr::idx)) {
       // to handle "shfl.idx.b32 %0, %1, %2, %3;"
-      OS() << MapNames::getDpctNamespace() << "select_from_sub_group(";
+      OS() << "select_from_sub_group(";
     } else if (Inst->hasAttr(InstAttr::bfly)) {
       // to handle "shfl.bfly.b32 %0, %1, %2, %3;"
-      OS() << MapNames::getDpctNamespace() << "permute_sub_group_by_xor(";
+      OS() << "permute_sub_group_by_xor(";
     }
 
     OS() << DpctGlobalInfo::getItem(GAS) << ".get_sub_group(), " << Op[0]
@@ -1208,12 +1208,12 @@ protected:
 
     if (Inst->getNumInputOperands() == 4 && Inst->getNumTypes() == 1 &&
         Inst->hasAttr(InstAttr::sync)) {
-      return HandleShfulSyncOp(Inst);
+      return HandleShflSync(Inst);
     }
 
     if (Inst->getNumInputOperands() == 3 && Inst->getNumTypes() == 1 &&
         !Inst->hasAttr(InstAttr::sync)) {
-      return HandleShfulNotSyncOp(Inst);
+      return HandleShfl(Inst);
     }
 
     return SYCLGenError();
