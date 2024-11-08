@@ -1225,7 +1225,6 @@ protected:
 
     OS() << MapNames::getClNamespace() << "atomic_fence(";
     if (Inst->hasAttr(InstAttr::sc) && Inst->hasAttr(InstAttr::cta)) {
-
       OS() << MapNames::getClNamespace() << "memory_order::seq_cst,"
            << MapNames::getClNamespace() << "memory_scope::work_group";
 
@@ -1252,7 +1251,7 @@ protected:
       SYCLGenError();
     }
 
-    OS() << ")";
+    OS() << ')';
     endstmt();
     return SYCLGenSuccess();
   }
