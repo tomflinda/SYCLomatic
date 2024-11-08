@@ -1260,6 +1260,31 @@ protected:
     return HandleAddSub(Inst);
   }
 
+  bool handle_membar(const InlineAsmInstruction *Inst) override {
+    if (Inst->getNumInputOperands() != 0)
+      return SYCLGenError();
+
+    if (!DpctGlobalInfo::useRootGroup() && Inst->hasAttr(InstAttr::gl)) {
+      report(Diagnostics::ND_RANGE_BARRIER, true,
+             GAS->getAsmString()->getString());
+      cutOffMigration();
+      return SYCLGenSuccess();
+    }
+
+    OS() << MapNames::getClNamespace() << "group_barrier("
+         << DpctGlobalInfo::getItem(GAS);
+    if (Inst->hasAttr(InstAttr::cta)) {
+      OS() << ".get_group()";
+    } else if (Inst->hasAttr(InstAttr::gl)) {
+      OS() << ".ext_oneapi_get_root_group()";
+    } else {
+      return SYCLGenError();
+    }
+    OS() << ')';
+    endstmt();
+    return SYCLGenSuccess();
+  }
+
   StringRef GetWiderTypeAsString(const InlineAsmBuiltinType *Type) const {
     switch (Type->getKind()) {
     case InlineAsmBuiltinType::s16:
