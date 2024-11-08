@@ -1223,38 +1223,36 @@ protected:
     if (Inst->getNumInputOperands() != 0)
       return SYCLGenError();
 
+    OS() << MapNames::getClNamespace() << "atomic_fence(";
     if (Inst->hasAttr(InstAttr::sc) && Inst->hasAttr(InstAttr::cta)) {
-      OS() << MapNames::getClNamespace() << "atomic_fence("
-           << MapNames::getClNamespace() << "memory_order::seq_cst,"
-           << MapNames::getClNamespace() << "memory_scope::work_group)";
+
+      OS() << MapNames::getClNamespace() << "memory_order::seq_cst,"
+           << MapNames::getClNamespace() << "memory_scope::work_group";
 
     } else if (Inst->hasAttr(InstAttr::sc) && Inst->hasAttr(InstAttr::gpu)) {
-      OS() << MapNames::getClNamespace() << "atomic_fence("
-           << MapNames::getClNamespace() << "memory_order::seq_cst,"
-           << MapNames::getClNamespace() << "memory_scope::device)";
+      OS() << MapNames::getClNamespace() << "memory_order::seq_cst,"
+           << MapNames::getClNamespace() << "memory_scope::device";
     } else if (Inst->hasAttr(InstAttr::sc) && Inst->hasAttr(InstAttr::sys)) {
-      OS() << MapNames::getClNamespace() << "atomic_fence("
-           << MapNames::getClNamespace() << "memory_order::seq_cst,"
-           << MapNames::getClNamespace() << "memory_scope::system)";
+      OS() << MapNames::getClNamespace() << "memory_order::seq_cst,"
+           << MapNames::getClNamespace() << "memory_scope::system";
     } else if (Inst->hasAttr(InstAttr::acq_rel) &&
                Inst->hasAttr(InstAttr::cta)) {
-      OS() << MapNames::getClNamespace() << "atomic_fence("
-           << MapNames::getClNamespace() << "memory_order::acq_rel,"
-           << MapNames::getClNamespace() << "memory_scope::work_group)";
+      OS() << MapNames::getClNamespace() << "memory_order::acq_rel,"
+           << MapNames::getClNamespace() << "memory_scope::work_group";
 
     } else if (Inst->hasAttr(InstAttr::acq_rel) &&
                Inst->hasAttr(InstAttr::gpu)) {
-      OS() << MapNames::getClNamespace() << "atomic_fence("
-           << MapNames::getClNamespace() << "memory_order::acq_rel,"
-           << MapNames::getClNamespace() << "memory_scope::device)";
+      OS() << MapNames::getClNamespace() << "memory_order::acq_rel,"
+           << MapNames::getClNamespace() << "memory_scope::device";
     } else if (Inst->hasAttr(InstAttr::acq_rel) &&
                Inst->hasAttr(InstAttr::sys)) {
-      OS() << MapNames::getClNamespace() << "atomic_fence("
-           << MapNames::getClNamespace() << "memory_order::acq_rel,"
-           << MapNames::getClNamespace() << "memory_scope::system)";
+      OS() << MapNames::getClNamespace() << "memory_order::acq_rel,"
+           << MapNames::getClNamespace() << "memory_scope::system";
     } else {
       SYCLGenError();
     }
+
+    OS() << ")";
     endstmt();
     return SYCLGenSuccess();
   }
