@@ -1227,7 +1227,6 @@ protected:
     if (Inst->hasAttr(InstAttr::sc) && Inst->hasAttr(InstAttr::cta)) {
       OS() << MapNames::getClNamespace() << "memory_order::seq_cst,"
            << MapNames::getClNamespace() << "memory_scope::work_group";
-
     } else if (Inst->hasAttr(InstAttr::sc) && Inst->hasAttr(InstAttr::gpu)) {
       OS() << MapNames::getClNamespace() << "memory_order::seq_cst,"
            << MapNames::getClNamespace() << "memory_scope::device";
@@ -1248,7 +1247,7 @@ protected:
       OS() << MapNames::getClNamespace() << "memory_order::acq_rel,"
            << MapNames::getClNamespace() << "memory_scope::system";
     } else {
-      SYCLGenError();
+      return SYCLGenError();
     }
 
     OS() << ')';
@@ -1264,22 +1263,19 @@ protected:
     if (Inst->getNumInputOperands() != 0)
       return SYCLGenError();
 
-    if (!DpctGlobalInfo::useRootGroup() && Inst->hasAttr(InstAttr::gl)) {
-      report(Diagnostics::ND_RANGE_BARRIER, true,
-             GAS->getAsmString()->getString());
-      cutOffMigration();
-      return SYCLGenSuccess();
-    }
+    OS() << MapNames::getClNamespace() << "atomic_fence("
+         << MapNames::getClNamespace() << "memory_order::seq_cst,";
 
-    OS() << MapNames::getClNamespace() << "group_barrier("
-         << DpctGlobalInfo::getItem(GAS);
     if (Inst->hasAttr(InstAttr::cta)) {
-      OS() << ".get_group()";
+      OS() << MapNames::getClNamespace() << "memory_scope::work_group";
     } else if (Inst->hasAttr(InstAttr::gl)) {
-      OS() << ".ext_oneapi_get_root_group()";
+      OS() << MapNames::getClNamespace() << "memory_scope::device";
+    } else if (Inst->hasAttr(InstAttr::sys)) {
+      OS() << MapNames::getClNamespace() << "memory_scope::system";
     } else {
       return SYCLGenError();
     }
+
     OS() << ')';
     endstmt();
     return SYCLGenSuccess();
