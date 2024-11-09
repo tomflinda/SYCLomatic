@@ -1,6 +1,6 @@
 // UNSUPPORTED: cuda-8.0, cuda-9.0, cuda-9.1, cuda-9.2, cuda-10.0, cuda-10.1, cuda-10.2
 // UNSUPPORTED: v8.0, v9.0, v9.1, v9.2, v10.0, v10.1, v10.2
-// RUN: dpct --format-range=none -out-root %T/membar_fence %s --cuda-include-path="%cuda-path/include" -- -std=c++14 -x cuda --cuda-host-only
+// RUN: dpct --use-experimental-features=root-group --format-range=none -out-root %T/membar_fence %s --cuda-include-path="%cuda-path/include" -- -std=c++14 -x cuda --cuda-host-only
 // RUN: FileCheck %s --match-full-lines --input-file %T/membar_fence/membar_fence.dp.cpp
 // RUN: %if build_lit %{icpx -c -fsycl %T/membar_fence/membar_fence.dp.cpp -o %T/membar_fence/membar_fence.dp.o %}
 
@@ -26,6 +26,20 @@ __global__ void fence() {
 
   // CHECK: sycl::atomic_fence(sycl::memory_order::acq_rel,sycl::memory_scope::system);
   asm volatile("fence.acq_rel.sys; " : : : "memory");
+}
+
+__global__ void membar() {
+
+  // CHECK: sycl::group_barrier(item_ct1.get_group());
+  asm volatile("membar.cta;":::"memory"); 
+
+  // CHECK: sycl::group_barrier(item_ct1.ext_oneapi_get_root_group());
+  asm volatile("membar.gl;":::"memory"); 
+
+  // CHECK: /*
+  // CHECK-NEXT: DPCT1053:{{[0-9]+}}: Migration of device assembly code is not supported.
+  // CHECK-NEXT: */
+  asm volatile("membar.sys;":::"memory");
 }
 
 // clang-format off
