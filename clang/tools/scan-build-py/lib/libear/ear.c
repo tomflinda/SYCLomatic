@@ -1715,8 +1715,8 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
 #endif // SYCLomatic_CUSTOMIZATION
 
 #ifdef SYCLomatic_CUSTOMIZATION
-int is_tool_available(const char *pathname) {
-
+int is_tool_available(char const *argv[], size_t const argc) {
+  const char *pathname = argv[0];
   int len = strlen(pathname);
   int is_nvcc = 0;
   int is_nvcc_available = 0;
@@ -1801,7 +1801,7 @@ static void bear_report_call(char const *fun, char const *const argv[]) {
 
   emit_cmake_warning(argv, argc);
 
-  if (is_tool_available(argv[0])) {
+  if (is_tool_available(argv, argc)) {
     for (size_t it = 0; it < argc; ++it) {
       fprintf(fd, "%s%c", argv[it], US);
     }
