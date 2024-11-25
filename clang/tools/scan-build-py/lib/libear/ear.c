@@ -503,6 +503,100 @@ int eaccess(const char *pathname, int mode) {
   return call_eaccess(pathname, mode);
 }
 
+const char *get_intercept_stub_path(void) {
+  char replacement[PATH_MAX];
+  char file_path[PATH_MAX];
+
+  FILE *fp = popen("which dpct", "r");
+  if (fp == NULL) {
+    perror("bear: failed to run command 'which dpct'\n");
+    exit(EXIT_FAILURE);
+  }
+
+  if (fgets(replacement, PATH_MAX, fp) == NULL) {
+    perror("bear: fgets\n");
+    exit(EXIT_FAILURE);
+  }
+  pclose(fp);
+  replacement[strlen(replacement) - 1] =
+      '\0'; // to remove extra '\n' added by "which dpct"
+
+  char *res = realpath(
+      replacement,
+      file_path); // to get the canonicalized absolute pathname in file_path
+
+  if (!res) {
+    perror("bear: realpath\n");
+    exit(EXIT_FAILURE);
+  }
+  if ((strlen(file_path) + strlen("lib/libear/intercept-stub") -
+       strlen("bin/dpct")) >= PATH_MAX) {
+    perror("bear: strcpy overflow, path to dpct is too long.\n");
+    exit(EXIT_FAILURE);
+  }
+  strcpy(file_path + strlen(file_path) - strlen("bin/dpct"),
+         "lib/libear/intercept-stub");
+
+  // To malloc required size of physical memory it really needs may fail in
+  // some case, so malloc 4K bytes (one physical page) instead.
+  char *buffer = (char *)malloc(4096);
+  if (buffer == NULL) {
+    perror("bear: malloc memory fail.");
+    exit(EXIT_FAILURE);
+  }
+
+  memcpy(buffer, file_path, strlen(file_path));
+
+  return buffer;
+}
+
+static int call_stat(const char *pathname, struct stat *statbuf) {
+  typedef int (*func)(const char *, struct statbuf *);
+  DLSYM(func, fp, "stat");
+  int const result = (*fp)(pathname, statbuf);
+  return result;
+}
+
+int stat(const char *pathname, struct stat *statbuf) {
+  int len = strlen(pathname);
+  if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
+      pathname[1] == 'v' && pathname[0] == 'n') {
+    // To handle case like "nvcc foo.cu ..."
+
+    {
+      FILE *fd = fopen("./lock_log.txt", "a+");
+      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
+
+      pathname = get_intercept_stub_path();
+      stat(pathname, statbuf);
+
+      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
+      fclose(fd);
+    }
+
+    return 0;
+  }
+  if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
+      pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
+      pathname[len - 5] == '/') {
+    // To handle case like "/path/to/nvcc foo.cu ..."
+
+    {
+      FILE *fd = fopen("./lock_log.txt", "a+");
+      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
+
+      pathname = get_intercept_stub_path();
+      stat(pathname, statbuf);
+
+      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
+      fclose(fd);
+    }
+
+    return 0;
+  }
+  return call_stat(pathname, statbuf);
+}
+
 /*
 * The content of g_data[] comes from hex dump of file foo.a,
 * where foo.c is a empty file. It comes from the following steps
@@ -1684,57 +1778,61 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
 #endif // SYCLomatic_CUSTOMIZATION
 
 #ifdef SYCLomatic_CUSTOMIZATION
-int is_tool_available(const char *pathname) {
-
+int is_tool_available(char const *argv[], size_t const argc) {
+  const char *pathname = argv[0];
+  const char *tmp_file = "/tmp/is_nvcc_available.txt";
   int len = strlen(pathname);
-  int is_nvcc = 0;
+  int is_nvcc_compiler = 0;
+  int is_nvcc_compiler_available = 0;
   if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc"
-    is_nvcc = 1;
+    is_nvcc_compiler = 1;
   }
-
   if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
       pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc"
-    is_nvcc = 1;
+    is_nvcc_compiler = 1;
   }
+  if (is_nvcc_compiler) {
+    FILE *file = fopen(tmp_file, "r");
+    if (file != NULL) {
+      (void)fscanf(file, "%d", &is_nvcc_compiler_available);
+      fclose(file);
+    }
 
-  if (is_nvcc) {
-    int idx = len - 4;
-    for (; idx > 0 && !isspace(pathname[idx]); idx--)
-      ;
-    struct stat buffer;
-    if (stat(pathname + idx, &buffer) == 0) {
+    if (is_nvcc_compiler_available) {
       return 1;
     }
     return 0;
   }
-
   int is_ld = 0;
   if (len == 2 && pathname[1] == 'd' && pathname[0] == 'l') {
     // To handle case like "ld"
     is_ld = 1;
   }
-
   if (len > 2 && pathname[len - 1] == 'd' && pathname[len - 2] == 'l' &&
       pathname[len - 3] == '/') {
     // To handle case like "/path/to/ld"
     is_ld = 1;
   }
-
   if (is_ld) {
-    int idx = len - 2;
-    for (; idx > 0 && !isspace(pathname[idx]); idx--)
-      ;
-    struct stat buffer;
-    if (stat(pathname + idx, &buffer) == 0) {
-      return 1;
+    FILE *file = fopen(tmp_file, "r");
+    if (file != NULL) {
+      (void)fscanf(file, "%d", &is_nvcc_compiler_available);
+      fclose(file);
     }
-    return 0;
+    if (!is_nvcc_compiler_available) {
+      for (size_t idx = 0; idx < argc; idx++) {
+        // if ld linker command uses cuda libarary like libcuda.so or
+        // libcudart.so, then the ld command should be intercepted.
+        if (strcmp(argv[idx], "-lcudart") == 0 ||
+            strcmp(argv[idx], "-lcuda") == 0)
+          return 0;
+      }
+    } 
   }
-
   return 1;
 }
 
@@ -1792,7 +1890,7 @@ static void bear_report_call(char const *fun, char const *const argv[]) {
 
   emit_cmake_warning(argv, argc);
 
-  if (is_tool_available(argv[0])) {
+  if (is_tool_available(argv, argc)) {
     for (size_t it = 0; it < argc; ++it) {
       fprintf(fd, "%s%c", argv[it], US);
     }
