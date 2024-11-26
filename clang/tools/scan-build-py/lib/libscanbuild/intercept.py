@@ -169,63 +169,48 @@ def capture(args):
         with open(args.cdb, "w+") as handle:
             json.dump(entries, handle, sort_keys=True, indent=4)
 
-        tmp_file = "/tmp/is_nvcc_available.txt" # temp file is created by libear.so
-        if os.path.exists(tmp_file):
-            os.remove(tmp_file)
         return exit_code
 
 
 # SYCLomatic_CUSTOMIZATION begin
-def find_nvcc_in_path():
-    """Check if nvcc is available in the PATH environment variable."""
-    result = subprocess.run(['which', 'nvcc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    if result.returncode == 0:
-        logging.debug("nvcc is found in PATH.")
-        logging.debug("Version information:")
-        print(result.stdout)
-        return True
-    else:
-        logging.debug("nvcc is not found in PATH.")
-        return False
+def set_system_environment_variable(variable_name, value):
+    """Set an environment variable and ensure it is available to other processes."""
+    try:
+        os.environ[variable_name] = value
+        export_command = f'export {variable_name}="{value}"'
+        subprocess.run(export_command, shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        logging.debug(f"Error while exporting the environment variable: {e}")
+    except Exception as e:
+        logging.debug(f"An error occurred: {e}")
 
+def find_nvcc_and_set_env_variable():
+    """Check if nvcc is available and set environment variable."""
+    # Check if nvcc exists in the path of environment PATH
+    nvcc_path = None
+    for path in os.environ.get("PATH", "").split(os.pathsep):
+        possible_path = os.path.join(path, "nvcc")
+        if os.path.isfile(possible_path) and os.access(possible_path, os.X_OK):
+            nvcc_path = possible_path
+            break
 
-def find_nvcc_in_default_directories():
-    """Search for nvcc in common CUDA installation directories."""
+    if nvcc_path:
+        set_system_environment_variable("NVCC_PATH", nvcc_path)
+        return
+
+    # Search for nvcc in CUDA SDK default installation directories.
     # Look for directories like /usr/local/cuda-*
     cuda_dirs = glob.glob("/usr/local/cuda-*")
-
     for cuda_dir in cuda_dirs:
-        nvcc_path = os.path.join(cuda_dir, "bin", "nvcc")
-        if os.path.isfile(nvcc_path) and os.access(nvcc_path, os.X_OK):
-            logging.debug(f"nvcc is found at {nvcc_path}.")
-            # Run 'nvcc --version' to verify it works
-            result = subprocess.run([nvcc_path, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            if result.returncode == 0:
-                logging.debug(result.stdout)
-                return True
-            else:
-                logging.debug(f"nvcc exists at {nvcc_path} but could not run properly.")
-                if result.stderr:
-                    logging.debug("Error:", result.stderr)
-                return False
+        possible_path = os.path.join(cuda_dir, "bin", "nvcc")
+        if os.path.isfile(possible_path) and os.access(possible_path, os.X_OK):
+            nvcc_path = possible_path
+            break
 
-    logging.debug("nvcc is not found in any CUDA installation directory.")
-    return False
+    if nvcc_path:
+        set_system_environment_variable("NVCC_PATH", nvcc_path)
+        return
 
-def save_nvcc_available_info_disk(filename, integer_value):
-    """Create a file in /tmp/ and write an integer to it."""
-    # Ensure the value is an integer
-    if not isinstance(integer_value, int):
-        raise ValueError("The value provided is not an integer.")
-
-    # Define the full path for the file
-    file_path = os.path.join("/tmp", filename)
-
-    # Open the file in write mode and write the integer
-    with open(file_path, 'w') as file:
-        file.write(f"{integer_value}\n")
-
-    logging.debug(f"Successfully wrote {integer_value} to {file_path}")
 # SYCLomatic_CUSTOMIZATION end
 
 def setup_environment(args, destination):
@@ -237,12 +222,8 @@ def setup_environment(args, destination):
 
     # SYCLomatic_CUSTOMIZATION begin
     # if nvcc is available in the PATH environment variable or in default
-    # CUDA installation directories, write 1 to a file "/tmp/is_nvcc_available.txt"
-    # else wirte 0 to the file.
-    if find_nvcc_in_path() or find_nvcc_in_default_directories():
-        save_nvcc_available_info_disk("is_nvcc_available.txt", 1)
-    else:
-        save_nvcc_available_info_disk("is_nvcc_available.txt", 0)
+    # CUDA installation directories, set envrionment NVCC_PATH used in 'libear'.
+    find_nvcc_and_set_env_variable()
     # SYCLomatic_CUSTOMIZATION end
 
     c_compiler = args.cc if "cc" in args else "cc"

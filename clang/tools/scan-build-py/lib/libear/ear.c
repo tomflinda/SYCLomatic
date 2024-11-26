@@ -1732,51 +1732,47 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
 
 #ifdef SYCLomatic_CUSTOMIZATION
 int is_tool_available(char const *argv[], size_t const argc) {
+
   const char *pathname = argv[0];
-  const char *tmp_file = "/tmp/is_nvcc_available.txt";
   int len = strlen(pathname);
-  int is_nvcc_compiler = 0;
-  int is_nvcc_compiler_available = 0;
+  int is_nvcc = 0;
+  int is_nvcc_available = 0;
+
+  const char *env_var = "NVCC_PATH";
+  char *value = getenv(env_var);
+  if (value) {
+    is_nvcc_available = 1;
+  }
+
   if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc"
-    is_nvcc_compiler = 1;
+    is_nvcc = 1;
   }
   if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
       pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc"
-    is_nvcc_compiler = 1;
+    is_nvcc = 1;
   }
-  if (is_nvcc_compiler) {
-    FILE *file = fopen(tmp_file, "r");
-    if (file != NULL) {
-      (void)fscanf(file, "%d", &is_nvcc_compiler_available);
-      fclose(file);
-    }
-
-    if (is_nvcc_compiler_available) {
+  if (is_nvcc) {
+    if (is_nvcc_available) {
       return 1;
     }
     return 0;
   }
-  int is_ld_command = 0;
+  int is_ld = 0;
   if (len == 2 && pathname[1] == 'd' && pathname[0] == 'l') {
     // To handle case like "ld"
-    is_ld_command = 1;
+    is_ld = 1;
   }
   if (len > 2 && pathname[len - 1] == 'd' && pathname[len - 2] == 'l' &&
       pathname[len - 3] == '/') {
     // To handle case like "/path/to/ld"
-    is_ld_command = 1;
+    is_ld = 1;
   }
-  if (is_ld_command) {
-    FILE *file = fopen(tmp_file, "r");
-    if (file != NULL) {
-      (void)fscanf(file, "%d", &is_nvcc_compiler_available);
-      fclose(file);
-    }
-    if (!is_nvcc_compiler_available) {
+  if (is_ld) {
+    if (!is_nvcc_available) {
       for (size_t idx = 0; idx < argc; idx++) {
         // if ld linker command uses cuda libarary like libcuda.so or
         // libcudart.so, then the ld command should be intercepted.
@@ -1784,7 +1780,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
             strcmp(argv[idx], "-lcuda") == 0)
           return 0;
       }
-    } 
+    }
   }
   return 1;
 }
