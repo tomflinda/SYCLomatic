@@ -122,7 +122,6 @@ def capture(args):
         entries_post = []
         occur_set = set()
         for entry in entries:
-            print("commmand Line:", entry["command"])
             # filter out the commmands that use /tmp/ directory
             if " /tmp/" in entry["command"]:
                 continue
@@ -181,12 +180,12 @@ def find_nvcc_in_path():
     """Check if nvcc is available in the PATH environment variable."""
     result = subprocess.run(['which', 'nvcc'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode == 0:
-        print("nvcc is found in PATH.")
-        print("Version information:")
+        logging.debug("nvcc is found in PATH.")
+        logging.debug("Version information:")
         print(result.stdout)
         return True
     else:
-        print("nvcc is not found in PATH.")
+        logging.debug("nvcc is not found in PATH.")
         return False
 
 
@@ -198,21 +197,19 @@ def find_nvcc_in_default_directories():
     for cuda_dir in cuda_dirs:
         nvcc_path = os.path.join(cuda_dir, "bin", "nvcc")
         if os.path.isfile(nvcc_path) and os.access(nvcc_path, os.X_OK):
-            print(f"nvcc is found at {nvcc_path}.")
+            logging.debug(f"nvcc is found at {nvcc_path}.")
             # Run 'nvcc --version' to verify it works
             result = subprocess.run([nvcc_path, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             if result.returncode == 0:
-                print("nvcc is installed and functional.")
-                print("Version information:")
-                print(result.stdout)
+                logging.debug(result.stdout)
                 return True
             else:
-                print(f"nvcc exists at {nvcc_path} but could not run properly.")
+                logging.debug(f"nvcc exists at {nvcc_path} but could not run properly.")
                 if result.stderr:
-                    print("Error:", result.stderr)
+                    logging.debug("Error:", result.stderr)
                 return False
 
-    print("nvcc is not found in any CUDA installation directory.")
+    logging.debug("nvcc is not found in any CUDA installation directory.")
     return False
 
 def write_integer_to_tmp_file(filename, integer_value):
@@ -228,7 +225,7 @@ def write_integer_to_tmp_file(filename, integer_value):
     with open(file_path, 'w') as file:
         file.write(f"{integer_value}\n")
 
-    print(f"Successfully wrote {integer_value} to {file_path}")
+    logging.debug(f"Successfully wrote {integer_value} to {file_path}")
 # SYCLomatic_CUSTOMIZATION end
 
 def setup_environment(args, destination):
@@ -242,7 +239,6 @@ def setup_environment(args, destination):
     # if nvcc is available in the PATH environment variable or in default
     # CUDA installation directories, write 1 to a file "/tmp/is_nvcc_available.txt"
     if find_nvcc_in_path() or find_nvcc_in_default_directories():
-        print("nvcc is available.")
         write_integer_to_tmp_file("is_nvcc_available.txt", 1)
     # SYCLomatic_CUSTOMIZATION end
 
