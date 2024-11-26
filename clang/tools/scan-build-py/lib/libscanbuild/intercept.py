@@ -212,7 +212,7 @@ def find_nvcc_in_default_directories():
     logging.debug("nvcc is not found in any CUDA installation directory.")
     return False
 
-def write_integer_to_tmp_file(filename, integer_value):
+def save_nvcc_available_info_disk(filename, integer_value):
     """Create a file in /tmp/ and write an integer to it."""
     # Ensure the value is an integer
     if not isinstance(integer_value, int):
@@ -238,8 +238,11 @@ def setup_environment(args, destination):
     # SYCLomatic_CUSTOMIZATION begin
     # if nvcc is available in the PATH environment variable or in default
     # CUDA installation directories, write 1 to a file "/tmp/is_nvcc_available.txt"
+    # else wirte 0 to the file.
     if find_nvcc_in_path() or find_nvcc_in_default_directories():
-        write_integer_to_tmp_file("is_nvcc_available.txt", 1)
+        save_nvcc_available_info_disk("is_nvcc_available.txt", 1)
+    else:
+        save_nvcc_available_info_disk("is_nvcc_available.txt", 0)
     # SYCLomatic_CUSTOMIZATION end
 
     c_compiler = args.cc if "cc" in args else "cc"
