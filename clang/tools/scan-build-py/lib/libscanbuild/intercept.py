@@ -171,9 +171,8 @@ def capture(args):
 
         return exit_code
 
-
 # SYCLomatic_CUSTOMIZATION begin
-def set_system_environment_variable(variable_name, value):
+def set_sys_env_var(variable_name, value):
     """Set an environment variable and ensure it is available to other processes."""
     try:
         os.environ[variable_name] = value
@@ -224,6 +223,12 @@ def setup_environment(args, destination):
     # if nvcc is available in the PATH environment variable or in default
     # CUDA installation directories, set envrionment NVCC_PATH used in 'libear'.
     find_nvcc_and_set_env_variable()
+
+    cur_dir = os.path.dirname(sys.argv[0])
+    file_path_1 = os.path.join(cur_dir, "..", "lib", "libear","intercept-stub")
+    file_path_2 = os.path.join(cur_dir, "..", "opt", "dpct", "lib", "libear","intercept-stub")
+    intercept_stub_path = file_path_1 if os.access(file_path_1, os.X_OK) else file_path_2
+    set_sys_env_var("INTERCEPT_STUB_PATH", intercept_stub_path)
     # SYCLomatic_CUSTOMIZATION end
 
     c_compiler = args.cc if "cc" in args else "cc"

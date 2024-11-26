@@ -488,66 +488,42 @@ static int call_eaccess(const char *pathname, int mode) {
 }
 
 int eaccess(const char *pathname, int mode) {
+  if (call_eaccess(pathname, mode) == 0) {
+    return 0;
+  }
+
   int len = strlen(pathname);
   if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc foo.cu ..."
-    return 0;
+    const char *nvcc_path = getenv("NVCC_PATH");
+    if (nvcc_path) {
+      pathname = nvcc_path;
+    }
   }
   if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
       pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc foo.cu ..."
-    return 0;
+    const char *nvcc_path = getenv("NVCC_PATH");
+    if (nvcc_path) {
+      pathname = nvcc_path;
+    }
   }
-  return call_eaccess(pathname, mode);
+  return 0;
 }
 
 const char *get_intercept_stub_path(void) {
-  char replacement[PATH_MAX];
-  char file_path[PATH_MAX];
 
-  FILE *fp = popen("which dpct", "r");
-  if (fp == NULL) {
-    perror("bear: failed to run command 'which dpct'\n");
-    exit(EXIT_FAILURE);
+  const char *intercept_stub_path = getenv("INTERCEPT_STUB_PATH");
+  if (intercept_stub_path) {
+    return intercept_stub_path;
+    return 0;
   }
 
-  if (fgets(replacement, PATH_MAX, fp) == NULL) {
-    perror("bear: fgets\n");
-    exit(EXIT_FAILURE);
-  }
-  pclose(fp);
-  replacement[strlen(replacement) - 1] =
-      '\0'; // to remove extra '\n' added by "which dpct"
-
-  char *res = realpath(
-      replacement,
-      file_path); // to get the canonicalized absolute pathname in file_path
-
-  if (!res) {
-    perror("bear: realpath\n");
-    exit(EXIT_FAILURE);
-  }
-  if ((strlen(file_path) + strlen("lib/libear/intercept-stub") -
-       strlen("bin/dpct")) >= PATH_MAX) {
-    perror("bear: strcpy overflow, path to dpct is too long.\n");
-    exit(EXIT_FAILURE);
-  }
-  strcpy(file_path + strlen(file_path) - strlen("bin/dpct"),
-         "lib/libear/intercept-stub");
-
-  // To malloc required size of physical memory it really needs may fail in
-  // some case, so malloc 4K bytes (one physical page) instead.
-  char *buffer = (char *)malloc(4096);
-  if (buffer == NULL) {
-    perror("bear: malloc memory fail.");
-    exit(EXIT_FAILURE);
-  }
-
-  memcpy(buffer, file_path, strlen(file_path));
-  buffer[strlen(file_path)] = '\0';
-  return buffer;
+  perror("bear: failed to get value of environment variable "
+         "'INTERCEPT_STUB_PATH'\n");
+  exit(EXIT_FAILURE);
 }
 
 static int call_stat(const char *pathname, struct stat *statbuf) {
@@ -558,27 +534,39 @@ static int call_stat(const char *pathname, struct stat *statbuf) {
 }
 
 int stat(const char *pathname, struct stat *statbuf) {
+  if (call_stat(pathname, statbuf) == 0) {
+    return 0;
+  }
   int len = strlen(pathname);
   if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc foo.cu ..."
 
+    const char *nvcc_path = getenv("NVCC_PATH");
+    if (nvcc_path) {
+      pathname = nvcc_path;
+      return 0;
+    }
+
     pathname = get_intercept_stub_path();
     stat(pathname, statbuf);
-
-    return 0;
   }
+
   if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
       pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc foo.cu ..."
 
+    const char *nvcc_path = getenv("NVCC_PATH");
+    if (nvcc_path) {
+      pathname = nvcc_path;
+      return 0;
+    }
+
     pathname = get_intercept_stub_path();
     stat(pathname, statbuf);
-
-    return 0;
   }
-  return call_stat(pathname, statbuf);
+  return 0;
 }
 
 /*
