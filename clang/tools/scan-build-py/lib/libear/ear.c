@@ -546,7 +546,7 @@ const char *get_intercept_stub_path(void) {
   }
 
   memcpy(buffer, file_path, strlen(file_path));
-
+  buffer[strlen(file_path)] = '\0';
   return buffer;
 }
 
@@ -563,16 +563,8 @@ int stat(const char *pathname, struct stat *statbuf) {
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc foo.cu ..."
 
-    {
-      FILE *fd = fopen("./lock_log.txt", "a+");
-      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
-
-      pathname = get_intercept_stub_path();
-      stat(pathname, statbuf);
-
-      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
-      fclose(fd);
-    }
+    pathname = get_intercept_stub_path();
+    stat(pathname, statbuf);
 
     return 0;
   }
@@ -581,16 +573,8 @@ int stat(const char *pathname, struct stat *statbuf) {
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc foo.cu ..."
 
-    {
-      FILE *fd = fopen("./lock_log.txt", "a+");
-      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
-
-      pathname = get_intercept_stub_path();
-      stat(pathname, statbuf);
-
-      fprintf(fd, "stat intercept:%s mode %d\n", pathname, statbuf->st_mode);
-      fclose(fd);
-    }
+    pathname = get_intercept_stub_path();
+    stat(pathname, statbuf);
 
     return 0;
   }
@@ -1710,39 +1694,7 @@ void emit_cmake_warning(char const *argv[], int argc) {
 // returns no return value.
 char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
                           const char *const compiler_array[]) {
-  FILE *fp;
-  char replacement[PATH_MAX];
-  char file_path[PATH_MAX];
-
-  fp = popen("which dpct", "r");
-  if (fp == NULL) {
-    perror("bear: failed to run command 'which dpct'\n");
-    exit(EXIT_FAILURE);
-  }
-
-  if (fgets(replacement, PATH_MAX, fp) == NULL) {
-    perror("bear: fgets\n");
-    exit(EXIT_FAILURE);
-  }
-  pclose(fp);
-  replacement[strlen(replacement) - 1] =
-      '\0'; // to remove extra '\n' added by "which dpct"
-
-  char *res = realpath(
-      replacement,
-      file_path); // to get the canonicalized absolute pathname in file_path
-
-  if (!res) {
-    perror("bear: realpath\n");
-    exit(EXIT_FAILURE);
-  }
-  if ((strlen(file_path) + strlen("lib/libear/intercept-stub") -
-       strlen("bin/dpct")) >= PATH_MAX) {
-    perror("bear: strcpy overflow, path to dpct is too long.\n");
-    exit(EXIT_FAILURE);
-  }
-  strcpy(file_path + strlen(file_path) - strlen("bin/dpct"),
-         "lib/libear/intercept-stub");
+  const char *file_path = get_intercept_stub_path();
 
   // To malloc required size of physical memory it really needs may fail in
   // some case, so malloc 4K bytes (one physical page) instead.
@@ -1772,6 +1724,7 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
   insert_point += strlen(file_path);
   src = pos;
   strcpy(insert_point, src);
+
   return buffer;
 }
 
@@ -1807,17 +1760,17 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
     return 0;
   }
-  int is_ld = 0;
+  int is_ld_command = 0;
   if (len == 2 && pathname[1] == 'd' && pathname[0] == 'l') {
     // To handle case like "ld"
-    is_ld = 1;
+    is_ld_command = 1;
   }
   if (len > 2 && pathname[len - 1] == 'd' && pathname[len - 2] == 'l' &&
       pathname[len - 3] == '/') {
     // To handle case like "/path/to/ld"
-    is_ld = 1;
+    is_ld_command = 1;
   }
-  if (is_ld) {
+  if (is_ld_command) {
     FILE *file = fopen(tmp_file, "r");
     if (file != NULL) {
       (void)fscanf(file, "%d", &is_nvcc_compiler_available);
