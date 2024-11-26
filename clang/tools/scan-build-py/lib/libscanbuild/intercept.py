@@ -194,7 +194,7 @@ def find_nvcc_and_set_env_variable():
             break
 
     if nvcc_path:
-        set_system_environment_variable("NVCC_PATH", nvcc_path)
+        set_sys_env_var("NVCC_PATH", nvcc_path)
         return
 
     # Search for nvcc in CUDA SDK default installation directories.
