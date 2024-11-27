@@ -1717,7 +1717,6 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
 #ifdef SYCLomatic_CUSTOMIZATION
 int is_tool_available(char const *argv[], size_t const argc) {
   const char *pathname = argv[0];
-  const char *tmp_file = "/tmp/is_nvcc_available.txt";
   int len = strlen(pathname);
   int is_nvcc = 0;
   int is_nvcc_available = 0;
