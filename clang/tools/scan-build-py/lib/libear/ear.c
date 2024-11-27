@@ -488,7 +488,8 @@ static int call_eaccess(const char *pathname, int mode) {
 }
 
 int eaccess(const char *pathname, int mode) {
-  if (call_eaccess(pathname, mode) == 0) {
+  int ret = call_eaccess(pathname, mode);
+  if (ret == 0) {
     return 0;
   }
 
@@ -504,7 +505,7 @@ int eaccess(const char *pathname, int mode) {
     // To handle case like "/path/to/nvcc foo.cu ..."
     return 0;
   }
-  return call_eaccess(pathname, mode);
+  return ret;
 }
 
 const char *get_intercept_stub_path(void) {
@@ -527,7 +528,8 @@ static int call_stat(const char *pathname, struct stat *statbuf) {
 }
 
 int stat(const char *pathname, struct stat *statbuf) {
-  if (call_stat(pathname, statbuf) == 0) {
+  int ret = call_stat(pathname, statbuf);
+  if (ret == 0) {
     return 0;
   }
   int len = strlen(pathname);
@@ -537,12 +539,12 @@ int stat(const char *pathname, struct stat *statbuf) {
 
     const char *nvcc_path = getenv("INTERCEPT_COMPILE_PATH");
     if (nvcc_path) {
-      stat(nvcc_path, statbuf);
+      call_stat(nvcc_path, statbuf);
       return 0;
     }
 
     pathname = get_intercept_stub_path();
-    stat(pathname, statbuf);
+    call_stat(pathname, statbuf);
     return 0;
   }
 
@@ -553,15 +555,15 @@ int stat(const char *pathname, struct stat *statbuf) {
 
     const char *nvcc_path = getenv("INTERCEPT_COMPILE_PATH");
     if (nvcc_path) {
-      stat(nvcc_path, statbuf);
+      call_stat(nvcc_path, statbuf);
       return 0;
     }
 
     pathname = get_intercept_stub_path();
-    stat(pathname, statbuf);
+    call_stat(pathname, statbuf);
     return 0;
   }
-  return call_stat(pathname, statbuf);
+  return ret;
 }
 
 /*
