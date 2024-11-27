@@ -496,21 +496,15 @@ int eaccess(const char *pathname, int mode) {
   if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc foo.cu ..."
-    const char *nvcc_path = getenv("NVCC_PATH");
-    if (nvcc_path) {
-      pathname = nvcc_path;
-    }
+    return 0;
   }
   if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
       pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc foo.cu ..."
-    const char *nvcc_path = getenv("NVCC_PATH");
-    if (nvcc_path) {
-      pathname = nvcc_path;
-    }
+    return 0;
   }
-  return 0;
+  return call_eaccess(pathname, mode);
 }
 
 const char *get_intercept_stub_path(void) {
@@ -541,14 +535,15 @@ int stat(const char *pathname, struct stat *statbuf) {
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc foo.cu ..."
 
-    const char *nvcc_path = getenv("NVCC_PATH");
+    const char *nvcc_path = getenv("INTERCEPT_COMPILE_PATH");
     if (nvcc_path) {
-      pathname = nvcc_path;
+      stat(nvcc_path, statbuf);
       return 0;
     }
 
     pathname = get_intercept_stub_path();
     stat(pathname, statbuf);
+    return 0;
   }
 
   if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
@@ -556,16 +551,17 @@ int stat(const char *pathname, struct stat *statbuf) {
       pathname[len - 5] == '/') {
     // To handle case like "/path/to/nvcc foo.cu ..."
 
-    const char *nvcc_path = getenv("NVCC_PATH");
+    const char *nvcc_path = getenv("INTERCEPT_COMPILE_PATH");
     if (nvcc_path) {
-      pathname = nvcc_path;
+      stat(nvcc_path, statbuf);
       return 0;
     }
 
     pathname = get_intercept_stub_path();
     stat(pathname, statbuf);
+    return 0;
   }
-  return 0;
+  return call_stat(pathname, statbuf);
 }
 
 /*
@@ -1723,7 +1719,7 @@ int is_tool_available(const char *pathname) {
   int is_nvcc = 0;
   int is_nvcc_available = 0;
 
-  const char *env_var = "NVCC_PATH";
+  const char *env_var = "INTERCEPT_COMPILE_PATH";
   char *value = getenv(env_var);
   if (value) {
     is_nvcc_available = 1;

@@ -194,7 +194,7 @@ def find_nvcc_and_set_env_variable():
             break
 
     if nvcc_path:
-        set_sys_env_var("NVCC_PATH", nvcc_path)
+        set_sys_env_var("INTERCEPT_COMPILE_PATH", nvcc_path)
         return
 
     # Search for nvcc in CUDA SDK default installation directories.
@@ -207,7 +207,7 @@ def find_nvcc_and_set_env_variable():
             break
 
     if nvcc_path:
-        set_system_environment_variable("NVCC_PATH", nvcc_path)
+        set_system_environment_variable("INTERCEPT_COMPILE_PATH", nvcc_path)
         return
 
 # SYCLomatic_CUSTOMIZATION end
@@ -221,7 +221,7 @@ def setup_environment(args, destination):
 
     # SYCLomatic_CUSTOMIZATION begin
     # if nvcc is available in the PATH environment variable or in default
-    # CUDA installation directories, set envrionment NVCC_PATH used in 'libear'.
+    # CUDA installation directories, set envrionment INTERCEPT_COMPILE_PATH used in 'libear'.
     find_nvcc_and_set_env_variable()
 
     cur_dir = os.path.dirname(sys.argv[0])
