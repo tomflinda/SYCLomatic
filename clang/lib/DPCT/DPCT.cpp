@@ -1181,18 +1181,18 @@ int runDPCT(int argc, const char **argv) {
   // load user defind rules in case.
   if (MigrateBuildScriptOnly ||
       DpctGlobalInfo::getBuildScript() == BuildScriptKind::BS_Cmake) {
-    SmallString<128> FilePath_1(DpctInstallPath.getCanonicalPath());
-    llvm::sys::path::append(FilePath_1,
+    SmallString<128> FilePath1(DpctInstallPath.getCanonicalPath());
+    llvm::sys::path::append(FilePath1,
                             Twine("extensions/cmake_rules/"
                                   "cmake_script_migration_rule.yaml"));
-    SmallString<128> FilePath_2(DpctInstallPath.getCanonicalPath());
-    llvm::sys::path::append(FilePath_2,
+    SmallString<128> FilePath2(DpctInstallPath.getCanonicalPath());
+    llvm::sys::path::append(FilePath2,
                             Twine("opt/dpct/extensions/cmake_rules/"
                                   "cmake_script_migration_rule.yaml"));
 
     std::vector<clang::tooling::UnifiedPath> CmakeRuleFiles{
-        llvm::sys::fs::exists(FilePath_1) ? FilePath_1.c_str()
-                                          : FilePath_2.c_str()};
+        llvm::sys::fs::exists(FilePath1) ? FilePath1.c_str()
+                                         : FilePath2.c_str()};
     importRules(CmakeRuleFiles);
     dpct::genCmakeHelperFunction(dpct::DpctGlobalInfo::getOutRoot());
   }
