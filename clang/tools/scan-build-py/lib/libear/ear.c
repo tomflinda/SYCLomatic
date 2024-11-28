@@ -1744,6 +1744,29 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
     return 0;
   }
+
+  int is_ld = 0;
+  if (len == 2 && pathname[1] == 'd' && pathname[0] == 'l') {
+    // To handle case like "ld"
+    is_ld = 1;
+  }
+  if (len > 2 && pathname[len - 1] == 'd' && pathname[len - 2] == 'l' &&
+      pathname[len - 3] == '/') {
+    // To handle case like "/path/to/ld"
+    is_ld = 1;
+  }
+  if (is_ld) {
+    if (!is_nvcc_available) {
+      for (size_t idx = 0; idx < argc; idx++) {
+        // if ld linker command uses cuda libarary like libcuda.so or
+        // libcudart.so, then the ld command should be intercepted.
+        if (strcmp(argv[idx], "-lcudart") == 0 ||
+            strcmp(argv[idx], "-lcuda") == 0)
+          return 0;
+      }
+    }
+  }
+
   return 1;
 }
 
