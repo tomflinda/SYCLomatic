@@ -24,6 +24,6 @@ public:
   typename thrust::iterator_difference<Iterator>::type IDTFieldDecl;
 };
 
-// TODO:
+// CHECK: typename std::iterator_traits<int *>::difference_type IDTVarDecl;
 typename thrust::iterator_difference<int *>::type IDTVarDecl;
 #endif
