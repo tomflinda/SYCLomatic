@@ -1730,7 +1730,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc"
     is_nvcc = 1;
-    value = getenv("INTERCEPT_COMPILE_FROM_ENV_PATH");
+    value = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
     if (value && *value == '0') {
       return 0;
     }
