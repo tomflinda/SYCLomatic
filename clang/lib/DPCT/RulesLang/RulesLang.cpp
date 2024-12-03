@@ -1040,33 +1040,26 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
       auto TSL = TL->getAs<TemplateSpecializationTypeLoc>();
       auto Parents = Result.Context->getParents(TSL);
       if (!Parents.empty()) {
-        const auto &NNSL = Parents[0].get<NestedNameSpecifierLoc>();
+        const auto *NNSL = Parents[0].get<NestedNameSpecifierLoc>();
 
         // To migrate "type" in case like "typename
         // thrust::iterator_difference<int
         // *>::type Var".
-        if (TypeStr.find("iterator_difference") != std::string::npos && NNSL) {
+        if (NNSL && getNestedNameSpecifierString(*NNSL).find(
+                        "thrust::iterator_difference") != std::string::npos) {
           auto Parents2 = Result.Context->getParents(*NNSL);
           if (!Parents2.empty()) {
-            const auto &NNSL2 = Parents2[0].get<TypeLoc>();
-
-            if (NNSL2 && NNSL2->getType().getAsString().find(
-                             "thrust::iterator") != std::string::npos) {
-
-              auto EndLoc = NNSL2->getEndLoc();
+            const auto *NNSL2 = Parents2[0].get<TypeLoc>();
+            if (NNSL2) {
               Token Tok;
               Lexer::getRawToken(TSL.getBeginLoc(), Tok, *SM, LOpts, true);
-              auto TemplateNameStr =
-                  Tok.isAnyIdentifier() ? Tok.getRawIdentifier().str() : "";
-              if (TemplateNameStr == "iterator_difference") {
-                emplaceTransformation(
-                    new ReplaceText(EndLoc, 4, std::string("difference_type")));
-              }
+              emplaceTransformation(new ReplaceText(
+                  NNSL2->getEndLoc(), 4, std::string("difference_type")));
             }
           }
         }
 
-        if (const auto &NNSL = Parents[0].get<NestedNameSpecifierLoc>()) {
+        if (const auto *NNSL = Parents[0].get<NestedNameSpecifierLoc>()) {
           if (replaceTemplateSpecialization(SM, LOpts, NNSL->getBeginLoc(),
                                             TSL)) {
             return;

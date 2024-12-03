@@ -26,3 +26,4 @@ public:
 // CHECK: typename std::iterator_traits<int *>::difference_type IDTVarDecl;
 typename thrust::iterator_difference<int *>::type IDTVarDecl;
 
+
