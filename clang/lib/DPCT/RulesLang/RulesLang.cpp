@@ -1174,6 +1174,14 @@ void VectorTypeNamespaceRule::registerMatcher(MatchFinder &MF) {
                          hasDeclaration(namedDecl(Vec3Types()))))))
                     .bind("SizeofVector3Warn"),
                 this);
+
+  MF.addMatcher(
+      declRefExpr(
+          hasParent(implicitCastExpr(hasParent(cxxReinterpretCastExpr(hasType(
+              pointsTo(namedDecl(Vec3Types()).bind("nameVec3Name"))))))))
+          .bind("declRefExpr3Warn"),
+      this);
+
   MF.addMatcher(cxxRecordDecl(isDirectlyDerivedFrom(hasAnyName(
                                   "char1", "uchar1", "short1", "ushort1",
                                   "int1", "uint1", "long1", "ulong1", "float1",
@@ -1384,6 +1392,17 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
     emplaceTransformation(new ReplaceStmt(DRE, Replacement));
     return;
   }
+
+  if (const auto &DRE =
+          getNodeAsType<DeclRefExpr>(Result, "declRefExpr3Warn")) {
+
+    if (const auto &NameDeoc =
+            getNodeAsType<NamedDecl>(Result, "nameVec3Name")) {
+      report(DRE, Diagnostics::SIZEOF_WARNING, true,
+             NameDeoc->getNameAsString());
+    }
+  }
+
   if (const auto *D = getNodeAsType<Decl>(Result, "vectorTypeInTemplateArg")) {
     if (const auto *VD = getAssistNodeAsType<NamedDecl>(Result, "vectorDecl")) {
       auto TypeStr = VD->getNameAsString();
