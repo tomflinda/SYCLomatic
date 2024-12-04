@@ -5,7 +5,7 @@
 #include <cuda_runtime.h>
 #include <vector>
 
-void foo() {
+void test() {
   char *dataHandle;
   int width, height;
   {

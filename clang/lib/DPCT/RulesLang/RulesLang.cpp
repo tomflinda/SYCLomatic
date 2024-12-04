@@ -1395,13 +1395,13 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
     return;
   }
 
-  if (const auto &DRE =
+  if (const auto *DRE =
           getNodeAsType<DeclRefExpr>(Result, "declRefExpr3Warn")) {
 
-    if (const auto &NameDeoc =
+    if (const auto *NameDecl =
             getNodeAsType<NamedDecl>(Result, "nameVec3Name")) {
       report(DRE, Diagnostics::SIZEOF_WARNING, true,
-             NameDeoc->getNameAsString(), "You may need to adjust the code");
+             NameDecl->getNameAsString(), "You may need to adjust the code");
     }
   }
 
