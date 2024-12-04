@@ -1371,7 +1371,9 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
     if (argTypeName != argCanTypeName)
       argTypeName += " (aka " + argCanTypeName + ")";
 
-    report(UETT, Diagnostics::SIZEOF_WARNING, true, argTypeName);
+    report(
+        UETT, Diagnostics::SIZEOF_WARNING, true, argTypeName,
+        "Check that the allocated memory size in the migrated code is correct");
   }
   // Runrule for __half_raw implicitly convert to half.
   if (auto DRE = getNodeAsType<DeclRefExpr>(Result, "halfRawExpr")) {
@@ -1399,7 +1401,7 @@ void VectorTypeNamespaceRule::runRule(const MatchFinder::MatchResult &Result) {
     if (const auto &NameDeoc =
             getNodeAsType<NamedDecl>(Result, "nameVec3Name")) {
       report(DRE, Diagnostics::SIZEOF_WARNING, true,
-             NameDeoc->getNameAsString());
+             NameDeoc->getNameAsString(), "You may need to adjust the code");
     }
   }
 
@@ -4568,7 +4570,9 @@ void KernelCallRule::runRule(
                                                   ExprContainSizeofType)) {
             if (ExprContainSizeofType) {
               report(ExprContainSizeofType->getBeginLoc(),
-                     Diagnostics::SIZEOF_WARNING, false, "local memory");
+                     Diagnostics::SIZEOF_WARNING, false, "local memory",
+                     "Check that the allocated memory size in the migrated "
+                     "code is correct");
             }
           }
         }

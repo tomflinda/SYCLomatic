@@ -11,14 +11,14 @@ void foo() {
   {
     std::vector<uchar3> data;
     // CHECK:  /*
-    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of uchar3 in the migrated code may be different from the original code. Check that the allocated memory size in the migrated code is correct.
+    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of uchar3 in the migrated code may be different from the original code. You may need to adjust the code.
     // CHECK-NEXT:  */
     data.assign(reinterpret_cast<uchar3 *>(dataHandle),
                 reinterpret_cast<uchar3 *>(dataHandle) + width * height);
   }
   {
     // CHECK:  /*
-    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of double3 in the migrated code may be different from the original code. Check that the allocated memory size in the migrated code is correct.
+    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of double3 in the migrated code may be different from the original code. You may need to adjust the code.
     // CHECK-NEXT:  */
     std::vector<double3> data;
     data.assign(reinterpret_cast<double3 *>(dataHandle),
@@ -27,7 +27,7 @@ void foo() {
   {
     std::vector<long3> data;
     // CHECK:  /*
-    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of long3 in the migrated code may be different from the original code. Check that the allocated memory size in the migrated code is correct.
+    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of long3 in the migrated code may be different from the original code. You may need to adjust the code.
     // CHECK-NEXT:  */
     data.assign(reinterpret_cast<long3 *>(dataHandle),
                 reinterpret_cast<long3 *>(dataHandle) + width * height);
@@ -35,7 +35,7 @@ void foo() {
   {
     std::vector<ulonglong3> data;
     // CHECK:  /*
-    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of ulonglong3 in the migrated code may be different from the original code. Check that the allocated memory size in the migrated code is correct.
+    // CHECK-NEXT:  DPCT1083:{{[0-9]+}}: The size of ulonglong3 in the migrated code may be different from the original code. You may need to adjust the code.
     // CHECK-NEXT:  */
     data.assign(reinterpret_cast<ulonglong3 *>(dataHandle),
                 reinterpret_cast<ulonglong3 *>(dataHandle) + width * height);
