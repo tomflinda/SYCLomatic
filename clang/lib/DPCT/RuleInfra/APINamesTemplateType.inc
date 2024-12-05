@@ -238,7 +238,8 @@ TYPE_REWRITE_ENTRY("thrust::system::error_code", TYPE_FACTORY(STR("std::error_co
 TYPE_REWRITE_ENTRY("thrust::system::error_condition", TYPE_FACTORY(STR("std::error_condition")))
 
 // thrust::system::errc::errc_t
-TYPE_REWRITE_ENTRY("thrust::system::errc::errc_t", TYPE_FACTORY(STR("std::io_errc")))
+TYPE_REWRITE_ENTRY("thrust::system::errc::errc_t",
+                   TYPE_FACTORY(STR("std::io_errc")))
 
 // thrust::bit_and
 TYPE_REWRITE_ENTRY(
