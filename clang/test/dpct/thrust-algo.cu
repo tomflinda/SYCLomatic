@@ -122,7 +122,6 @@ void k() {
   // CHECK: dpct::partition_point(oneapi::dpl::execution::seq, v.begin(), v.end(), up);
   thrust::partition_point(v.begin(), v.end(), up);
 
-#ifndef NO_BUILD_TEST
   // binary_search
 
   // CHECK: oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin());
@@ -134,7 +133,7 @@ void k() {
   thrust::binary_search(thrust::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
   // CHECK: oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
   thrust::binary_search(v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
-
+#ifndef NO_BUILD_TEST
   // CHECK: oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), 1);
   thrust::binary_search(thrust::seq, v.begin(), v.end(), 1);
 
