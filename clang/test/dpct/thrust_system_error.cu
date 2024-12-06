@@ -11,7 +11,7 @@
 
 void cuda_safe_call(cudaError_t error, const std::string &message = "") {
 
-  // CHECK: std::io_errc e;
+  // CHECK: std::errc e;
   thrust::errc::errc_t e;
 
   // CHECK: std::system_error(error, std::generic_category(), message);
