@@ -1770,6 +1770,22 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
   }
 
+  if (!is_nvcc_available) {
+    // To handle case like "sh -c 'nvcc -c foo.cu -o foo.o'" on the environment
+    // where tool chain is not available.
+    for (size_t idx = 0; idx < 3 && idx < argc; idx++) {
+
+      size_t len = strlen(argv[idx]);
+      if (len < 4) {
+        continue;
+      }
+
+      if (strstr(argv[idx], "nvcc") != NULL) {
+        return 0;
+      }
+    }
+  }
+
   return 1;
 }
 
