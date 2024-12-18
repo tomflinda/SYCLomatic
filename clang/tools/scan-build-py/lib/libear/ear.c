@@ -1770,19 +1770,40 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
   }
 
-  if (!is_nvcc_available) {
-    // To handle case like "sh -c 'nvcc -c foo.cu -o foo.o'" on the environment
-    // where tool chain is not available.
-    for (size_t idx = 0; idx < 3 && idx < argc; idx++) {
+  if (!is_nvcc_available && argc == 3) {
+    // To handle case like "/bin/[sh/bash] -c '[echo or something]
+    // [/path/to/]nvcc -c foo.cu -o foo.o'" on the environment where tool chain
+    // is not available.
+    int is_bash = 0;
+    is_nvcc = 0;
+    const char *pathname = argv[0];
+    len = strlen(pathname);
 
-      size_t len = strlen(argv[idx]);
-      if (len < 4) {
-        continue;
-      }
+    is_bash = (len == 2 && pathname[0] == 's' && pathname[1] == 'h') ||
+              (len > 2 && pathname[len - 3] == '/' &&
+               pathname[len - 2] == 's' && pathname[len - 1] == 'h') ||
+              (len == 4 && pathname[3] == 'h' && pathname[2] == 's' &&
+               pathname[1] == 'a' && pathname[0] == 'b') ||
+              (len > 4 && pathname[len - 1] == 'h' &&
+               pathname[len - 2] == 's' && pathname[len - 3] == 'a' &&
+               pathname[len - 4] == 'b' && pathname[len - 5] == '/');
 
-      if (strstr(argv[idx], "nvcc") != NULL) {
-        return 0;
-      }
+    pathname = argv[2];
+    const char *pos = strstr(argv[2], "nvcc");
+    if (pos) {
+      is_nvcc =
+          pos > argv[2]
+              ? strlen(pos) >= 4 && isspace(*(pos + 4)) &&
+                    (*(pos - 1) == '/' ||
+                     *(pos - 1) == ';') // check arount of "nvcc" to make
+                                        // sure it is a compiler command.
+              : strlen(pos) >= 4 &&
+                    isspace(*(pos + 4)); // check the end of "nvcc" to make
+                                         // sure it is a compiler command.
+    }
+
+    if (is_bash && strcmp(argv[1], "-c") == 0 && is_nvcc) {
+      return 0;
     }
   }
 
