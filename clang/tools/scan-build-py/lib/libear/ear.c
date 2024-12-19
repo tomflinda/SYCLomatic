@@ -1787,16 +1787,24 @@ int is_tool_available(char const *argv[], size_t const argc) {
               (len > 4 && pathname[len - 1] == 'h' &&
                pathname[len - 2] == 's' && pathname[len - 3] == 'a' &&
                pathname[len - 4] == 'b' && pathname[len - 5] == '/');
+    if (!is_bash) {
+      return 1;
+    }
 
     pathname = argv[2];
     const char *pos = strstr(argv[2], "nvcc");
+
+    if (!pos) {
+      return 1;
+    }
+
     if (pos) {
       is_nvcc =
           pos > argv[2]
               ? strlen(pos) >= 4 && isspace(*(pos + 4)) &&
-                    (*(pos - 1) == '/' ||
-                     *(pos - 1) == ';') // check arount of "nvcc" to make
-                                        // sure it is a compiler command.
+                    (*(pos - 1) == '/' || *(pos - 1) == ';' ||
+                     isspace(*(pos - 1))) // check arount of "nvcc" to make
+                                          // sure it is a compiler command.
               : strlen(pos) >= 4 &&
                     isspace(*(pos + 4)); // check the end of "nvcc" to make
                                          // sure it is a compiler command.
