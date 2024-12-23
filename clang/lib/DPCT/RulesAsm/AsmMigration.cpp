@@ -2773,9 +2773,7 @@ protected:
     return SYCLGenSuccess();
   }
 
-  bool handle_cp(const InlineAsmInstruction *Inst) override {
-    if (Inst->getNumInputOperands() != 3 || Inst->getNumTypes() != 1)
-      return SYCLGenError();
+  bool HandleCopyOperation(const InlineAsmInstruction *Inst) {
 
     llvm::SaveAndRestore<const InlineAsmInstruction *> Store(CurrInst);
     CurrInst = Inst;
@@ -2811,6 +2809,35 @@ protected:
 
     report(Diagnostics::ASYNC_COPY_DEVICE_WARN, true);
     return SYCLGenSuccess();
+  }
+
+
+  bool HandleCopyWait(const InlineAsmInstruction *Inst) {
+      auto CommonStr = llvm::Twine("")
+                           .concat("\"")
+                           .concat(GAS->getAsmString()->getString())
+                           .concat("\"")
+                           .str();
+
+      report(Diagnostics::FUNC_CALL_REMOVED, true, CommonStr,
+             "there is no equivalent "
+             "functionality in "
+             "SYCL side. You may need to adjust the code.");
+      return SYCLGenSuccess();
+  }
+
+  bool handle_cp(const InlineAsmInstruction *Inst) override {
+    if (Inst->getNumInputOperands() == 3 && Inst->getNumTypes() == 1)
+      return HandleCopyOperation(Inst);
+
+    printf("handle_cp: %d %d\n", (int)Inst->getNumInputOperands(),
+           Inst->getNumTypes());
+
+    if (Inst->getNumInputOperands() == 0 && Inst->hasAttr(InstAttr::async) &&
+        Inst->hasAttr(InstAttr::commit_group)) {
+      HandleCopyWait(Inst);
+    }
+    return SYCLGenError();
   }
 };
 
@@ -2992,6 +3019,7 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
+  printf("AsmRule::doMigrateInternel [%s] [%s]\n", Buffer.c_str(), GAS->getBeginLoc().printToString(SM).data());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
