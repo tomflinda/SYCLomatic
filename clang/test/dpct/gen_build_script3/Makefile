@@ -1,11 +1,13 @@
-# This Makefile is used to verify intercept-build to work in the environment where tool chain is not installed.
+# This Makefile is used to verify intercept-build to work in the environment where tool chain is not installed
+# or installed in the default path, but not adding into environment path.
 TARGET = hello
 
-# Define a variable that checks for nvcc
-CHECK_NVCC := $(shell command -v nvcc >/dev/null 2>&1 && echo "available" || echo "not available")
+CHECK_INSTALL_PATH := $(shell command -v ls /usr/local | grep -E "^cuda-[0-9]+\.[0-9]+" && echo "available" || echo "not available")
+CHECK_NVCC_FROM_PATH := $(shell command -v nvcc >/dev/null 2>&1 && echo "available" || echo "not available")
 
-# Target to check nvcc
-ifeq ($(CHECK_NVCC), available)
+ifeq ($(CHECK_INSTALL_PATH), available)
+	COMPILER = nvcc
+else ifeq  ($(CHECK_NVCC_FROM_PATH), available)
 	COMPILER = nvcc
 else
 	COMPILER = echo "dump compiler"
