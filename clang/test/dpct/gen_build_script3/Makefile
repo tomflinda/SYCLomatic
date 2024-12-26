@@ -6,7 +6,7 @@ CHECK_NVCC_FROM_PATH = $(shell nvcc --version >/dev/null 2>&1 && echo "available
 
 ifneq ($(CHECK_NVCC_FROM_PATH), available)
     ifeq ($(CHECK_DEFAULT_INSTALL_PATH), available)
-    # This test case is not used to verify nvcc is intalled in defaut path but not available from ENV PATH.
+    # This test case is not used to verify nvcc is installed in default path but not available from ENV PATH.
     COMPILER = echo "dump compiler"
     endif
 endif
