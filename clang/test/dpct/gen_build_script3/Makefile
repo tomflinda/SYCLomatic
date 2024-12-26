@@ -1,16 +1,14 @@
-# This Makefile is used to verify intercept-build to work in the environment where tool chain is not installed
-# or installed in the default path, but not adding into environment path.
 TARGET = hello
+COMPILER = nvcc
 
-CHECK_INSTALL_PATH := $(shell command -v ls /usr/local | grep -E "^cuda-[0-9]+\.[0-9]+" && echo "available" || echo "not available")
-CHECK_NVCC_FROM_PATH := $(shell command -v nvcc >/dev/null 2>&1 && echo "available" || echo "not available")
+CHECK_DEFAULT_INSTALL_PATH = $(shell ls /usr/local | grep -E "^cuda-[0-9]+\.[0-9]+" > /dev/null 2>&1 && echo "available" || echo "not available")
+CHECK_NVCC_FROM_PATH = $(shell nvcc --version >/dev/null 2>&1 && echo "available" || echo "not available")
 
-ifeq ($(CHECK_INSTALL_PATH), available)
-	COMPILER = nvcc
-else ifeq  ($(CHECK_NVCC_FROM_PATH), available)
-	COMPILER = nvcc
-else
-	COMPILER = echo "dump compiler"
+ifneq ($(CHECK_NVCC_FROM_PATH), available)
+    ifeq ($(CHECK_DEFAULT_INSTALL_PATH), available)
+    # This test case is not used to verify nvcc is intalled in defaut path but not available from ENV PATH.
+    COMPILER = echo "dump compiler"
+    endif
 endif
 
 all: 
