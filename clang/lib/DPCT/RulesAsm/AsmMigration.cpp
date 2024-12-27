@@ -2834,7 +2834,9 @@ protected:
            Inst->getNumTypes());
 
     if (Inst->getNumInputOperands() == 0 && Inst->hasAttr(InstAttr::async) &&
-        Inst->hasAttr(InstAttr::commit_group)) {
+        (Inst->hasAttr(InstAttr::commit_group) ||
+         Inst->hasAttr(InstAttr::wait_group) ||
+         Inst->hasAttr(InstAttr::wait_all))) {
       HandleCopyWait(Inst);
     }
     return SYCLGenError();
@@ -3019,7 +3021,6 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
-  printf("AsmRule::doMigrateInternel [%s] [%s]\n", Buffer.c_str(), GAS->getBeginLoc().printToString(SM).data());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
