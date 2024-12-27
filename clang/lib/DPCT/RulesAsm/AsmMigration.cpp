@@ -2673,11 +2673,10 @@ protected:
   }
 
   bool handle_cp(const InlineAsmInstruction *Inst) override {
-    printf("handle_cp: %d %d\n", (int)Inst->getNumInputOperands(),
-           Inst->getNumTypes());
     if (Inst->getNumInputOperands() == 0 && Inst->hasAttr(InstAttr::async) &&
-        Inst->hasAttr(InstAttr::commit_group)) {
-
+        (Inst->hasAttr(InstAttr::commit_group) ||
+         Inst->hasAttr(InstAttr::wait_group) ||
+         Inst->hasAttr(InstAttr::wait_all))) {
       auto CommonStr = llvm::Twine("")
                            .concat("\"")
                            .concat(GAS->getAsmString()->getString())
@@ -2872,7 +2871,6 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
-  printf("AsmRule::doMigrateInternel [%s] [%s]\n", Buffer.c_str(), GAS->getBeginLoc().printToString(SM).data());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
