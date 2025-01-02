@@ -1205,6 +1205,38 @@ template <typename Func, std::size_t N> struct nth_argument_type {
   using type = decltype(helper(std::declval<Func>()));
 };
 
+/// \brief The functions performs bitwise logical operations on three input
+/// values of \p a, \p b and \p c based on the specified 8-bit truth table \p
+/// lut and return the result
+///
+/// \param [in] a Input value
+/// \param [in] b Input value
+/// \param [in] c Input value
+/// \param [in] lut truth table for looking up
+/// \returns The result
+uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
+  uint32_t result = 0;
+
+  // Iterate through all 32 bits
+  for (int i = 0; i < 32; i++) {
+    // Extract the i-th bit from each input
+    uint8_t a_bit_val = (a >> i) & 1;
+    uint8_t b_bit_val = (b >> i) & 1;
+    uint8_t c_bit_val = (c >> i) & 1;
+
+    // Compute the index for the truth table using the three bits
+    uint8_t index = a_bit_val << 2 | b_bit_val << 1 | c_bit_val;
+
+    // Extract the corresponding bit from the mask
+    uint8_t output_bit = (lut >> index) & 1;
+
+    // Set the output bit in the result
+    result |= (output_bit << i);
+  }
+
+  return result;
+}
+
 #ifdef _WIN32
 #define DPCT_EXPORT __declspec(dllexport)
 #else
