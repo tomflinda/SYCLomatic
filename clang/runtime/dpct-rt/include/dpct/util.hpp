@@ -1214,7 +1214,7 @@ template <typename Func, std::size_t N> struct nth_argument_type {
 /// \param [in] c Input value
 /// \param [in] lut truth table for looking up
 /// \returns The result
-uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
+inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
   uint32_t result = 0;
 
   // Iterate through all 32 bits
