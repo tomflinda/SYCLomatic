@@ -588,9 +588,9 @@ bool SYCLGenBase::emitVariableDeclaration(const InlineAsmVarDecl *D) {
 }
 
 bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
-  // Address expression only support ld/st & atom instructions.
+  // Address expression only support ld/st/red & atom instructions.
   if (!CurrInst || !CurrInst->is(asmtok::op_st, asmtok::op_ld, asmtok::op_atom,
-                                 asmtok::op_prefetch))
+                                 asmtok::op_prefetch, asmtok::op_red))
     return SYCLGenError();
   std::string Type;
   if (tryEmitType(Type, CurrInst->getType(0)))
@@ -607,7 +607,7 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     return false;
   };
 
-  if (CurrInst->is(asmtok::op_st, asmtok::op_ld))
+  if (CurrInst->is(asmtok::op_st, asmtok::op_ld, asmtok::op_red))
     OS() << "*";
   switch (Dst->getMemoryOpKind()) {
   case InlineAsmAddressExpr::Imm:
@@ -2710,6 +2710,35 @@ protected:
     OS() << ')';
     endstmt();
     insertHeader(HeaderType::HT_DPCT_Atomic);
+    return SYCLGenSuccess();
+  }
+
+  bool handle_red(const InlineAsmInstruction *Inst) override {
+    if (Inst->getNumInputOperands() != 1)
+      return SYCLGenError();
+
+    llvm::SaveAndRestore<const InlineAsmInstruction *> Store(CurrInst);
+    CurrInst = Inst;
+
+    const auto *Src = Inst->getInputOperand(0);
+    const auto *Dst =
+        dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
+    if (!Dst)
+      return false;
+    std::string Type;
+    if (tryEmitType(Type, Inst->getType(0)))
+      return SYCLGenError();
+
+    if (emitStmt(Dst))
+      return SYCLGenError();
+
+    if (Inst->hasAttr(InstAttr::add))
+      OS() << " += ";
+
+    if (emitStmt(Src))
+      return SYCLGenError();
+    endstmt();
+
     return SYCLGenSuccess();
   }
 };
