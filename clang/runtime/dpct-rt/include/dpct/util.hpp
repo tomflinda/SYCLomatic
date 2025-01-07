@@ -1307,6 +1307,8 @@ inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
       case 0x80:
         result |= (a & b & c);
         break;
+      default:
+        break;
       }
     }
     break;
