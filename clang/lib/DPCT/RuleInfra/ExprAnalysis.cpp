@@ -2226,7 +2226,6 @@ void IndexAnalysis::dispatch(const Stmt *Expression) {
   switch (Expression->getStmtClass()) {
     ANALYZE_EXPR(UnaryOperator)
     ANALYZE_EXPR(BinaryOperator)
-    ANALYZE_EXPR(ImplicitCastExpr)
     ANALYZE_EXPR(DeclRefExpr)
     ANALYZE_EXPR(PseudoObjectExpr)
     ANALYZE_EXPR(ParenExpr)
@@ -2257,9 +2256,7 @@ void IndexAnalysis::analyzeExpr(const BinaryOperator *BO) {
   if (!BO->isAdditiveOp())
     ContainNonAdditiveOp.pop();
 }
-void IndexAnalysis::analyzeExpr(const ImplicitCastExpr *ICE) {
-  dispatch(ICE->getSubExpr());
-}
+
 void IndexAnalysis::analyzeExpr(const DeclRefExpr *DRE) {
   auto Res = trackInitExprOfDRE(DRE);
   if (Res.first) {

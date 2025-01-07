@@ -956,7 +956,6 @@ private:
   using Base = ExprAnalysis;
   void analyzeExpr(const UnaryOperator *UO);
   void analyzeExpr(const BinaryOperator *BO);
-  void analyzeExpr(const ImplicitCastExpr *ICE);
   void analyzeExpr(const DeclRefExpr *DRE);
   void analyzeExpr(const PseudoObjectExpr *POE);
   void analyzeExpr(const ParenExpr *PE);
