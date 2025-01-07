@@ -1221,6 +1221,29 @@ inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
   case 0x0:
     result = 0;
     break;
+  case 0x1:
+    result = ~a & ~b & ~c;
+    break;
+  case 0x2:
+    result = ~a & ~b & c;
+  case 0x4:
+    result = ~a & b & ~c;
+    break;
+  case 0x8:
+    result = ~a & b & c;
+    break;
+  case 0x10:
+    result = a & ~b & ~c;
+    break;
+  case 0x20:
+    result = a & ~b & c;
+    break;
+  case 0x40:
+    result = a & b & ~c;
+    break;
+  case 0x80:
+    result = a & b & c;
+    break;
   case 0x1a:
     result = (a & b | c) ^ a;
     break;
@@ -1230,14 +1253,8 @@ inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
   case 0x2d:
     result = ~a ^ (~b & c);
     break;
-  case 0x40:
-    result = a & b & ~c;
-    break;
   case 0x78:
     result = a ^ (b & c);
-    break;
-  case 0x80:
-    result = a & b & c;
     break;
   case 0x96:
     result = a ^ b ^ c;
@@ -1264,23 +1281,34 @@ inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
     result = -1;
     break;
   default: {
-    // Iterate through all 32 bits
-    for (int i = 0; i < 32; i++) {
-      // Extract the i-th bit from each input
-      uint8_t a_bit_val = (a >> i) & 1;
-      uint8_t b_bit_val = (b >> i) & 1;
-      uint8_t c_bit_val = (c >> i) & 1;
-
-      // Compute the index for the truth table using the three bits
-      uint8_t index = a_bit_val << 2 | b_bit_val << 1 | c_bit_val;
-
-      // Extract the corresponding bit from the mask
-      uint8_t output_bit = (lut >> index) & 1;
-
-      // Set the output bit in the result
-      result |= (output_bit << i);
+    for (uint8_t i = 0; i < 8; i++) {
+      switch (lut & (1 << i)) {
+      case 0x1:
+        result |= (~a & ~b & ~c);
+        break;
+      case 0x2:
+        result |= (~a & ~b & c);
+        break;
+      case 0x4:
+        result |= (~a & b & ~c);
+        break;
+      case 0x8:
+        result |= (~a & b & c);
+        break;
+      case 0x10:
+        result |= (a & ~b & ~c);
+        break;
+      case 0x20:
+        result |= (a & ~b & c);
+        break;
+      case 0x40:
+        result |= (a & b & ~c);
+        break;
+      case 0x80:
+        result |= (a & b & c);
+        break;
+      }
     }
-
     break;
   }
   }
