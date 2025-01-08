@@ -949,8 +949,80 @@ protected:
         return SYCLGenError();
     }
 
-    OS() << MapNames::getDpctNamespace() << "lop3(" << Op[0] << ", " << Op[1]
-         << ", " << Op[2] << ", " << Op[3] << ")";
+    if (!isa<InlineAsmIntegerLiteral>(I->getInputOperand(3))) {
+      OS() << MapNames::getDpctNamespace() << "lop3(" << Op[0] << ", " << Op[1]
+           << ", " << Op[2] << ", " << Op[3] << ")";
+
+    } else {
+      unsigned Imm = dyn_cast<InlineAsmIntegerLiteral>(I->getInputOperand(3))
+                         ->getValue()
+                         .getZExtValue();
+
+#define EMPTY nullptr
+#define EMPTY4 EMPTY, EMPTY, EMPTY, EMPTY
+#define EMPTY16 EMPTY4, EMPTY4, EMPTY4, EMPTY4
+      constexpr const char *FastMap[256] = {
+          /*0x00*/ "0",
+          // clang-format off
+      EMPTY16, EMPTY4, EMPTY4, EMPTY,
+      /*0x1a*/ "({0} & {1} | {2}) ^ {0}",
+      EMPTY, EMPTY, EMPTY,
+      /*0x1e*/ "{0} ^ ({1} | {2})",
+      EMPTY4, EMPTY4, EMPTY4, EMPTY, EMPTY,
+      /*0x2d*/ "~{0} ^ (~{1} & {2})",
+      EMPTY16, EMPTY, EMPTY,
+      /*0x40*/ "{0} & {1} & ~{2}",
+      EMPTY16, EMPTY16, EMPTY16, EMPTY4, EMPTY, EMPTY, EMPTY,
+      /*0x78*/ "{0} ^ ({1} & {2})",
+      EMPTY4, EMPTY, EMPTY, EMPTY,
+      /*0x80*/ "{0} & {1} & {2}",
+      EMPTY16, EMPTY4, EMPTY,
+      /*0x96*/ "{0} ^ {1} ^ {2}",
+      EMPTY16, EMPTY4, EMPTY4, EMPTY4, EMPTY,
+      /*0xb4*/ "{0} ^ ({1} & ~{2})",
+      EMPTY, EMPTY, EMPTY,
+      /*0xb8*/ "({0} ^ ({1} & ({2} ^ {0})))",
+      EMPTY16, EMPTY4, EMPTY4, EMPTY,
+      /*0xd2*/ "{0} ^ (~{1} & {2})",
+      EMPTY16, EMPTY4, EMPTY,
+      /*0xe8*/ "(({0} & ({1} | {2})) | ({1} & {2}))",
+      EMPTY,
+      /*0xea*/ "({0} & {1}) | {2}",
+      EMPTY16, EMPTY, EMPTY, EMPTY,
+      /*0xfe*/ "{0} | {1} | {2}",
+      /*0xff*/ "uint32_t(-1)"};
+      // clang-format on
+
+#undef EMPTY16
+#undef EMPTY4
+#undef EMPTY
+      // clang-format off
+    constexpr const char *SlowMap[8] = {
+      /* 0x01*/ "(~{0} & ~{1} & ~{2})",
+      /* 0x02*/ "(~{0} & ~{1} & {2})",
+      /* 0x04*/ "(~{0} & {1} & ~{2})",
+      /* 0x08*/ "(~{0} & {1} & {2})",
+      /* 0x10*/ "({0} & ~{1} & ~{2})",
+      /* 0x20*/ "({0} & ~{1} & {2})",
+      /* 0x40*/ "({0} & {1} & ~{2})",
+      /* 0x80*/ "({0} & {1} & {2})"
+    };
+      // clang-format on
+
+      if (FastMap[Imm]) {
+        OS() << llvm::formatv(FastMap[Imm], Op[0], Op[1], Op[2]);
+      } else {
+        SmallVector<std::string, 8> Templates;
+        for (auto Bit : llvm::seq(0, 8)) {
+          if (Imm & (1U << Bit)) {
+            Templates.push_back(
+                llvm::formatv(SlowMap[Bit], Op[0], Op[1], Op[2]).str());
+          }
+        }
+
+        OS() << llvm::join(Templates, " | ");
+      }
+    }
 
     endstmt();
     return SYCLGenSuccess();
