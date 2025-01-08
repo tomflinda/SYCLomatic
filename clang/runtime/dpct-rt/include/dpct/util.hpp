@@ -1281,36 +1281,22 @@ inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
     result = -1;
     break;
   default: {
-    for (uint8_t i = 0; i < 8; i++) {
-      switch (lut & (1 << i)) {
-      case 0x1:
-        result |= (~a & ~b & ~c);
-        break;
-      case 0x2:
-        result |= (~a & ~b & c);
-        break;
-      case 0x4:
-        result |= (~a & b & ~c);
-        break;
-      case 0x8:
-        result |= (~a & b & c);
-        break;
-      case 0x10:
-        result |= (a & ~b & ~c);
-        break;
-      case 0x20:
-        result |= (a & ~b & c);
-        break;
-      case 0x40:
-        result |= (a & b & ~c);
-        break;
-      case 0x80:
-        result |= (a & b & c);
-        break;
-      default:
-        break;
-      }
-    }
+    if (lut & 0x01)
+      result |= ~a & ~b & ~c;
+    if (lut & 0x02)
+      result |= ~a & ~b & c;
+    if (lut & 0x04)
+      result |= ~a & b & ~c;
+    if (lut & 0x08)
+      result |= ~a & b & c;
+    if (lut & 0x10)
+      result |= a & ~b & ~c;
+    if (lut & 0x20)
+      result |= a & ~b & c;
+    if (lut & 0x40)
+      result |= a & b & ~c;
+    if (lut & 0x80)
+      result |= a & b & c;
     break;
   }
   }
