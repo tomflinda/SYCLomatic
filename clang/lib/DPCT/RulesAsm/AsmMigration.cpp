@@ -950,8 +950,8 @@ protected:
     }
 
     if (!isa<InlineAsmIntegerLiteral>(I->getInputOperand(3))) {
-      OS() << MapNames::getDpctNamespace() << "lop3(" << Op[0] << ", " << Op[1]
-           << ", " << Op[2] << ", " << Op[3] << ")";
+      OS() << MapNames::getDpctNamespace() << "ternary_logic_op(" << Op[0]
+           << ", " << Op[1] << ", " << Op[2] << ", " << Op[3] << ")";
 
     } else {
       unsigned Imm = dyn_cast<InlineAsmIntegerLiteral>(I->getInputOperand(3))

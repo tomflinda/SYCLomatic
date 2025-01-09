@@ -1205,7 +1205,7 @@ template <typename Func, std::size_t N> struct nth_argument_type {
   using type = decltype(helper(std::declval<Func>()));
 };
 
-/// \brief The functions performs bitwise logical operations on three input
+/// \brief The function performs bitwise logical operations on three input
 /// values of \p a, \p b and \p c based on the specified 8-bit truth table \p
 /// lut and return the result
 ///
@@ -1214,7 +1214,8 @@ template <typename Func, std::size_t N> struct nth_argument_type {
 /// \param [in] c Input value
 /// \param [in] lut truth table for looking up
 /// \returns The result
-inline uint32_t lop3(uint32_t a, uint32_t b, uint32_t c, uint8_t lut) {
+inline uint32_t ternary_logic_op(uint32_t a, uint32_t b, uint32_t c,
+                                 uint8_t lut) {
   uint32_t result = 0;
 
   switch (lut) {

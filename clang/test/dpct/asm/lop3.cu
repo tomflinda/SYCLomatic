@@ -38,7 +38,7 @@ __device__  int hard(int a) {
 
 // CHECK: template <int lut, typename T> inline T lop3(T a, T b, T c) {
 // CHECK-NEXT:  T res;
-// CHECK-NEXT:  res = dpct::lop3(a, b, c, lut);
+// CHECK-NEXT:  res = dpct::ternary_logic_op(a, b, c, lut);
 // CHECK-NEXT:  return res;
 // CHECK-NEXT:}
 template <int lut, typename T> __device__ inline T lop3(T a, T b, T c) {
