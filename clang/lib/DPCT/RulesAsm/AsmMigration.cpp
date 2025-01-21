@@ -2740,6 +2740,8 @@ protected:
       OS() << " += ";
     else if (Inst->hasAttr(InstAttr::op_or))
       OS() << " |= ";
+    else if (Inst->hasAttr(InstAttr::op_xor))
+      OS() << " ^= ";
 
     if (emitStmt(Src))
       return SYCLGenError();
