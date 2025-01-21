@@ -2755,17 +2755,27 @@ protected:
     else if (Inst->hasAttr(InstAttr::op_and))
       OS() << " &= ";
     else if (Inst->hasAttr(InstAttr::dec)) {
-       // (r==0 || r > s)  ? s : r-1;
-       OS() << " = ";
-       OS() << '(';
-       OS() << a << " == 0 || " << a << " > " << b << ") ? " << b << " : " << a
-            << " - 1";
-       endstmt();
-       return SYCLGenSuccess();
-    
-    } else if (Inst->hasAttr(InstAttr::inc))
-      OS() << "++";
-    else
+      // (r==0 || r > s)  ? s : r-1;
+      OS() << " = ";
+      OS() << '(';
+      OS() << a << " == 0 || " << a << " > " << b << ") ? " << b << " : " << a
+           << " - 1";
+      endstmt();
+      return SYCLGenSuccess();
+
+    } else if (Inst->hasAttr(InstAttr::inc)) {
+      // (r >= s) ? 0 : r+1;
+      OS() << " = ";
+      OS() << '(';
+      OS() << a << " >= " << b << ") ? 0 : " << a << " + 1";
+      endstmt();
+      return SYCLGenSuccess();
+    } else if (Inst->hasAttr(InstAttr::max)) {
+      OS() << " = " << MapNames::getClNamespace() + "max(" << a << ", " << b
+           << ")";
+      endstmt();
+      return SYCLGenSuccess();
+    } else
       return SYCLGenError();
 
     if (emitStmt(Src))

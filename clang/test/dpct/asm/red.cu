@@ -49,4 +49,12 @@ __global__ void atomicDecKernel(uint32_t* lock, uint32_t val) {
                  ::"l"(lock),"r"(val):"memory");
 }
 
+// CHECK: void atomicMaxKernel(uint32_t* lock, uint32_t val) {
+// CHECK-NEXT:    *lock = sycl::max(*lock, val);
+// CHECK-NEXT: }
+__global__ void atomicMaxKernel(uint32_t* lock, uint32_t val) {
+    asm volatile("red.relaxed.gpu.global.max.u32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
 // clang-format on
