@@ -2737,14 +2737,11 @@ protected:
       return SYCLGenError();
 
     std::string a;
-    if (tryEmitStmt(a, Inst->getOutputOperand()))
+    if (tryEmitStmt(a, Dst))
       return SYCLGenError();
-
     std::string b;
-    if (tryEmitStmt(b, Inst->getInputOperand(0)))
+    if (tryEmitStmt(b, Src))
       return SYCLGenError();
-    printf("#######################[%s]\n", a.c_str());
-    printf("#######################[%s]\n", b.c_str());
 
     if (Inst->hasAttr(InstAttr::add))
       OS() << " += ";
@@ -2755,7 +2752,6 @@ protected:
     else if (Inst->hasAttr(InstAttr::op_and))
       OS() << " &= ";
     else if (Inst->hasAttr(InstAttr::dec)) {
-      // (r==0 || r > s)  ? s : r-1;
       OS() << " = ";
       OS() << '(';
       OS() << a << " == 0 || " << a << " > " << b << ") ? " << b << " : " << a
@@ -2764,7 +2760,6 @@ protected:
       return SYCLGenSuccess();
 
     } else if (Inst->hasAttr(InstAttr::inc)) {
-      // (r >= s) ? 0 : r+1;
       OS() << " = ";
       OS() << '(';
       OS() << a << " >= " << b << ") ? 0 : " << a << " + 1";
@@ -2772,6 +2767,11 @@ protected:
       return SYCLGenSuccess();
     } else if (Inst->hasAttr(InstAttr::max)) {
       OS() << " = " << MapNames::getClNamespace() + "max(" << a << ", " << b
+           << ")";
+      endstmt();
+      return SYCLGenSuccess();
+    } else if (Inst->hasAttr(InstAttr::min)) {
+      OS() << " = " << MapNames::getClNamespace() + "min(" << a << ", " << b
            << ")";
       endstmt();
       return SYCLGenSuccess();
