@@ -32,4 +32,13 @@ __global__ void atomicXorKernel(uint32_t* lock, uint32_t val) {
                  ::"l"(lock),"r"(val):"memory");
 }
 
+
+// CHECK: void atomicAndKernel(uint32_t* lock, uint32_t val) {
+// CHECK-NEXT:    *lock &= val;
+// CHECK-NEXT:}
+__global__ void atomicAndKernel(uint32_t* lock, uint32_t val) {
+    asm volatile("red.relaxed.gpu.global.and.b32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
 // clang-format on
