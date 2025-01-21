@@ -41,4 +41,12 @@ __global__ void atomicAndKernel(uint32_t* lock, uint32_t val) {
                  ::"l"(lock),"r"(val):"memory");
 }
 
+// CHECK: void atomicDecKernel(uint32_t* lock, uint32_t val) {
+// CHECK-NEXT:     *lock = (*lock == 0 || *lock > val) ? val : *lock - 1;
+// CHECK-NEXT: }
+__global__ void atomicDecKernel(uint32_t* lock, uint32_t val) {
+    asm volatile("red.relaxed.gpu.global.dec.u32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
 // clang-format on

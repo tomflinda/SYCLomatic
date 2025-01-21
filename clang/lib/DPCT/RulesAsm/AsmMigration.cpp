@@ -2736,6 +2736,16 @@ protected:
     if (emitStmt(Dst))
       return SYCLGenError();
 
+    std::string a;
+    if (tryEmitStmt(a, Inst->getOutputOperand()))
+      return SYCLGenError();
+
+    std::string b;
+    if (tryEmitStmt(b, Inst->getInputOperand(0)))
+      return SYCLGenError();
+    printf("#######################[%s]\n", a.c_str());
+    printf("#######################[%s]\n", b.c_str());
+
     if (Inst->hasAttr(InstAttr::add))
       OS() << " += ";
     else if (Inst->hasAttr(InstAttr::op_or))
@@ -2744,6 +2754,19 @@ protected:
       OS() << " ^= ";
     else if (Inst->hasAttr(InstAttr::op_and))
       OS() << " &= ";
+    else if (Inst->hasAttr(InstAttr::dec)) {
+       // (r==0 || r > s)  ? s : r-1;
+       OS() << " = ";
+       OS() << '(';
+       OS() << a << " == 0 || " << a << " > " << b << ") ? " << b << " : " << a
+            << " - 1";
+       endstmt();
+       return SYCLGenSuccess();
+    
+    } else if (Inst->hasAttr(InstAttr::inc))
+      OS() << "++";
+    else
+      return SYCLGenError();
 
     if (emitStmt(Src))
       return SYCLGenError();
