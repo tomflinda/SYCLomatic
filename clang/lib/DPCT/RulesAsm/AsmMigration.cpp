@@ -618,7 +618,8 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
-    if (CurrInst->is(asmtok::op_prefetch) || CanSuppressCast(Dst->getSymbol()))
+    if (CurrInst->is(asmtok::op_prefetch, asmtok::op_red) ||
+        CanSuppressCast(Dst->getSymbol()))
       OS() << llvm::formatv("{0}", Reg);
     else
       OS() << llvm::formatv("(({0} *)(uintptr_t){1})", Type, Reg);
@@ -2725,8 +2726,11 @@ protected:
         dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
     if (!Dst)
       return false;
-    std::string Type;
-    if (tryEmitType(Type, Inst->getType(0)))
+
+    const auto *Type = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0));
+    if (!Type || (Type->getKind() != InlineAsmBuiltinType::s32 &&
+                  Type->getKind() != InlineAsmBuiltinType::b32 &&
+                  Type->getKind() != InlineAsmBuiltinType::u32))
       return SYCLGenError();
 
     if (emitStmt(Dst))
@@ -2734,6 +2738,8 @@ protected:
 
     if (Inst->hasAttr(InstAttr::add))
       OS() << " += ";
+    else if (Inst->hasAttr(InstAttr::op_or))
+      OS() << " |= ";
 
     if (emitStmt(Src))
       return SYCLGenError();

@@ -5,6 +5,7 @@
 // RUN: %if build_lit %{icpx -c -fsycl %T/red/red.dp.cpp -o %T/red/red.dp.o %}
 
 // clang-format off
+#include <cstdint>
 #include <cuda_runtime.h>
 
 // CHECK: void atomicAddKernel(int* lock, int val) {
@@ -12,6 +13,14 @@
 // CHECK-NEXT:}
 __global__ void atomicAddKernel(int* lock, int val) {
     asm volatile("red.relaxed.gpu.global.add.s32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
+// CHECK: void atomicOrKernel(uint32_t* lock, uint32_t val) {
+// CHECK-NEXT:    *lock |= val;
+// CHECK-NEXT:}
+__global__ void atomicOrKernel(uint32_t* lock, uint32_t val) {
+    asm volatile("red.relaxed.gpu.global.or.b32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
 
