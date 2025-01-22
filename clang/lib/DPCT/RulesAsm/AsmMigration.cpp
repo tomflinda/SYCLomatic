@@ -2730,7 +2730,8 @@ protected:
     const auto *Type = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0));
     if (!Type || (Type->getKind() != InlineAsmBuiltinType::s32 &&
                   Type->getKind() != InlineAsmBuiltinType::b32 &&
-                  Type->getKind() != InlineAsmBuiltinType::u32))
+                  Type->getKind() != InlineAsmBuiltinType::u32 &&
+                  Type->getKind() != InlineAsmBuiltinType::f32))
       return SYCLGenError();
 
     if (emitStmt(Dst))
@@ -2743,45 +2744,27 @@ protected:
     if (tryEmitStmt(b, Src))
       return SYCLGenError();
 
+    OS() << " = ";
+    OS() << MapNames::getClNamespace() + "reduce_over_group(";
+    OS() << DpctGlobalInfo::getItem(GAS) << ".get_group(), " << b << ",";
+
     if (Inst->hasAttr(InstAttr::add))
-      OS() << " += ";
+      OS() << MapNames::getClNamespace() + "plus<>()";
     else if (Inst->hasAttr(InstAttr::op_or))
-      OS() << " |= ";
+      OS() << MapNames::getClNamespace() + "bit_or<>()";
     else if (Inst->hasAttr(InstAttr::op_xor))
-      OS() << " ^= ";
+      OS() << MapNames::getClNamespace() + "bit_xor<>()";
     else if (Inst->hasAttr(InstAttr::op_and))
-      OS() << " &= ";
-    else if (Inst->hasAttr(InstAttr::dec)) {
-      OS() << " = ";
-      OS() << '(';
-      OS() << a << " == 0 || " << a << " > " << b << ") ? " << b << " : " << a
-           << " - 1";
-      endstmt();
-      return SYCLGenSuccess();
-
-    } else if (Inst->hasAttr(InstAttr::inc)) {
-      OS() << " = ";
-      OS() << '(';
-      OS() << a << " >= " << b << ") ? 0 : " << a << " + 1";
-      endstmt();
-      return SYCLGenSuccess();
-    } else if (Inst->hasAttr(InstAttr::max)) {
-      OS() << " = " << MapNames::getClNamespace() + "max(" << a << ", " << b
-           << ")";
-      endstmt();
-      return SYCLGenSuccess();
-    } else if (Inst->hasAttr(InstAttr::min)) {
-      OS() << " = " << MapNames::getClNamespace() + "min(" << a << ", " << b
-           << ")";
-      endstmt();
-      return SYCLGenSuccess();
-    } else
+      OS() << MapNames::getClNamespace() + "bit_and<>()";
+    else if (Inst->hasAttr(InstAttr::min))
+      OS() << MapNames::getClNamespace() + "minimum<>()";
+    else if (Inst->hasAttr(InstAttr::max))
+      OS() << MapNames::getClNamespace() + "maximum<>()";
+    else
       return SYCLGenError();
 
-    if (emitStmt(Src))
-      return SYCLGenError();
+    OS() << ")";
     endstmt();
-
     return SYCLGenSuccess();
   }
 };

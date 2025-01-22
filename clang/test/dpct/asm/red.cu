@@ -8,56 +8,53 @@
 #include <cstdint>
 #include <cuda_runtime.h>
 
-// CHECK: void atomicAddKernel(int* lock, int val) {
-// CHECK-NEXT:    *lock += val;
+// CHECK: void atomicAddKernel(int* lock, int val, const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::plus<>());
 // CHECK-NEXT:}
 __global__ void atomicAddKernel(int* lock, int val) {
     asm volatile("red.relaxed.gpu.global.add.s32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
 
-// CHECK: void atomicOrKernel(uint32_t* lock, uint32_t val) {
-// CHECK-NEXT:    *lock |= val;
+// CHECK: void atomicOrKernel(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                     const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::bit_or<>());
 // CHECK-NEXT:}
 __global__ void atomicOrKernel(uint32_t* lock, uint32_t val) {
     asm volatile("red.relaxed.gpu.global.or.b32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
 
-// CHECK: void atomicXorKernel(uint32_t* lock, uint32_t val) {
-// CHECK-NEXT:    *lock ^= val;
+// CHECK: void atomicXorKernel(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                      const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::bit_xor<>());
 // CHECK-NEXT:}
 __global__ void atomicXorKernel(uint32_t* lock, uint32_t val) {
     asm volatile("red.relaxed.gpu.global.xor.b32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
 
-// CHECK: void atomicAndKernel(uint32_t* lock, uint32_t val) {
-// CHECK-NEXT:    *lock &= val;
-// CHECK-NEXT:}
+// CHECK: void atomicAndKernel(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                     const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::bit_and<>());
+// CHECK-NEXT: }
 __global__ void atomicAndKernel(uint32_t* lock, uint32_t val) {
     asm volatile("red.relaxed.gpu.global.and.b32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
 
-// CHECK: void atomicDecKernel(uint32_t* lock, uint32_t val) {
-// CHECK-NEXT:     *lock = (*lock == 0 || *lock > val) ? val : *lock - 1;
-// CHECK-NEXT: }
-__global__ void atomicDecKernel(uint32_t* lock, uint32_t val) {
-    asm volatile("red.relaxed.gpu.global.dec.u32 [%0], %1;\n"
-                 ::"l"(lock),"r"(val):"memory");
-}
-
-// CHECK: void atomicMaxKernel(uint32_t* lock, uint32_t val) {
-// CHECK-NEXT:    *lock = sycl::max(*lock, val);
+// CHECK: void atomicMaxKernel(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                      const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::maximum<>());
 // CHECK-NEXT: }
 __global__ void atomicMaxKernel(uint32_t* lock, uint32_t val) {
     asm volatile("red.relaxed.gpu.global.max.u32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
 
-// CHECK: void atomicMinKernel(uint32_t* lock, uint32_t val) {
-// CHECK-NEXT:     *lock = sycl::min(*lock, val);
+// CHECK: void atomicMinKernel(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                      const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::minimum<>());
 // CHECK-NEXT: }
 __global__ void atomicMinKernel(uint32_t* lock, uint32_t val) {
     asm volatile("red.relaxed.gpu.global.min.u32 [%0], %1;\n"
