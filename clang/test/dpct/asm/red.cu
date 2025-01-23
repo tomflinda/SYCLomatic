@@ -114,5 +114,4 @@ __global__ void atomicMinKernelRelease(uint32_t* lock, uint32_t val) {
     asm volatile("red.release.gpu.global.min.u32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
-
 // clang-format on

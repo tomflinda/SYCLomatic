@@ -2728,10 +2728,12 @@ protected:
       return false;
 
     const auto *Type = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0));
-    if (!Type || (Type->getKind() != InlineAsmBuiltinType::s32 &&
-                  Type->getKind() != InlineAsmBuiltinType::b32 &&
-                  Type->getKind() != InlineAsmBuiltinType::u32 &&
-                  Type->getKind() != InlineAsmBuiltinType::f32))
+    if (!Type ||
+        (Type->getKind() != InlineAsmBuiltinType::s32 &&
+         Type->getKind() != InlineAsmBuiltinType::b32 &&
+         Type->getKind() != InlineAsmBuiltinType::u32 &&
+         Type->getKind() != InlineAsmBuiltinType::f32) ||
+        !Inst->hasAttr(InstAttr::gpu))
       return SYCLGenError();
 
     if (emitStmt(Dst))
