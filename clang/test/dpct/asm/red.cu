@@ -60,4 +60,59 @@ __global__ void atomicMinKernel(uint32_t* lock, uint32_t val) {
     asm volatile("red.relaxed.gpu.global.min.u32 [%0], %1;\n"
                  ::"l"(lock),"r"(val):"memory");
 }
+
+// CHECK: void atomicAddKernelRelease(int* lock, int val,
+// CHECK-NEXT:                        const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::plus<>());
+// CHECK-NEXT:}
+__global__ void atomicAddKernelRelease(int* lock, int val) {
+    asm volatile("red.release.gpu.global.add.s32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
+// CHECK: void atomicOrKernelRelease(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                     const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::bit_or<>());
+// CHECK-NEXT:}
+__global__ void atomicOrKernelRelease(uint32_t* lock, uint32_t val) {
+    asm volatile("red.release.gpu.global.or.b32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
+// CHECK: void atomicXorKernelRelease(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                      const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::bit_xor<>());
+// CHECK-NEXT:}
+__global__ void atomicXorKernelRelease(uint32_t* lock, uint32_t val) {
+    asm volatile("red.release.gpu.global.xor.b32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
+// CHECK: void atomicAndKernelRelease(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                     const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::bit_and<>());
+// CHECK-NEXT: }
+__global__ void atomicAndKernelRelease(uint32_t* lock, uint32_t val) {
+    asm volatile("red.release.gpu.global.and.b32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
+// CHECK: void atomicMaxKernelRelease(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                      const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::maximum<>());
+// CHECK-NEXT: }
+__global__ void atomicMaxKernelRelease(uint32_t* lock, uint32_t val) {
+    asm volatile("red.release.gpu.global.max.u32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
+// CHECK: void atomicMinKernelRelease(uint32_t* lock, uint32_t val,
+// CHECK-NEXT:                      const sycl::nd_item<3> &item_ct1) {
+// CHECK-NEXT:     *lock = sycl::reduce_over_group(item_ct1.get_group(), val,sycl::minimum<>());
+// CHECK-NEXT: }
+__global__ void atomicMinKernelRelease(uint32_t* lock, uint32_t val) {
+    asm volatile("red.release.gpu.global.min.u32 [%0], %1;\n"
+                 ::"l"(lock),"r"(val):"memory");
+}
+
 // clang-format on
