@@ -68,7 +68,7 @@ __device__ inline void cp_async4_pred(void *smem_ptr, const void *glob_ptr,
 
 // CHECK:inline void cp_async_commit_group() {
 // CHECK-NEXT:  /*
-// CHECK-NEXT:  DPCT1026:{{[0-9]+}}: The call to "cp.async.commit_group;" was removed because there is no equivalent functionality in SYCL side. You may need to adjust the code.
+// CHECK-NEXT:  DPCT1026:{{[0-9]+}}: The call to "cp.async.commit_group;" was removed because SYCL currently has a functionality gap for asynchronous copy operations. Synchronous copy operations are used on the SYCL side and may cause performance issues. You may need to adjust the code.
 // CHECK-NEXT:  */
 // CHECK-EMPTY:
 // CHECK-NEXT:}
@@ -78,7 +78,7 @@ asm volatile("cp.async.commit_group;" ::);
 
 // CHECK:inline void cp_async_wait_group() {
 // CHECK-NEXT:  /*
-// CHECK-NEXT:  DPCT1026:{{[0-9]+}}: The call to "cp.async.wait_group 0;" was removed because there is no equivalent functionality in SYCL side. You may need to adjust the code.
+// CHECK-NEXT:  DPCT1026:{{[0-9]+}}: The call to "cp.async.wait_group 0;" was removed because SYCL currently has a functionality gap for asynchronous copy operations. Synchronous copy operations are used on the SYCL side and may cause performance issues. You may need to adjust the code.
 // CHECK-NEXT:  */
 // CHECK-EMPTY:
 // CHECK-NEXT:}
@@ -88,7 +88,7 @@ asm volatile("cp.async.wait_group 0;");
 
 // CHECK:inline void cp_async_wait_all() {
 // CHECK-NEXT:  /*
-// CHECK-NEXT:  DPCT1026:{{[0-9]+}}: The call to "cp.async.wait_all;" was removed because there is no equivalent functionality in SYCL side. You may need to adjust the code.
+// CHECK-NEXT:  DPCT1026:{{[0-9]+}}: The call to "cp.async.wait_all;" was removed because SYCL currently has a functionality gap for asynchronous copy operations. Synchronous copy operations are used on the SYCL side and may cause performance issues. You may need to adjust the code.
 // CHECK-NEXT:  */
 // CHECK-EMPTY:
 // CHECK-NEXT:}

@@ -2820,9 +2820,10 @@ protected:
                            .str();
 
       report(Diagnostics::FUNC_CALL_REMOVED, true, CommonStr,
-             "there is no equivalent "
-             "functionality in "
-             "SYCL side. You may need to adjust the code.");
+             "SYCL currently has a functionality gap for asynchronous copy "
+             "operations. Synchronous copy operations are used on the SYCL "
+             "side and may cause performance issues. You may need to adjust "
+             "the code.");
       return SYCLGenSuccess();
   }
 
