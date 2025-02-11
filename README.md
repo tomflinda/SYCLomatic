@@ -47,11 +47,18 @@ Note: SYCLomatic can be built from source without any CUDA dependencies. However
 
 ### Create SYCLomatic workspace
 
+<<<<<<< HEAD
 Throughout this document `SYCLOMATIC_HOME` denotes the path to the local directory
 created as SYCLomatic workspace. It might be useful to
 create an environment variable with the same name.
 
 **Linux**:
+=======
+#### Dockerfiles
+
+See available Dockerfiles to create containers with pre-built/pre-installed DPC++ compiler at:
+[Containers](./sycl/doc/developer/DockerBKMs.md#sycl-dockerfiles-overview)
+>>>>>>> origin/sycl
 
 ```bash
 export SYCLOMATIC_HOME=~/workspace
