@@ -467,18 +467,14 @@ static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
   std::string YamlFilePath = appendPath(OutRoot.getCanonicalPath().str(),
                                         DpctGlobalInfo::getYamlFileName());
   auto PreTU = std::make_shared<clang::tooling::TranslationUnitReplacements>();
-  printf("YamlFilePath:[%s]\n", YamlFilePath.c_str());
   if (llvm::sys::fs::exists(YamlFilePath)) {
-    printf("YamlFilePath:[%s]\n", YamlFilePath.c_str());
     if (loadFromYaml(YamlFilePath, *PreTU) != 0) {
       llvm::errs() << getLoadYamlFailWarning(YamlFilePath);
     }
   }
   for (auto &Entry : PreTU->MainSourceFilesDigest) {
-    if (Entry.HasCUDASyntax) {
-      printf("############[%s]\n", Entry.MainSourceFile.c_str());
+    if (Entry.HasCUDASyntax)
       MainSrcFilesHasCudaSyntex.insert(Entry.MainSourceFile);
-    }
   }
 
   // Currently, when "--use-experimental-features=device_global" and
