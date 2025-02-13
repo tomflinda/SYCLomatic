@@ -467,14 +467,18 @@ static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
   std::string YamlFilePath = appendPath(OutRoot.getCanonicalPath().str(),
                                         DpctGlobalInfo::getYamlFileName());
   auto PreTU = std::make_shared<clang::tooling::TranslationUnitReplacements>();
+  printf("YamlFilePath:[%s]\n", YamlFilePath.c_str());
   if (llvm::sys::fs::exists(YamlFilePath)) {
+    printf("YamlFilePath:[%s]\n", YamlFilePath.c_str());
     if (loadFromYaml(YamlFilePath, *PreTU) != 0) {
       llvm::errs() << getLoadYamlFailWarning(YamlFilePath);
     }
   }
   for (auto &Entry : PreTU->MainSourceFilesDigest) {
-    if (Entry.HasCUDASyntax)
+    if (Entry.HasCUDASyntax) {
+      printf("############[%s]\n", Entry.MainSourceFile.c_str());
       MainSrcFilesHasCudaSyntex.insert(Entry.MainSourceFile);
+    }
   }
 
   // Currently, when "--use-experimental-features=device_global" and
@@ -1322,7 +1326,10 @@ int runDPCT(int argc, const char **argv) {
   }
   // OC_Action: only migrate Build scripts.
   if (MigrateBuildScriptOnly) {
-    doBuildScriptMigration();
+    loadMainSrcFileInfo(OutRootPath);
+    collectBuildScriptsSpecified(OptParser, InRootPath, OutRootPath);
+    migrateBuildScripts(InRootPath, OutRootPath);
+
     ShowStatus(MigrationBuildScriptCompleted);
     dpctExit(MigrationSucceeded, false);
   }
