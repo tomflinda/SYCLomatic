@@ -2769,6 +2769,13 @@ protected:
     endstmt();
     return SYCLGenSuccess();
   }
+
+  bool handle_cp(const InlineAsmInstruction *Inst) override {
+    printf("Enter handle_cp ...\n");
+    return SYCLGenSuccess();
+  }
+
+
 };
 
 /// Clean the special character in identifier.
@@ -2949,6 +2956,7 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
+  printf("Buffer: %s\n", Buffer.c_str());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
