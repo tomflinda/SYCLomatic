@@ -345,15 +345,12 @@ void ThrustTypeRule::registerMatcher(ast_matchers::MatchFinder &MF) {
       this);
 
   auto hasFunctionalActor = []() {
-    return hasType(qualType(hasDeclaration(
-        cxxRecordDecl(hasName("thrust::detail::functional::actor")))));
+    return hasType(qualType(hasCanonicalType(hasDeclaration(
+        cxxRecordDecl(hasName("thrust::detail::functional::actor"))))));
   };
 
   MF.addMatcher(
-      cxxConstructExpr(anyOf(hasFunctionalActor(),
-                             hasType(qualType(hasDeclaration(
-                                 typedefNameDecl(hasFunctionalActor()))))))
-          .bind("thrustCtorPlaceHolder"),
+      cxxConstructExpr(hasFunctionalActor()).bind("thrustCtorPlaceHolder"),
       this);
 
   // Var register
