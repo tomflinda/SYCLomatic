@@ -348,6 +348,7 @@ InlineAsmStmtResult InlineAsmParser::ParseInstruction() {
     default:
       return AsmStmtError();
     }
+    printf("Tok:[%s]\n", Tok.getName());
     ConsumeToken(); // consume instruction attribute
   }
 
@@ -361,6 +362,7 @@ InlineAsmStmtResult InlineAsmParser::ParseInstruction() {
     InlineAsmExprResult E = ParseExpression();
     if (E.isInvalid())
       return AsmStmtError();
+    printf("Tok:[%s]\n", Tok.getName());
     Ops.push_back(E.get());
   }
 
@@ -377,6 +379,12 @@ InlineAsmStmtResult InlineAsmParser::ParseInstruction() {
     Ops.push_back(Out.get());
     Out = nullptr;
     Types.push_back(Context.getBuiltinType(InlineAsmBuiltinType::byte));
+  }
+
+  if (Opcode->getTokenID() == asmtok::op_cp) {
+    Ops.push_back(Out.get());
+    Out = nullptr;
+    Types.push_back(Context.getBuiltinType(InlineAsmBuiltinType::u32));
   }
 
   return ::new (Context) InlineAsmInstruction(Opcode, StateSpaces, Attrs, Types,

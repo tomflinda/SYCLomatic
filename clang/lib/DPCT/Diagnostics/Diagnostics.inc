@@ -298,6 +298,9 @@ DEF_WARNING(JOINT_MATRIX_SHAPE, 1135, HIGH_LEVEL, "Please check if joint_matrix 
 DEF_COMMENT(JOINT_MATRIX_SHAPE, 1135, HIGH_LEVEL, "Please check if joint_matrix implementations support the combination of data type and matrix shape type in the target hardware.")
 DEF_WARNING(UNSUPPORTED_EXTMEM_WIN_HANDLE, 1136, HIGH_LEVEL, "SYCL Bindless Images extension only supports importing external resource memory using NT handle on Windows. If assert(%0.get_win32_handle()) fails, you may need to adjust the code to use (%0.get_win32_handle()).")
 DEF_COMMENT(UNSUPPORTED_EXTMEM_WIN_HANDLE, 1136, HIGH_LEVEL, "SYCL Bindless Images extension only supports importing external resource memory using NT handle on Windows. If assert({0}.get_win32_handle()) fails, you may need to adjust the code to use ({0}.get_win32_handle()).")
+DEF_WARNING(ASYNC_COPY_DEVICE_WARN, 1137, LOW_LEVEL, "Synchronous copy operations are used on the SYCL side for migration of PTX \"cp.async\" and may cause performance issues. You may need to adjust.")
+DEF_COMMENT(ASYNC_COPY_DEVICE_WARN, 1137, LOW_LEVEL, "Synchronous copy operations are used on the SYCL side for migration of PTX \"cp.async\" and may cause performance issues. You may need to adjust.")
+
 // clang-format on
 
 #undef DEF_COMMENT
