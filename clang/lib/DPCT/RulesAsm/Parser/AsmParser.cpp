@@ -348,7 +348,6 @@ InlineAsmStmtResult InlineAsmParser::ParseInstruction() {
     default:
       return AsmStmtError();
     }
-    printf("Tok:[%s]\n", Tok.getName());
     ConsumeToken(); // consume instruction attribute
   }
 
@@ -362,7 +361,6 @@ InlineAsmStmtResult InlineAsmParser::ParseInstruction() {
     InlineAsmExprResult E = ParseExpression();
     if (E.isInvalid())
       return AsmStmtError();
-    printf("Tok:[%s]\n", Tok.getName());
     Ops.push_back(E.get());
   }
 

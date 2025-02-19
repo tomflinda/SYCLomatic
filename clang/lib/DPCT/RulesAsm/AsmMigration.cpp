@@ -36,7 +36,7 @@ using namespace clang::dpct;
 
 namespace {
 
-inline bool SYCLGenError() { assert(0); return true; }
+inline bool SYCLGenError() { return true; }
 inline bool SYCLGenSuccess() {return false; }
 
 /// This is used to handle all the AST nodes (except specific instructions, Eg.
@@ -67,8 +67,6 @@ protected:
       CodeGen.endl();
       CodeGen.incIndent();
     }
-
-    llvm::StringRef getCodeGenIndent() const { return CodeGen.Indent.str(); }
 
     ~BlockDelimiterGuard() {
       CodeGen.decIndent();
@@ -141,9 +139,10 @@ public:
   void cutOffMigration() { MigrationStopped = true; }
 
   bool isMigrationStopped() const { return MigrationStopped; }
-  void indent() { OS() << Indent; }
 
 protected:
+  void indent() { OS() << Indent; }
+
   void endl() {
     if (EmitNewLine) {
       if (NewLine.empty()) {
@@ -595,7 +594,6 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
                     asmtok::op_prefetch, asmtok::op_red, asmtok::op_cp)) {
     return SYCLGenError();
   }
-  printf("SYCLGenBase::emitAddressExp 000000000000000000000\n");
   std::string Type;
   if (tryEmitType(Type, CurrInst->getType(0)))
     return SYCLGenError();
@@ -623,13 +621,9 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
 
-    printf("SYCLGenBase::emitAddressExp 1111111111 %s\n", Reg.c_str());
-
     if (CurrInst->is(asmtok::op_prefetch, asmtok::op_red) ||
         CanSuppressCast(Dst->getSymbol()))
       OS() << llvm::formatv("{0}", Reg);
-    if(CurrInst->is(asmtok::op_cp))
-      OS() << llvm::formatv("(({0} *)(uintptr_t){1})", Type, Reg);
     else
       OS() << llvm::formatv("(({0} *)(uintptr_t){1})", Type, Reg);
     break;
@@ -2780,9 +2774,6 @@ protected:
   }
 
   bool handle_cp(const InlineAsmInstruction *Inst) override {
-    printf("Enter handle_cp ...\n");
-    printf("Inst->getNumInputOperands(): %ld\n", Inst->getNumInputOperands());
-    printf("Inst->getNumTypes(): %d\n", Inst->getNumTypes());
 
     if (Inst->getNumInputOperands() != 3 || Inst->getNumTypes() != 1)
       return SYCLGenError();
@@ -2794,10 +2785,6 @@ protected:
     for (int i = 0; i < 3; ++i)
       if (tryEmitStmt(Op[i], Inst->getInputOperand(i)))
         return SYCLGenError();
-
-    printf("Op[0]: %s\n", Op[0].c_str());
-    printf("Op[1]: %s\n", Op[1].c_str());
-    printf("Op[2]: %s\n", Op[2].c_str());
 
     OS() << "*(" << Op[2] << ") = *(" << Op[0] << ");\n";
 
@@ -2826,12 +2813,9 @@ protected:
     indent();
     decIndent();
     OS() << "    *(" << Op[2] << " + 12) = *(" << Op[0] << " + 12)";
-
     endstmt();
 
     report(Diagnostics::ASYNC_COPY_DEVICE_WARN, true);
-
-
     return SYCLGenSuccess();
   }
 };
@@ -3014,7 +2998,6 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
   InlineAsmContext Context;
   llvm::SourceMgr Mgr;
   std::string Buffer = GAS->getAsmString()->getString().str();
-  printf("Buffer: %s\n", Buffer.c_str());
   Mgr.AddNewSourceBuffer(llvm::MemoryBuffer::getMemBuffer(Buffer),
                          llvm::SMLoc());
   SYCLIdentiferHandler Handle;
@@ -3039,25 +3022,18 @@ void AsmRule::doMigrateInternel(const GCCAsmStmt *GAS) {
     if (needExtraParens(E) && !isa<UnaryOperator>(E) &&
         !isa<UnaryExprOrTypeTraitExpr>(E))
       return "(" + AA.getRewriteString() + ")";
-    
-    auto Str = AA.getRewriteString();
-    printf("Str: [%s]\n", Str.c_str());
-    return Str;
+    return AA.getRewriteString();
   };
   Parser.addBuiltinIdentifier();
-  printf("--------------------getNumOutputs -----------------\n");
   for (unsigned I = 0, E = GAS->getNumOutputs(); I != E; ++I)
     Parser.addInlineAsmOperands(GAS->getOutputExpr(I),
                                 getReplaceString(GAS->getOutputExpr(I)),
                                 GAS->getOutputConstraint(I));
-  printf("--------------------------------------------------\n");
- 
- printf("--------------------getNumInputs -----------------\n");
+
   for (unsigned I = 0, E = GAS->getNumInputs(); I != E; ++I)
     Parser.addInlineAsmOperands(GAS->getInputExpr(I),
                                 getReplaceString(GAS->getInputExpr(I)),
                                 GAS->getInputConstraint(I));
- printf("--------------------------------------------------\n");
   do {
     auto Inst = Parser.ParseStatement();
     if (Inst.isInvalid()) {
