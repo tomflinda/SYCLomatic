@@ -2774,7 +2774,6 @@ protected:
   }
 
   bool handle_cp(const InlineAsmInstruction *Inst) override {
-
     if (Inst->getNumInputOperands() != 3 || Inst->getNumTypes() != 1)
       return SYCLGenError();
 
@@ -2786,33 +2785,28 @@ protected:
       if (tryEmitStmt(Op[i], Inst->getInputOperand(i)))
         return SYCLGenError();
 
+    auto CommonIfStat = [&](std::string Val) {
+      indent();
+      return "if (" + Op[1] + " > " + Val + ")\n";
+    };
+
+    auto CommonBody = [&](std::string Val) {
+      incIndent();
+      indent();
+      decIndent();
+      return "*(" + Op[2] + " + " + Val + ") = *(" + Op[0] + " + " + Val + ")";
+    };
+
     OS() << "*(" << Op[2] << ") = *(" << Op[0] << ");\n";
 
-    indent();
-    OS() << "if (" << Op[1] << "> 4 )\n";
+    OS() << CommonIfStat("4");
+    OS() << CommonBody("1") << ";\n";
 
-    incIndent();
-    indent();
-    decIndent();
-    OS() << "    *(" << Op[2] << " + 4) = *(" << Op[0] << " + 4);\n";
+    OS() << CommonIfStat("8");
+    OS() << CommonBody("2") << ";\n";
 
-    indent();
-    OS() << "if (" << Op[1] << "> 8 )\n";
-
-
-    incIndent();
-    indent();
-    decIndent();    
-    OS() << "    *(" << Op[2] << " + 8) = *(" << Op[0] << " + 8);\n";
-
-    indent();
-    OS() << "if (" << Op[1] << "> 12 )\n";
-
-
-    incIndent();
-    indent();
-    decIndent();
-    OS() << "    *(" << Op[2] << " + 12) = *(" << Op[0] << " + 12)";
+    OS() << CommonIfStat("12");
+    OS() << CommonBody("3");
     endstmt();
 
     report(Diagnostics::ASYNC_COPY_DEVICE_WARN, true);

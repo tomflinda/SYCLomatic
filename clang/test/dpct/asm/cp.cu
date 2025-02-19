@@ -9,8 +9,6 @@
 #include <cstdint>
 #include <cuda_runtime.h>
 
-
-
 // CHECK: inline void cp_async4(void *smem_ptr, const void *glob_ptr) {
 // CHECK-NEXT:  const int BYTES = 16;
 // CHECK-NEXT:  auto smem = smem_ptr;
@@ -19,12 +17,12 @@
 // CHECK-NEXT:  */
 // CHECK-NEXT:  {
 // CHECK-NEXT:    *(((uint32_t *)(uintptr_t)smem)) = *(((uint32_t *)(uintptr_t)glob_ptr));
-// CHECK-NEXT:    if (BYTES> 4 )
-// CHECK-NEXT:          *(((uint32_t *)(uintptr_t)smem) + 4) = *(((uint32_t *)(uintptr_t)glob_ptr) + 4);
-// CHECK-NEXT:    if (BYTES> 8 )
-// CHECK-NEXT:          *(((uint32_t *)(uintptr_t)smem) + 8) = *(((uint32_t *)(uintptr_t)glob_ptr) + 8);
-// CHECK-NEXT:    if (BYTES> 12 )
-// CHECK-NEXT:          *(((uint32_t *)(uintptr_t)smem) + 12) = *(((uint32_t *)(uintptr_t)glob_ptr) + 12);
+// CHECK-NEXT:    if (BYTES > 4)
+// CHECK-NEXT:      *(((uint32_t *)(uintptr_t)smem) + 1) = *(((uint32_t *)(uintptr_t)glob_ptr) + 1);
+// CHECK-NEXT:    if (BYTES > 8)
+// CHECK-NEXT:      *(((uint32_t *)(uintptr_t)smem) + 2) = *(((uint32_t *)(uintptr_t)glob_ptr) + 2);
+// CHECK-NEXT:    if (BYTES > 12)
+// CHECK-NEXT:      *(((uint32_t *)(uintptr_t)smem) + 3) = *(((uint32_t *)(uintptr_t)glob_ptr) + 3);
 // CHECK-NEXT:  }
 // CHECK-NEXT:}
 __device__ inline void cp_async4(void *smem_ptr, const void *glob_ptr) {
@@ -48,12 +46,12 @@ __device__ inline void cp_async4(void *smem_ptr, const void *glob_ptr) {
 // CHECK-NEXT:    p = (int)pred != 0;
 // CHECK-NEXT:    if (p) {
 // CHECK-NEXT:      *(((uint32_t *)(uintptr_t)smem)) = *(((uint32_t *)(uintptr_t)glob_ptr));
-// CHECK-NEXT:      if (BYTES> 4 )
-// CHECK-NEXT:            *(((uint32_t *)(uintptr_t)smem) + 4) = *(((uint32_t *)(uintptr_t)glob_ptr) + 4);
-// CHECK-NEXT:      if (BYTES> 8 )
-// CHECK-NEXT:            *(((uint32_t *)(uintptr_t)smem) + 8) = *(((uint32_t *)(uintptr_t)glob_ptr) + 8);
-// CHECK-NEXT:      if (BYTES> 12 )
-// CHECK-NEXT:            *(((uint32_t *)(uintptr_t)smem) + 12) = *(((uint32_t *)(uintptr_t)glob_ptr) + 12);
+// CHECK-NEXT:      if (BYTES > 4)
+// CHECK-NEXT:        *(((uint32_t *)(uintptr_t)smem) + 1) = *(((uint32_t *)(uintptr_t)glob_ptr) + 1);
+// CHECK-NEXT:      if (BYTES > 8)
+// CHECK-NEXT:        *(((uint32_t *)(uintptr_t)smem) + 2) = *(((uint32_t *)(uintptr_t)glob_ptr) + 2);
+// CHECK-NEXT:      if (BYTES > 12)
+// CHECK-NEXT:        *(((uint32_t *)(uintptr_t)smem) + 3) = *(((uint32_t *)(uintptr_t)glob_ptr) + 3);
 // CHECK-NEXT:    }
 // CHECK-NEXT:  }
 // CHECK-NEXT:}
