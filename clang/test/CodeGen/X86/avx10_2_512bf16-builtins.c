@@ -351,36 +351,36 @@ __m512bh test_mm512_maskz_divne_pbh(__mmask32 __U, __m512bh __A, __m512bh __B) {
 
 __m512bh test_mm512_max_pbh(__m512bh __A, __m512bh __B) {
   // CHECK-LABEL: @test_mm512_max_pbh
-  // CHECK: @llvm.x86.avx10.vmaxpbf16512(
+  // CHECK: @llvm.x86.avx10.vmaxbf16512(
   return _mm512_max_pbh(__A, __B);
 }
 
 __m512bh test_mm512_mask_max_pbh(__m512bh __W, __mmask32 __U, __m512bh __A, __m512bh __B) {
-  // CHECK: @llvm.x86.avx10.vmaxpbf16512
+  // CHECK: @llvm.x86.avx10.vmaxbf16512
   // CHECK: select <32 x i1> %{{.*}}, <32 x bfloat> %{{.*}}, <32 x bfloat> %{{.*}}
   return _mm512_mask_max_pbh(__W, __U, __A, __B);
 }
 
 __m512bh test_mm512_maskz_max_pbh(__mmask32 __U, __m512bh __A, __m512bh __B) {
-  // CHECK: @llvm.x86.avx10.vmaxpbf16512
+  // CHECK: @llvm.x86.avx10.vmaxbf16512
   // CHECK: select <32 x i1> %{{.*}}, <32 x bfloat> %{{.*}}, <32 x bfloat> %{{.*}}
   return _mm512_maskz_max_pbh(__U, __A, __B);
 }
 
 __m512bh test_mm512_min_pbh(__m512bh __A, __m512bh __B) {
   // CHECK-LABEL: @test_mm512_min_pbh
-  // CHECK: @llvm.x86.avx10.vminpbf16512(
+  // CHECK: @llvm.x86.avx10.vminbf16512(
   return _mm512_min_pbh(__A, __B);
 }
 
 __m512bh test_mm512_mask_min_pbh(__m512bh __W, __mmask32 __U, __m512bh __A, __m512bh __B) {
-  // CHECK: @llvm.x86.avx10.vminpbf16512
+  // CHECK: @llvm.x86.avx10.vminbf16512
   // CHECK: select <32 x i1> %{{.*}}, <32 x bfloat> %{{.*}}, <32 x bfloat> %{{.*}}
   return _mm512_mask_min_pbh(__W, __U, __A, __B);
 }
 
 __m512bh test_mm512_maskz_min_pbh(__mmask32 __U, __m512bh __A, __m512bh __B) {
-  // CHECK: @llvm.x86.avx10.vminpbf16512
+  // CHECK: @llvm.x86.avx10.vminbf16512
   // CHECK: select <32 x i1> %{{.*}}, <32 x bfloat> %{{.*}}, <32 x bfloat> %{{.*}}
   return _mm512_maskz_min_pbh(__U, __A, __B);
 }

@@ -16300,9 +16300,9 @@ Value *CodeGenFunction::EmitX86BuiltinExpr(unsigned BuiltinID,
   case X86::BI__builtin_ia32_sqrtph256:
   case X86::BI__builtin_ia32_sqrtph:
   case X86::BI__builtin_ia32_sqrtph512:
-  case X86::BI__builtin_ia32_vsqrtnepbf16256:
-  case X86::BI__builtin_ia32_vsqrtnepbf16:
-  case X86::BI__builtin_ia32_vsqrtnepbf16512:
+  case X86::BI__builtin_ia32_vsqrtbf16256:
+  case X86::BI__builtin_ia32_vsqrtbf16:
+  case X86::BI__builtin_ia32_vsqrtbf16512:
   case X86::BI__builtin_ia32_sqrtps512:
   case X86::BI__builtin_ia32_sqrtpd512: {
     if (Ops.size() == 2) {

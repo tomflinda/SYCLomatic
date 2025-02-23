@@ -578,72 +578,72 @@ __m128bh test_mm_maskz_divne_pbh(__mmask16 __U, __m128bh __A, __m128bh __B) {
 
 __m256bh test_mm256_max_pbh(__m256bh __A, __m256bh __B) {
   // CHECK-LABEL: @test_mm256_max_pbh
-  // CHECK: @llvm.x86.avx10.vmaxpbf16256(
+  // CHECK: @llvm.x86.avx10.vmaxbf16256(
   return _mm256_max_pbh(__A, __B);
 }
 
 __m256bh test_mm256_mask_max_pbh(__m256bh __W, __mmask16 __U, __m256bh __A, __m256bh __B) {
-  // CHECK: @llvm.x86.avx10.vmaxpbf16256
+  // CHECK: @llvm.x86.avx10.vmaxbf16256
   // CHECK: select <16 x i1> %{{.*}}, <16 x bfloat> %{{.*}}, <16 x bfloat> %{{.*}}
   return (__m256bh)_mm256_mask_max_pbh(__W, __U, __A, __B);
 }
 
 __m256bh test_mm256_maskz_max_pbh(__mmask16 __U, __m256bh __A, __m256bh __B) {
-  // CHECK: @llvm.x86.avx10.vmaxpbf16256
+  // CHECK: @llvm.x86.avx10.vmaxbf16256
   // CHECK: select <16 x i1> %{{.*}}, <16 x bfloat> %{{.*}}, <16 x bfloat> %{{.*}}
   return _mm256_maskz_max_pbh(__U, __A, __B);
 }
 
 __m128bh test_mm_max_pbh(__m128bh __A, __m128bh __B) {
   // CHECK-LABEL: @test_mm_max_pbh
-  // CHECK: @llvm.x86.avx10.vmaxpbf16128(
+  // CHECK: @llvm.x86.avx10.vmaxbf16128(
   return _mm_max_pbh(__A, __B);
 }
 
 __m128bh test_mm_mask_max_pbh(__m128bh __W, __mmask16 __U, __m128bh __A, __m128bh __B) {
-  // CHECK: @llvm.x86.avx10.vmaxpbf16128
+  // CHECK: @llvm.x86.avx10.vmaxbf16128
   // CHECK: select <8 x i1> %{{.*}}, <8 x bfloat> %{{.*}}, <8 x bfloat> %{{.*}}
   return (__m128bh)_mm_mask_max_pbh(__W, __U, __A, __B);
 }
 
 __m128bh test_mm_maskz_max_pbh(__mmask16 __U, __m128bh __A, __m128bh __B) {
-  // CHECK: @llvm.x86.avx10.vmaxpbf16128
+  // CHECK: @llvm.x86.avx10.vmaxbf16128
   // CHECK: select <8 x i1> %{{.*}}, <8 x bfloat> %{{.*}}, <8 x bfloat> %{{.*}}
   return _mm_maskz_max_pbh(__U, __A, __B);
 }
 
 __m256bh test_mm256_min_pbh(__m256bh __A, __m256bh __B) {
   // CHECK-LABEL: @test_mm256_min_pbh
-  // CHECK: @llvm.x86.avx10.vminpbf16256(
+  // CHECK: @llvm.x86.avx10.vminbf16256(
   return _mm256_min_pbh(__A, __B);
 }
 
 __m256bh test_mm256_mask_min_pbh(__m256bh __W, __mmask16 __U, __m256bh __A, __m256bh __B) {
-  // CHECK: @llvm.x86.avx10.vminpbf16256
+  // CHECK: @llvm.x86.avx10.vminbf16256
   // CHECK: select <16 x i1> %{{.*}}, <16 x bfloat> %{{.*}}, <16 x bfloat> %{{.*}}
   return (__m256bh)_mm256_mask_min_pbh(__W, __U, __A, __B);
 }
 
 __m256bh test_mm256_maskz_min_pbh(__mmask16 __U, __m256bh __A, __m256bh __B) {
-  // CHECK: @llvm.x86.avx10.vminpbf16256
+  // CHECK: @llvm.x86.avx10.vminbf16256
   // CHECK: select <16 x i1> %{{.*}}, <16 x bfloat> %{{.*}}, <16 x bfloat> %{{.*}}
   return _mm256_maskz_min_pbh(__U, __A, __B);
 }
 
 __m128bh test_mm_min_pbh(__m128bh __A, __m128bh __B) {
   // CHECK-LABEL: @test_mm_min_pbh
-  // CHECK: @llvm.x86.avx10.vminpbf16128(
+  // CHECK: @llvm.x86.avx10.vminbf16128(
   return _mm_min_pbh(__A, __B);
 }
 
 __m128bh test_mm_mask_min_pbh(__m128bh __W, __mmask16 __U, __m128bh __A, __m128bh __B) {
-  // CHECK: @llvm.x86.avx10.vminpbf16128
+  // CHECK: @llvm.x86.avx10.vminbf16128
   // CHECK: select <8 x i1> %{{.*}}, <8 x bfloat> %{{.*}}, <8 x bfloat> %{{.*}}
   return (__m128bh)_mm_mask_min_pbh(__W, __U, __A, __B);
 }
 
 __m128bh test_mm_maskz_min_pbh(__mmask16 __U, __m128bh __A, __m128bh __B) {
-  // CHECK: @llvm.x86.avx10.vminpbf16128
+  // CHECK: @llvm.x86.avx10.vminbf16128
   // CHECK: select <8 x i1> %{{.*}}, <8 x bfloat> %{{.*}}, <8 x bfloat> %{{.*}}
   return _mm_maskz_min_pbh(__U, __A, __B);
 }
