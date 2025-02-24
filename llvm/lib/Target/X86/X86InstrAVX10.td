@@ -1233,19 +1233,19 @@ multiclass avx10_fp_binopne_int_pbf16<bits<8> opc, string OpcodeStr,
                                       bit IsCommutable = 0> {
   let Predicates = [HasAVX10_2_512] in
     defm Z : avx512_fp_packed<opc, OpcodeStr,
-                              !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"pbf16512"),
-                              !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"pbf16512"),
+                              !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"bf16512"),
+                              !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"bf16512"),
                               v32bf16_info, sched.PH.ZMM, IsCommutable>, EVEX_V512,
                               T_MAP5, PD, EVEX_CD8<16, CD8VF>;
   let Predicates = [HasAVX10_2] in {
     defm Z128 : avx512_fp_packed<opc, OpcodeStr,
-                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"pbf16128"),
-                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"pbf16128"),
+                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"bf16128"),
+                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"bf16128"),
                                  v8bf16x_info, sched.PH.XMM, IsCommutable>, EVEX_V128,
                                  T_MAP5, PD, EVEX_CD8<16, CD8VF>;
     defm Z256 : avx512_fp_packed<opc, OpcodeStr,
-                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"pbf16256"),
-                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"pbf16256"),
+                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"bf16256"),
+                                 !cast<Intrinsic>("int_x86_avx10_"#OpcodeStr#"bf16256"),
                                  v16bf16x_info, sched.PH.YMM, IsCommutable>, EVEX_V256,
                                  T_MAP5, PD, EVEX_CD8<16, CD8VF>;
   }
