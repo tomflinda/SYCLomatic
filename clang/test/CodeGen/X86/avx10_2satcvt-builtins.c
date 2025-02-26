@@ -304,20 +304,20 @@ __m256i test_mm256_maskz_ipcvt_roundps_epu8(__mmask8 __A, __m256 __B) {
 
 __m128i test_mm_ipcvttnebf16_epi8(__m128bh __A) {
   // CHECK-LABEL: @test_mm_ipcvttnebf16_epi8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162ibs128
+  // CHECK: @llvm.x86.avx10.vcvttbf162ibs128
   return _mm_ipcvttnebf16_epi8(__A);
 }
 
 __m128i test_mm_mask_ipcvttnebf16_epi8(__m128i __S, __mmask8 __A, __m128bh __B) {
   // CHECK-LABEL: @test_mm_mask_ipcvttnebf16_epi8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162ibs128
+  // CHECK: @llvm.x86.avx10.vcvttbf162ibs128
   // CHECK: select <8 x i1> %{{.*}}, <8 x i16> %{{.*}}, <8 x i16> %{{.*}}
   return _mm_mask_ipcvttnebf16_epi8(__S, __A, __B);
 }
 
 __m128i test_mm_maskz_ipcvttnebf16_epi8(__mmask8 __A, __m128bh __B) {
   // CHECK-LABEL: @test_mm_maskz_ipcvttnebf16_epi8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162ibs128
+  // CHECK: @llvm.x86.avx10.vcvttbf162ibs128
   // CHECK: zeroinitializer
   // CHECK: select <8 x i1> %{{.*}}, <8 x i16> %{{.*}}, <8 x i16> %{{.*}}
   return _mm_maskz_ipcvttnebf16_epi8(__A, __B);
@@ -325,20 +325,20 @@ __m128i test_mm_maskz_ipcvttnebf16_epi8(__mmask8 __A, __m128bh __B) {
 
 __m256i test_mm256_ipcvttnebf16_epi8(__m256bh __A) {
   // CHECK-LABEL: @test_mm256_ipcvttnebf16_epi8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162ibs256
+  // CHECK: @llvm.x86.avx10.vcvttbf162ibs256
   return _mm256_ipcvttnebf16_epi8(__A);
 }
 
 __m256i test_mm256_mask_ipcvttnebf16_epi8(__m256i __S, __mmask16 __A, __m256bh __B) {
   // CHECK-LABEL: @test_mm256_mask_ipcvttnebf16_epi8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162ibs256
+  // CHECK: @llvm.x86.avx10.vcvttbf162ibs256
   // CHECK: select <16 x i1> %{{.*}}, <16 x i16> %{{.*}}, <16 x i16> %{{.*}}
   return _mm256_mask_ipcvttnebf16_epi8(__S, __A, __B);
 }
 
 __m256i test_mm256_maskz_ipcvttnebf16_epi8(__mmask16 __A, __m256bh __B) {
   // CHECK-LABEL: @test_mm256_maskz_ipcvttnebf16_epi8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162ibs256
+  // CHECK: @llvm.x86.avx10.vcvttbf162ibs256
   // CHECK: zeroinitializer
   // CHECK: select <16 x i1> %{{.*}}, <16 x i16> %{{.*}}, <16 x i16> %{{.*}}
   return _mm256_maskz_ipcvttnebf16_epi8(__A, __B);
@@ -346,20 +346,20 @@ __m256i test_mm256_maskz_ipcvttnebf16_epi8(__mmask16 __A, __m256bh __B) {
 
 __m128i test_mm_ipcvttnebf16_epu8(__m128bh __A) {
   // CHECK-LABEL: @test_mm_ipcvttnebf16_epu8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162iubs128
+  // CHECK: @llvm.x86.avx10.vcvttbf162iubs128
   return _mm_ipcvttnebf16_epu8(__A);
 }
 
 __m128i test_mm_mask_ipcvttnebf16_epu8(__m128i __S, __mmask8 __A, __m128bh __B) {
   // CHECK-LABEL: @test_mm_mask_ipcvttnebf16_epu8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162iubs128
+  // CHECK: @llvm.x86.avx10.vcvttbf162iubs128
   // CHECK: select <8 x i1> %{{.*}}, <8 x i16> %{{.*}}, <8 x i16> %{{.*}}
   return _mm_mask_ipcvttnebf16_epu8(__S, __A, __B);
 }
 
 __m128i test_mm_maskz_ipcvttnebf16_epu8(__mmask8 __A, __m128bh __B) {
   // CHECK-LABEL: @test_mm_maskz_ipcvttnebf16_epu8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162iubs128
+  // CHECK: @llvm.x86.avx10.vcvttbf162iubs128
   // CHECK: zeroinitializer
   // CHECK: select <8 x i1> %{{.*}}, <8 x i16> %{{.*}}, <8 x i16> %{{.*}}
   return _mm_maskz_ipcvttnebf16_epu8(__A, __B);
@@ -367,20 +367,20 @@ __m128i test_mm_maskz_ipcvttnebf16_epu8(__mmask8 __A, __m128bh __B) {
 
 __m256i test_mm256_ipcvttnebf16_epu8(__m256bh __A) {
   // CHECK-LABEL: @test_mm256_ipcvttnebf16_epu8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162iubs256
+  // CHECK: @llvm.x86.avx10.vcvttbf162iubs256
   return _mm256_ipcvttnebf16_epu8(__A);
 }
 
 __m256i test_mm256_mask_ipcvttnebf16_epu8(__m256i __S, __mmask16 __A, __m256bh __B) {
   // CHECK-LABEL: @test_mm256_mask_ipcvttnebf16_epu8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162iubs256
+  // CHECK: @llvm.x86.avx10.vcvttbf162iubs256
   // CHECK: select <16 x i1> %{{.*}}, <16 x i16> %{{.*}}, <16 x i16> %{{.*}}
   return _mm256_mask_ipcvttnebf16_epu8(__S, __A, __B);
 }
 
 __m256i test_mm256_maskz_ipcvttnebf16_epu8(__mmask16 __A, __m256bh __B) {
   // CHECK-LABEL: @test_mm256_maskz_ipcvttnebf16_epu8(
-  // CHECK: @llvm.x86.avx10.vcvttnebf162iubs256
+  // CHECK: @llvm.x86.avx10.vcvttbf162iubs256
   // CHECK: zeroinitializer
   // CHECK: select <16 x i1> %{{.*}}, <16 x i16> %{{.*}}, <16 x i16> %{{.*}}
   return _mm256_maskz_ipcvttnebf16_epu8(__A, __B);

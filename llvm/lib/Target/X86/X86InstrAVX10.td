@@ -586,11 +586,11 @@ defm VCVTPS2IUBS : avx10_sat_cvt_base<0x6b, "vcvtps2iubs", SchedWriteVecIMul,
                                     X86vcvtp2iubsRnd>,
                    AVX512PDIi8Base, T_MAP5, EVEX_CD8<32, CD8VF>;
 
-defm VCVTTNEBF162IBS : avx10_sat_cvt_base<0x68, "vcvttnebf162ibs",
+defm VCVTTBF162IBS : avx10_sat_cvt_base<0x68, "vcvttbf162ibs",
                                           SchedWriteVecIMul, X86vcvttp2ibs,
                                           avx512vl_i16_info, avx512vl_bf16_info>,
                        AVX512XDIi8Base, T_MAP5, EVEX_CD8<16, CD8VF>;
-defm VCVTTNEBF162IUBS : avx10_sat_cvt_base<0x6a, "vcvttnebf162iubs",
+defm VCVTTBF162IUBS : avx10_sat_cvt_base<0x6a, "vcvttbf162iubs",
                                            SchedWriteVecIMul, X86vcvttp2iubs,
                                            avx512vl_i16_info, avx512vl_bf16_info>,
                         AVX512XDIi8Base, T_MAP5, EVEX_CD8<16, CD8VF>;
@@ -1389,7 +1389,7 @@ defm VRCP    : avx10_fp14_pbf16<0x4C, "vrcp", X86rcp14, SchedWriteFRcp>,
 defm VGETEXP : avx10_fp14_pbf16<0x42, "vgetexp", X86fgetexp, SchedWriteFRnd>,
                                 T_MAP5, EVEX_CD8<16, CD8VF>;
 
-// VSCALEFPBF16
+// VSCALEFBF16
 multiclass avx10_fp_scalef_bf16<bits<8> opc, string OpcodeStr,
                                 X86SchedWriteWidths sched> {
   let Predicates = [HasAVX10_2_512] in
@@ -1404,7 +1404,7 @@ multiclass avx10_fp_scalef_bf16<bits<8> opc, string OpcodeStr,
 }
 
 let Uses = []<Register>, mayRaiseFPException = 0 in
-defm VSCALEFPBF16 : avx10_fp_scalef_bf16<0x2C, "vscalef", SchedWriteFAdd>;
+defm VSCALEFBF16 : avx10_fp_scalef_bf16<0x2C, "vscalef", SchedWriteFAdd>;
 
 // VREDUCEBF16, VRNDSCALEBF16, VGETMANTBF16
 multiclass avx10_common_unary_fp_packed_imm_bf16<string OpcodeStr,
