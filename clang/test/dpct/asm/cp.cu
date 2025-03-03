@@ -13,7 +13,7 @@
 // CHECK-NEXT:  const int BYTES = 16;
 // CHECK-NEXT:  auto smem = smem_ptr;
 // CHECK-NEXT:  /*
-// CHECK-NEXT:  DPCT1137:{{[0-9]+}}: Synchronous copy operations are used on the SYCL side for migration of PTX "cp.async" and may cause performance issues. You may need to adjust.
+// CHECK-NEXT:  DPCT1137:{{[0-9]+}}: ASM instruction "cp.async" is asynchronous copy, current it is migrated to synchronous copy operation. You may need to adjust the code to tune the performance.
 // CHECK-NEXT:  */
 // CHECK-NEXT:  {
 // CHECK-NEXT:    *(((uint32_t *)(uintptr_t)smem)) = *(((uint32_t *)(uintptr_t)glob_ptr));
@@ -39,7 +39,7 @@ __device__ inline void cp_async4(void *smem_ptr, const void *glob_ptr) {
 // CHECK-NEXT:  const int BYTES = 16;
 // CHECK-NEXT:  auto smem = smem_ptr;
 // CHECK-NEXT:  /*
-// CHECK-NEXT:  DPCT1137:{{[0-9]+}}: Synchronous copy operations are used on the SYCL side for migration of PTX "cp.async" and may cause performance issues. You may need to adjust.
+// CHECK-NEXT:  DPCT1137:{{[0-9]+}}: ASM instruction "cp.async" is asynchronous copy, current it is migrated to synchronous copy operation. You may need to adjust the code to tune the performance.
 // CHECK-NEXT:  */
 // CHECK-NEXT:  {
 // CHECK-NEXT:    bool p;
