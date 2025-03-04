@@ -48,6 +48,7 @@ enum class CudaVersion {
   CUDA_124,
   CUDA_125,
   CUDA_126,
+<<<<<<< HEAD
 #ifdef SYCLomatic_CUSTOMIZATION
   CUDA_128,
   FULLY_SUPPORTED = CUDA_126,
@@ -58,6 +59,12 @@ enum class CudaVersion {
   PARTIALLY_SUPPORTED =
       CUDA_126, // Partially supported. Proceed with a warning.
 #endif
+=======
+  CUDA_128,
+  FULLY_SUPPORTED = CUDA_123,
+  PARTIALLY_SUPPORTED =
+      CUDA_128, // Partially supported. Proceed with a warning.
+>>>>>>> origin/sycl
   NEW = 10000,  // Too new. Issue a warning, but allow using it.
 };
 const char *CudaVersionToString(CudaVersion V);
@@ -94,6 +101,7 @@ enum class OffloadArch {
   SM_90,
   SM_90a,
   SM_100,
+  SM_100a,
   GFX600,
   GFX601,
   GFX602,
@@ -117,9 +125,11 @@ enum class OffloadArch {
   GFX909,
   GFX90a,
   GFX90c,
+  GFX9_4_GENERIC,
   GFX940,
   GFX941,
   GFX942,
+  GFX950,
   GFX10_1_GENERIC,
   GFX1010,
   GFX1011,
@@ -141,6 +151,7 @@ enum class OffloadArch {
   GFX1150,
   GFX1151,
   GFX1152,
+  GFX1153,
   GFX12_GENERIC,
   GFX1200,
   GFX1201,
