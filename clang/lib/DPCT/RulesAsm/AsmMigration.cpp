@@ -2820,9 +2820,10 @@ protected:
                          .concat("\"")
                          .str();
 
-    report(Diagnostics::FUNC_CALL_REMOVED, true, CommonStr,
-           "synchronous copy operation is used. You may need to adjust the "
-           "code to tune the performance.");
+    report(
+        Diagnostics::FUNC_CALL_REMOVED, true, CommonStr,
+        "current \"cp.async\" is migrated to synchronous copy operation. You "
+        "may need to adjust the code to tune the performance.");
     return SYCLGenSuccess();
   }
 
