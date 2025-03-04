@@ -584,13 +584,8 @@ bool ToolInvocation::run() {
   TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), DiagOpts);
   IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics =
       CompilerInstance::createDiagnostics(
-<<<<<<< HEAD
-          &*DiagOpts, DiagConsumer ? DiagConsumer : &DiagnosticPrinter, false);
-
-=======
           Files->getVirtualFileSystem(), &*DiagOpts,
           DiagConsumer ? DiagConsumer : &DiagnosticPrinter, false);
->>>>>>> origin/sycl
   // Although `Diagnostics` are used only for command-line parsing, the custom
   // `DiagConsumer` might expect a `SourceManager` to be present.
   SourceManager SrcMgr(*Diagnostics, *Files);

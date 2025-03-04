@@ -934,15 +934,9 @@ def X86vcvtbiasph2hf8 : SDNode<"X86ISD::VCVTBIASPH2HF8",
                                SDTAVX10CONVERT_2I8F16>;
 def X86vcvtbiasph2hf8s : SDNode<"X86ISD::VCVTBIASPH2HF8S",
                                 SDTAVX10CONVERT_2I8F16>;
-<<<<<<< HEAD
-def X86vcvtph2bf8512 : SDNode<"X86ISD::VCVTPH2BF8512",
-                             SDTAVX10CONVERT_I8F16>;
-def X86vcvtph2bf8512s : SDNode<"X86ISD::VCVTPH2BF8512S",
-=======
 def X86vcvtph2bf8 : SDNode<"X86ISD::VCVTPH2BF8",
                              SDTAVX10CONVERT_I8F16>;
 def X86vcvtph2bf8s : SDNode<"X86ISD::VCVTPH2BF8S",
->>>>>>> origin/sycl
                               SDTAVX10CONVERT_I8F16>;
 def X86vcvtph2hf8 : SDNode<"X86ISD::VCVTPH2HF8",
                              SDTAVX10CONVERT_I8F16>;

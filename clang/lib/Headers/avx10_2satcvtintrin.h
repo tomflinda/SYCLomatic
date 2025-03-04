@@ -14,11 +14,7 @@
 #ifndef __AVX10_2SATCVTINTRIN_H
 #define __AVX10_2SATCVTINTRIN_H
 
-<<<<<<< HEAD
-#define _mm_ipcvtnebf16_epi8(A)                                                \
-=======
 #define _mm_ipcvtbf16_epi8(A)                                                  \
->>>>>>> origin/sycl
   ((__m128i)__builtin_ia32_vcvtbf162ibs128((__v8bf)(__m128bh)(A)))
 
 #define _mm_mask_ipcvtbf16_epi8(W, U, A)                                       \
@@ -30,11 +26,7 @@
                                        (__v8hi)_mm_ipcvtbf16_epi8(A),          \
                                        (__v8hi)_mm_setzero_si128()))
 
-<<<<<<< HEAD
-#define _mm256_ipcvtnebf16_epi8(A)                                             \
-=======
 #define _mm256_ipcvtbf16_epi8(A)                                               \
->>>>>>> origin/sycl
   ((__m256i)__builtin_ia32_vcvtbf162ibs256((__v16bf)(__m256bh)(A)))
 
 #define _mm256_mask_ipcvtbf16_epi8(W, U, A)                                    \
@@ -47,11 +39,7 @@
                                        (__v16hi)_mm256_ipcvtbf16_epi8(A),      \
                                        (__v16hi)_mm256_setzero_si256()))
 
-<<<<<<< HEAD
-#define _mm_ipcvtnebf16_epu8(A)                                                \
-=======
 #define _mm_ipcvtbf16_epu8(A)                                                  \
->>>>>>> origin/sycl
   ((__m128i)__builtin_ia32_vcvtbf162iubs128((__v8bf)(__m128bh)(A)))
 
 #define _mm_mask_ipcvtbf16_epu8(W, U, A)                                       \
@@ -63,11 +51,7 @@
                                        (__v8hi)_mm_ipcvtbf16_epu8(A),          \
                                        (__v8hi)_mm_setzero_si128()))
 
-<<<<<<< HEAD
-#define _mm256_ipcvtnebf16_epu8(A)                                             \
-=======
 #define _mm256_ipcvtbf16_epu8(A)                                               \
->>>>>>> origin/sycl
   ((__m256i)__builtin_ia32_vcvtbf162iubs256((__v16bf)(__m256bh)(A)))
 
 #define _mm256_mask_ipcvtbf16_epu8(W, U, A)                                    \

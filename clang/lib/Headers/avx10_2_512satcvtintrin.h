@@ -14,11 +14,7 @@
 #ifndef __AVX10_2_512SATCVTINTRIN_H
 #define __AVX10_2_512SATCVTINTRIN_H
 
-<<<<<<< HEAD
-#define _mm512_ipcvtnebf16_epi8(A)                                             \
-=======
 #define _mm512_ipcvtbf16_epi8(A)                                               \
->>>>>>> origin/sycl
   ((__m512i)__builtin_ia32_vcvtbf162ibs512((__v32bf)(__m512bh)(A)))
 
 #define _mm512_mask_ipcvtbf16_epi8(W, U, A)                                    \
@@ -31,11 +27,7 @@
                                        (__v32hi)_mm512_ipcvtbf16_epi8(A),      \
                                        (__v32hi)_mm512_setzero_si512()))
 
-<<<<<<< HEAD
-#define _mm512_ipcvtnebf16_epu8(A)                                             \
-=======
 #define _mm512_ipcvtbf16_epu8(A)                                               \
->>>>>>> origin/sycl
   ((__m512i)__builtin_ia32_vcvtbf162iubs512((__v32bf)(__m512bh)(A)))
 
 #define _mm512_mask_ipcvtbf16_epu8(W, U, A)                                    \

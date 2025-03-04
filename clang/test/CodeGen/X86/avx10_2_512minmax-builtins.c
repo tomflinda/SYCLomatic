@@ -5,16 +5,6 @@
 
 #include <immintrin.h>
 
-<<<<<<< HEAD
-__m512bh test_mm512_minmaxne_pbh(__m512bh __A, __m512bh __B) {
-  // CHECK-LABEL: @test_mm512_minmaxne_pbh(
-  // CHECK: call <32 x bfloat> @llvm.x86.avx10.vminmaxbf16512(
-  return _mm512_minmaxne_pbh(__A, __B, 127);
-}
-
-__m512bh test_mm512_mask_minmaxne_pbh(__m512bh __A, __mmask32 __B, __m512bh __C, __m512bh __D) {
-  // CHECK-LABEL: @test_mm512_mask_minmaxne_pbh(
-=======
 __m512bh test_mm512_minmax_pbh(__m512bh __A, __m512bh __B) {
   // CHECK-LABEL: @test_mm512_minmax_pbh(
   // CHECK: call <32 x bfloat> @llvm.x86.avx10.vminmaxbf16512(
@@ -23,19 +13,13 @@ __m512bh test_mm512_minmax_pbh(__m512bh __A, __m512bh __B) {
 
 __m512bh test_mm512_mask_minmax_pbh(__m512bh __A, __mmask32 __B, __m512bh __C, __m512bh __D) {
   // CHECK-LABEL: @test_mm512_mask_minmax_pbh(
->>>>>>> origin/sycl
   // CHECK: call <32 x bfloat> @llvm.x86.avx10.vminmaxbf16512(
   // CHECK: select <32 x i1> %{{.*}}, <32 x bfloat> %{{.*}}, <32 x bfloat> %{{.*}}
   return _mm512_mask_minmax_pbh(__A, __B, __C, __D, 127);
 }
 
-<<<<<<< HEAD
-__m512bh test_mm512_maskz_minmaxne_pbh(__mmask32 __A, __m512bh __B, __m512bh __C) {
-  // CHECK-LABEL: @test_mm512_maskz_minmaxne_pbh(
-=======
 __m512bh test_mm512_maskz_minmax_pbh(__mmask32 __A, __m512bh __B, __m512bh __C) {
   // CHECK-LABEL: @test_mm512_maskz_minmax_pbh(
->>>>>>> origin/sycl
   // CHECK: call <32 x bfloat> @llvm.x86.avx10.vminmaxbf16512(
   // CHECK: zeroinitializer
   // CHECK: select <32 x i1> %{{.*}}, <32 x bfloat> %{{.*}}, <32 x bfloat> %{{.*}}
