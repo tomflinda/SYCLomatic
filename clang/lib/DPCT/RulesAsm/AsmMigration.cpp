@@ -2841,6 +2841,23 @@ protected:
 
     return SYCLGenError();
   }
+
+  bool handle_brkpt(const InlineAsmInstruction *Inst) override {
+
+    if (Inst->getNumInputOperands() != 0)
+      return SYCLGenError();
+
+    auto CommonStr = llvm::Twine("")
+                         .concat("\"")
+                         .concat(GAS->getAsmString()->getString())
+                         .concat("\"")
+                         .str();
+
+    report(Diagnostics::FUNC_CALL_REMOVED, true, CommonStr,
+           "this instruction is typically used for debugging. You may need to "
+           "rewrite the code.");
+    return SYCLGenSuccess();
+  }
 };
 
 /// Clean the special character in identifier.
