@@ -332,7 +332,8 @@ void CubIntrinsicRule::registerMatcher(ast_matchers::MatchFinder &MF) {
                          "SmVersionUncached", "RowMajorTid",
                          "LoadDirectBlocked", "LoadDirectStriped",
                          "StoreDirectBlocked", "StoreDirectStriped",
-                         "ShuffleDown", "ShuffleUp", "Debug"),
+                         "ShuffleDown", "ShuffleUp", "Debug",
+                         "LoadDirectWarpStriped", "StoreDirectWarpStriped"),
               hasAncestor(namespaceDecl(hasName("cub")))))))
           .bind("IntrinsicCall"),
       this);
