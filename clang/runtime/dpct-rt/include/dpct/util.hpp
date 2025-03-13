@@ -193,12 +193,12 @@ inline unsigned int byte_level_permute(unsigned int a, unsigned int b,
 /// result of 4 bytes selected in the way
 /// \param [in] mode The mode of permutation, defines the permutation mode
 /// (default: 0). The available modes are:
-///             - 0: Forward 4-byte extract
-///             - 1: Backward 4-byte extract
-///             - 2: Replicate 8-bit values
-///             - 3: Edge clamp left
-///             - 4: Edge clamp right
-///             - 5: Replicate 16-bit values
+///             - 1: Forward 4-byte extract
+///             - 2: Backward 4-byte extract
+///             - 3: Replicate 8-bit values
+///             - 4: Edge clamp left
+///             - 5: Edge clamp right
+///             - 6: Replicate 16-bit values
 ///             - Any other value: Uses `sel` directly without predefined
 ///             mapping.
 /// \returns the permutation result of 4 bytes selected in the way
