@@ -187,6 +187,39 @@ inline unsigned int byte_level_permute(unsigned int a, unsigned int b,
   return ret;
 }
 
+/// \param [in] a The first value contains 4 bytes
+/// \param [in] b The second value contains 4 bytes
+/// \param [in] sel The selector value, only lower 16bit, used the permutation
+/// result of 4 bytes selected in the way
+/// \param [in] mode The mode of permutation, defines the permutation mode
+/// (default: 0). The available modes are:
+///             - 0: Forward 4-byte extract
+///             - 1: Backward 4-byte extract
+///             - 2: Replicate 8-bit values
+///             - 3: Edge clamp left
+///             - 4: Edge clamp right
+///             - 5: Replicate 16-bit values
+///             - Any other value: Uses `sel` directly without predefined
+///             mapping.
+/// \returns the permutation result of 4 bytes selected in the way
+/// specified by \p sel from \p a and \p b based on the mode \b mode.
+inline uint32_t custom_byte_level_permute(uint32_t a, uint32_t b, uint32_t sel,
+                                          int mode = 0) {
+  constexpr uint16_t lookup[6][4] = {
+      {0x3210, 0x4321, 0x5432, 0x6543}, // Forward 4-byte extract
+      {0x5670, 0x6701, 0x7012, 0x0123}, // Backward 4-byte extract
+      {0x0000, 0x1111, 0x2222, 0x3333}, // Replicate 8-bit values
+      {0x3120, 0x3211, 0x3222, 0x3333}, // Edge clamp left
+      {0x0000, 0x1110, 0x2210, 0x3210}, // Edge clamp right
+      {0x1010, 0x3232, 0x1010, 0x3232}  // Replicate 16-bit values
+  };
+
+  if (mode >= 1 && mode <= 6) {
+    return byte_level_permute(a, b, lookup[mode - 1][sel & 0x3]);
+  }
+  return byte_level_permute(a, b, sel);
+}
+
 /// Find position of first least significant set bit in an integer.
 /// ffs(0) returns 0.
 ///
