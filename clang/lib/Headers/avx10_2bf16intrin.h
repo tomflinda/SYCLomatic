@@ -519,35 +519,6 @@ _mm_maskz_min_pbh(__mmask8 __U, __m128bh __A, __m128bh __B) {
       (__mmask8)__U, (__v8bf)_mm_min_pbh(__A, __B), (__v8bf)_mm_setzero_pbh());
 }
 
-<<<<<<< HEAD
-static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comeqsbh(__m128bh A,
-                                                         __m128bh B) {
-  return __builtin_ia32_vcomisbf16eq((__v8bf)A, (__v8bf)B);
-}
-
-static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comltsbh(__m128bh A,
-                                                         __m128bh B) {
-  return __builtin_ia32_vcomisbf16lt((__v8bf)A, (__v8bf)B);
-}
-
-static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comlesbh(__m128bh A,
-                                                         __m128bh B) {
-  return __builtin_ia32_vcomisbf16le((__v8bf)A, (__v8bf)B);
-}
-
-static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comgtsbh(__m128bh A,
-                                                         __m128bh B) {
-  return __builtin_ia32_vcomisbf16gt((__v8bf)A, (__v8bf)B);
-}
-
-static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comgesbh(__m128bh A,
-                                                         __m128bh B) {
-  return __builtin_ia32_vcomisbf16ge((__v8bf)A, (__v8bf)B);
-}
-
-static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comneqsbh(__m128bh A,
-                                                          __m128bh B) {
-=======
 static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comieq_sbh(__m128bh A,
                                                            __m128bh B) {
   return __builtin_ia32_vcomisbf16eq((__v8bf)A, (__v8bf)B);
@@ -575,47 +546,10 @@ static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comige_sbh(__m128bh A,
 
 static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comineq_sbh(__m128bh A,
                                                             __m128bh B) {
->>>>>>> origin/sycl
   return __builtin_ia32_vcomisbf16neq((__v8bf)A, (__v8bf)B);
 }
 
 #define _mm256_cmp_pbh_mask(__A, __B, __P)                                     \
-<<<<<<< HEAD
-  ((__mmask16)__builtin_ia32_vcmpbf16256_mask((__v16bf)(__m256bh)(__A),       \
-                                               (__v16bf)(__m256bh)(__B),       \
-                                               (int)(__P), (__mmask16) - 1))
-
-#define _mm256_mask_cmp_pbh_mask(__U, __A, __B, __P)                           \
-  ((__mmask16)__builtin_ia32_vcmpbf16256_mask((__v16bf)(__m256bh)(__A),       \
-                                               (__v16bf)(__m256bh)(__B),       \
-                                               (int)(__P), (__mmask16)(__U)))
-
-#define _mm_cmp_pbh_mask(__A, __B, __P)                                        \
-  ((__mmask8)__builtin_ia32_vcmpbf16128_mask((__v8bf)(__m128bh)(__A),         \
-                                              (__v8bf)(__m128bh)(__B),         \
-                                              (int)(__P), (__mmask8) - 1))
-
-#define _mm_mask_cmp_pbh_mask(__U, __A, __B, __P)                              \
-  ((__mmask8)__builtin_ia32_vcmpbf16128_mask((__v8bf)(__m128bh)(__A),         \
-                                              (__v8bf)(__m128bh)(__B),         \
-                                              (int)(__P), (__mmask8)(__U)))
-
-#define _mm256_mask_fpclass_pbh_mask(__U, __A, imm)                            \
-  ((__mmask16)__builtin_ia32_vfpclassbf16256_mask(                            \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__mmask16)(__U)))
-
-#define _mm256_fpclass_pbh_mask(__A, imm)                                      \
-  ((__mmask16)__builtin_ia32_vfpclassbf16256_mask(                            \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__mmask16) - 1))
-
-#define _mm_mask_fpclass_pbh_mask(__U, __A, imm)                               \
-  ((__mmask8)__builtin_ia32_vfpclassbf16128_mask(                             \
-      (__v8bf)(__m128bh)(__A), (int)(imm), (__mmask8)(__U)))
-
-#define _mm_fpclass_pbh_mask(__A, imm)                                         \
-  ((__mmask8)__builtin_ia32_vfpclassbf16128_mask((__v8bf)(__m128bh)(__A),     \
-                                                  (int)(imm), (__mmask8) - 1))
-=======
   ((__mmask16)__builtin_ia32_vcmpbf16256_mask((__v16bf)(__m256bh)(__A),        \
                                               (__v16bf)(__m256bh)(__B),        \
                                               (int)(__P), (__mmask16) - 1))
@@ -650,7 +584,6 @@ static __inline__ int __DEFAULT_FN_ATTRS128 _mm_comineq_sbh(__m128bh A,
 #define _mm_fpclass_pbh_mask(__A, imm)                                         \
   ((__mmask8)__builtin_ia32_vfpclassbf16128_mask((__v8bf)(__m128bh)(__A),      \
                                                  (int)(imm), (__mmask8) - 1))
->>>>>>> origin/sycl
 
 static __inline__ __m256bh __DEFAULT_FN_ATTRS256
 _mm256_scalef_pbh(__m256bh __A, __m256bh __B) {
@@ -698,11 +631,7 @@ static __inline__ __m256bh __DEFAULT_FN_ATTRS256 _mm256_rcp_pbh(__m256bh __A) {
 static __inline__ __m256bh __DEFAULT_FN_ATTRS256
 _mm256_mask_rcp_pbh(__m256bh __W, __mmask16 __U, __m256bh __A) {
   return (__m256bh)__builtin_ia32_vrcpbf16256_mask((__v16bf)__A, (__v16bf)__W,
-<<<<<<< HEAD
-                                                    (__mmask16)__U);
-=======
                                                    (__mmask16)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m256bh __DEFAULT_FN_ATTRS256
@@ -719,11 +648,7 @@ static __inline__ __m128bh __DEFAULT_FN_ATTRS128 _mm_rcp_pbh(__m128bh __A) {
 static __inline__ __m128bh __DEFAULT_FN_ATTRS128
 _mm_mask_rcp_pbh(__m128bh __W, __mmask8 __U, __m128bh __A) {
   return (__m128bh)__builtin_ia32_vrcpbf16128_mask((__v8bf)__A, (__v8bf)__W,
-<<<<<<< HEAD
-                                                    (__mmask8)__U);
-=======
                                                    (__mmask8)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m128bh __DEFAULT_FN_ATTRS128
@@ -758,11 +683,7 @@ static __inline__ __m128bh __DEFAULT_FN_ATTRS128 _mm_getexp_pbh(__m128bh __A) {
 static __inline__ __m128bh __DEFAULT_FN_ATTRS128
 _mm_mask_getexp_pbh(__m128bh __W, __mmask8 __U, __m128bh __A) {
   return (__m128bh)__builtin_ia32_vgetexpbf16128_mask((__v8bf)__A, (__v8bf)__W,
-<<<<<<< HEAD
-                                                       (__mmask8)__U);
-=======
                                                       (__mmask8)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m128bh __DEFAULT_FN_ATTRS128
@@ -779,13 +700,8 @@ _mm256_rsqrt_pbh(__m256bh __A) {
 
 static __inline__ __m256bh __DEFAULT_FN_ATTRS256
 _mm256_mask_rsqrt_pbh(__m256bh __W, __mmask16 __U, __m256bh __A) {
-<<<<<<< HEAD
-  return (__m256bh)__builtin_ia32_vrsqrtbf16256_mask(
-      (__v16bf)__A, (__v16bf)__W, (__mmask16)__U);
-=======
   return (__m256bh)__builtin_ia32_vrsqrtbf16256_mask((__v16bf)__A, (__v16bf)__W,
                                                      (__mmask16)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m256bh __DEFAULT_FN_ATTRS256
@@ -802,11 +718,7 @@ static __inline__ __m128bh __DEFAULT_FN_ATTRS128 _mm_rsqrt_pbh(__m128bh __A) {
 static __inline__ __m128bh __DEFAULT_FN_ATTRS128
 _mm_mask_rsqrt_pbh(__m128bh __W, __mmask8 __U, __m128bh __A) {
   return (__m128bh)__builtin_ia32_vrsqrtbf16128_mask((__v8bf)__A, (__v8bf)__W,
-<<<<<<< HEAD
-                                                      (__mmask8)__U);
-=======
                                                      (__mmask8)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m128bh __DEFAULT_FN_ATTRS128
@@ -815,65 +727,6 @@ _mm_maskz_rsqrt_pbh(__mmask8 __U, __m128bh __A) {
       (__v8bf)__A, (__v8bf)_mm_setzero_pbh(), (__mmask8)__U);
 }
 
-<<<<<<< HEAD
-#define _mm256_reducene_pbh(__A, imm)                                          \
-  ((__m256bh)__builtin_ia32_vreducebf16256_mask(                            \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)_mm256_undefined_pbh(),   \
-      (__mmask16) - 1))
-
-#define _mm256_mask_reducene_pbh(__W, __U, __A, imm)                           \
-  ((__m256bh)__builtin_ia32_vreducebf16256_mask(                            \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)(__m256bh)(__W),          \
-      (__mmask16)(__U)))
-
-#define _mm256_maskz_reducene_pbh(__U, __A, imm)                               \
-  ((__m256bh)__builtin_ia32_vreducebf16256_mask(                            \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)_mm256_setzero_pbh(),     \
-      (__mmask16)(__U)))
-
-#define _mm_reducene_pbh(__A, imm)                                             \
-  ((__m128bh)__builtin_ia32_vreducebf16128_mask(                            \
-      (__v8bf)(__m128bh)(__A), (int)(imm), (__v8bf)_mm_undefined_pbh(),        \
-      (__mmask8) - 1))
-
-#define _mm_mask_reducene_pbh(__W, __U, __A, imm)                              \
-  ((__m128bh)__builtin_ia32_vreducebf16128_mask(                            \
-      (__v8bf)(__m128bh)(__A), (int)(imm), (__v8bf)(__m128bh)(__W),            \
-      (__mmask8)(__U)))
-
-#define _mm_maskz_reducene_pbh(__U, __A, imm)                                  \
-  ((__m128bh)__builtin_ia32_vreducebf16128_mask(                            \
-      (__v8bf)(__m128bh)(__A), (int)(imm), (__v8bf)_mm_setzero_pbh(),          \
-      (__mmask8)(__U)))
-
-#define _mm256_roundscalene_pbh(__A, imm)                                      \
-  ((__m256bh)__builtin_ia32_vrndscalebf16_256_mask(                         \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)_mm256_setzero_pbh(),     \
-      (__mmask16) - 1))
-
-#define _mm256_mask_roundscalene_pbh(__W, __U, __A, imm)                       \
-  ((__m256bh)__builtin_ia32_vrndscalebf16_256_mask(                         \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)(__m256bh)(__W),          \
-      (__mmask16)(__U)))
-
-#define _mm256_maskz_roundscalene_pbh(__U, __A, imm)                           \
-  ((__m256bh)__builtin_ia32_vrndscalebf16_256_mask(                         \
-      (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)_mm256_setzero_pbh(),     \
-      (__mmask16)(__U)))
-
-#define _mm_roundscalene_pbh(__A, imm)                                         \
-  ((__m128bh)__builtin_ia32_vrndscalebf16_128_mask(                         \
-      (__v8bf)(__m128bh)(__A), (int)(imm), (__v8bf)_mm_setzero_pbh(),          \
-      (__mmask8) - 1))
-
-#define _mm_mask_roundscalene_pbh(__W, __U, __A, imm)                          \
-  ((__m128bh)__builtin_ia32_vrndscalebf16_128_mask(                         \
-      (__v8bf)(__m128bh)(__A), (int)(imm), (__v8bf)(__m128bh)(__W),            \
-      (__mmask8)(__U)))
-
-#define _mm_maskz_roundscalene_pbh(__U, __A, imm)                              \
-  ((__m128bh)__builtin_ia32_vrndscalebf16_128_mask(                         \
-=======
 #define _mm256_reduce_pbh(__A, imm)                                            \
   ((__m256bh)__builtin_ia32_vreducebf16256_mask(                               \
       (__v16bf)(__m256bh)(__A), (int)(imm), (__v16bf)_mm256_undefined_pbh(),   \
@@ -931,61 +784,36 @@ _mm_maskz_rsqrt_pbh(__mmask8 __U, __m128bh __A) {
 
 #define _mm_maskz_roundscale_pbh(__U, __A, imm)                                \
   ((__m128bh)__builtin_ia32_vrndscalebf16_128_mask(                            \
->>>>>>> origin/sycl
       (__v8bf)(__m128bh)(__A), (int)(imm), (__v8bf)_mm_setzero_pbh(),          \
       (__mmask8)(__U)))
 
 #define _mm256_getmant_pbh(__A, __B, __C)                                      \
-<<<<<<< HEAD
-  ((__m256bh)__builtin_ia32_vgetmantbf16256_mask(                             \
-=======
   ((__m256bh)__builtin_ia32_vgetmantbf16256_mask(                              \
->>>>>>> origin/sycl
       (__v16bf)(__m256bh)(__A), (int)(((__C) << 2) | (__B)),                   \
       (__v16bf)_mm256_undefined_pbh(), (__mmask16) - 1))
 
 #define _mm256_mask_getmant_pbh(__W, __U, __A, __B, __C)                       \
-<<<<<<< HEAD
-  ((__m256bh)__builtin_ia32_vgetmantbf16256_mask(                             \
-=======
   ((__m256bh)__builtin_ia32_vgetmantbf16256_mask(                              \
->>>>>>> origin/sycl
       (__v16bf)(__m256bh)(__A), (int)(((__C) << 2) | (__B)),                   \
       (__v16bf)(__m256bh)(__W), (__mmask16)(__U)))
 
 #define _mm256_maskz_getmant_pbh(__U, __A, __B, __C)                           \
-<<<<<<< HEAD
-  ((__m256bh)__builtin_ia32_vgetmantbf16256_mask(                             \
-=======
   ((__m256bh)__builtin_ia32_vgetmantbf16256_mask(                              \
->>>>>>> origin/sycl
       (__v16bf)(__m256bh)(__A), (int)(((__C) << 2) | (__B)),                   \
       (__v16bf)_mm256_setzero_pbh(), (__mmask16)(__U)))
 
 #define _mm_getmant_pbh(__A, __B, __C)                                         \
-<<<<<<< HEAD
-  ((__m128bh)__builtin_ia32_vgetmantbf16128_mask(                             \
-=======
   ((__m128bh)__builtin_ia32_vgetmantbf16128_mask(                              \
->>>>>>> origin/sycl
       (__v8bf)(__m128bh)(__A), (int)(((__C) << 2) | (__B)),                    \
       (__v8bf)_mm_undefined_pbh(), (__mmask8) - 1))
 
 #define _mm_mask_getmant_pbh(__W, __U, __A, __B, __C)                          \
-<<<<<<< HEAD
-  ((__m128bh)__builtin_ia32_vgetmantbf16128_mask(                             \
-=======
   ((__m128bh)__builtin_ia32_vgetmantbf16128_mask(                              \
->>>>>>> origin/sycl
       (__v8bf)(__m128bh)(__A), (int)(((__C) << 2) | (__B)),                    \
       (__v8bf)(__m128bh)(__W), (__mmask8)(__U)))
 
 #define _mm_maskz_getmant_pbh(__U, __A, __B, __C)                              \
-<<<<<<< HEAD
-  ((__m128bh)__builtin_ia32_vgetmantbf16128_mask(                             \
-=======
   ((__m128bh)__builtin_ia32_vgetmantbf16128_mask(                              \
->>>>>>> origin/sycl
       (__v8bf)(__m128bh)(__A), (int)(((__C) << 2) | (__B)),                    \
       (__v8bf)_mm_setzero_pbh(), (__mmask8)(__U)))
 

@@ -884,42 +884,6 @@ __m512bh test_mm512_maskz_rsqrt_pbh(__mmask32 __U, __m512bh __A) {
   return _mm512_maskz_rsqrt_pbh(__U, __A);
 }
 
-<<<<<<< HEAD
-__m512bh test_mm512_reducene_pbh(__m512bh __A) {
-  // CHECK-LABEL: @test_mm512_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.512
-  return _mm512_reducene_pbh(__A, 3);
-}
-
-__m512bh test_mm512_mask_reducene_pbh(__m512bh __W, __mmask16 __U, __m512bh __A) {
-  // CHECK-LABEL: @test_mm512_mask_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.512
-  return _mm512_mask_reducene_pbh(__W, __U, __A, 1);
-}
-
-__m512bh test_mm512_maskz_reducene_pbh(__mmask16 __U, __m512bh __A) {
-  // CHECK-LABEL: @test_mm512_maskz_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.512
-  return _mm512_maskz_reducene_pbh(__U, __A, 1);
-}
-
-__m512bh test_mm512_roundscalene_pbh(__m512bh __A) {
-  // CHECK-LABEL: @test_mm512_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.512
-  return _mm512_roundscalene_pbh(__A, 3);
-}
-
-__m512bh test_mm512_mask_roundscalene_pbh(__m512bh __W, __mmask16 __U, __m512bh __A) {
-  // CHECK-LABEL: @test_mm512_mask_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.512
-  return _mm512_mask_roundscalene_pbh(__W, __U, __A, 1);
-}
-
-__m512bh test_mm512_maskz_roundscalene_pbh(__mmask16 __U, __m512bh __A) {
-  // CHECK-LABEL: @test_mm512_maskz_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.512
-  return _mm512_maskz_roundscalene_pbh(__U, __A, 1 );
-=======
 __m512bh test_mm512_reduce_pbh(__m512bh __A) {
   // CHECK-LABEL: @test_mm512_reduce_pbh
   // CHECK: @llvm.x86.avx10.mask.reduce.bf16.512
@@ -954,7 +918,6 @@ __m512bh test_mm512_maskz_roundscale_pbh(__mmask16 __U, __m512bh __A) {
   // CHECK-LABEL: @test_mm512_maskz_roundscale_pbh
   // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.512
   return _mm512_maskz_roundscale_pbh(__U, __A, 1 );
->>>>>>> origin/sycl
 }
 
 __m512bh test_mm512_getmant_pbh(__m512bh __A) {

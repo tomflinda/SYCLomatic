@@ -287,23 +287,6 @@ _mm512_maskz_min_pbh(__mmask32 __U, __m512bh __A, __m512bh __B) {
 }
 
 #define _mm512_cmp_pbh_mask(__A, __B, __P)                                     \
-<<<<<<< HEAD
-  ((__mmask32)__builtin_ia32_vcmpbf16512_mask((__v32bf)(__m512bh)(__A),       \
-                                               (__v32bf)(__m512bh)(__B),       \
-                                               (int)(__P), (__mmask32) - 1))
-
-#define _mm512_mask_cmp_pbh_mask(__U, __A, __B, __P)                           \
-  ((__mmask32)__builtin_ia32_vcmpbf16512_mask((__v32bf)(__m512bh)(__A),       \
-                                               (__v32bf)(__m512bh)(__B),       \
-                                               (int)(__P), (__mmask32)(__U)))
-
-#define _mm512_mask_fpclass_pbh_mask(__U, __A, imm)                            \
-  ((__mmask32)__builtin_ia32_vfpclassbf16512_mask(                            \
-      (__v32bf)(__m512bh)(__A), (int)(imm), (__mmask32)(__U)))
-
-#define _mm512_fpclass_pbh_mask(__A, imm)                                      \
-  ((__mmask32)__builtin_ia32_vfpclassbf16512_mask(                            \
-=======
   ((__mmask32)__builtin_ia32_vcmpbf16512_mask((__v32bf)(__m512bh)(__A),        \
                                               (__v32bf)(__m512bh)(__B),        \
                                               (int)(__P), (__mmask32) - 1))
@@ -319,7 +302,6 @@ _mm512_maskz_min_pbh(__mmask32 __U, __m512bh __A, __m512bh __B) {
 
 #define _mm512_fpclass_pbh_mask(__A, imm)                                      \
   ((__mmask32)__builtin_ia32_vfpclassbf16512_mask(                             \
->>>>>>> origin/sycl
       (__v32bf)(__m512bh)(__A), (int)(imm), (__mmask32) - 1))
 
 static __inline__ __m512bh __DEFAULT_FN_ATTRS512
@@ -350,11 +332,7 @@ static __inline__ __m512bh __DEFAULT_FN_ATTRS512 _mm512_rcp_pbh(__m512bh __A) {
 static __inline__ __m512bh __DEFAULT_FN_ATTRS512
 _mm512_mask_rcp_pbh(__m512bh __W, __mmask32 __U, __m512bh __A) {
   return (__m512bh)__builtin_ia32_vrcpbf16512_mask((__v32bf)__A, (__v32bf)__W,
-<<<<<<< HEAD
-                                                    (__mmask32)__U);
-=======
                                                    (__mmask32)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m512bh __DEFAULT_FN_ATTRS512
@@ -389,13 +367,8 @@ _mm512_rsqrt_pbh(__m512bh __A) {
 
 static __inline__ __m512bh __DEFAULT_FN_ATTRS512
 _mm512_mask_rsqrt_pbh(__m512bh __W, __mmask32 __U, __m512bh __A) {
-<<<<<<< HEAD
-  return (__m512bh)__builtin_ia32_vrsqrtbf16512_mask(
-      (__v32bf)__A, (__v32bf)__W, (__mmask32)__U);
-=======
   return (__m512bh)__builtin_ia32_vrsqrtbf16512_mask((__v32bf)__A, (__v32bf)__W,
                                                      (__mmask32)__U);
->>>>>>> origin/sycl
 }
 
 static __inline__ __m512bh __DEFAULT_FN_ATTRS512
@@ -404,35 +377,6 @@ _mm512_maskz_rsqrt_pbh(__mmask32 __U, __m512bh __A) {
       (__v32bf)__A, (__v32bf)_mm512_setzero_pbh(), (__mmask32)__U);
 }
 
-<<<<<<< HEAD
-#define _mm512_reducene_pbh(__A, imm)                                          \
-  ((__m512bh)__builtin_ia32_vreducebf16512_mask(                            \
-      (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)_mm512_undefined_pbh(),   \
-      (__mmask32) - 1))
-
-#define _mm512_mask_reducene_pbh(__W, __U, __A, imm)                           \
-  ((__m512bh)__builtin_ia32_vreducebf16512_mask(                            \
-      (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)(__m512bh)(__W),          \
-      (__mmask32)(__U)))
-
-#define _mm512_maskz_reducene_pbh(__U, __A, imm)                               \
-  ((__m512bh)__builtin_ia32_vreducebf16512_mask(                            \
-      (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)_mm512_setzero_pbh(),     \
-      (__mmask32)(__U)))
-
-#define _mm512_roundscalene_pbh(__A, imm)                                      \
-  ((__m512bh)__builtin_ia32_vrndscalebf16_mask(                             \
-      (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)_mm512_setzero_pbh(),     \
-      (__mmask32) - 1))
-
-#define _mm512_mask_roundscalene_pbh(__W, __U, __A, imm)                       \
-  ((__m512bh)__builtin_ia32_vrndscalebf16_mask(                             \
-      (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)(__m512bh)(__W),          \
-      (__mmask32)(__U)))
-
-#define _mm512_maskz_roundscalene_pbh(__U, __A, imm)                           \
-  ((__m512bh)__builtin_ia32_vrndscalebf16_mask(                             \
-=======
 #define _mm512_reduce_pbh(__A, imm)                                            \
   ((__m512bh)__builtin_ia32_vreducebf16512_mask(                               \
       (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)_mm512_undefined_pbh(),   \
@@ -460,34 +404,21 @@ _mm512_maskz_rsqrt_pbh(__mmask32 __U, __m512bh __A) {
 
 #define _mm512_maskz_roundscale_pbh(__U, __A, imm)                             \
   ((__m512bh)__builtin_ia32_vrndscalebf16_mask(                                \
->>>>>>> origin/sycl
       (__v32bf)(__m512bh)(__A), (int)(imm), (__v32bf)_mm512_setzero_pbh(),     \
       (__mmask32)(__U)))
 
 #define _mm512_getmant_pbh(__A, __B, __C)                                      \
-<<<<<<< HEAD
-  ((__m512bh)__builtin_ia32_vgetmantbf16512_mask(                             \
-=======
   ((__m512bh)__builtin_ia32_vgetmantbf16512_mask(                              \
->>>>>>> origin/sycl
       (__v32bf)(__m512bh)(__A), (int)(((__C) << 2) | (__B)),                   \
       (__v32bf)_mm512_undefined_pbh(), (__mmask32) - 1))
 
 #define _mm512_mask_getmant_pbh(__W, __U, __A, __B, __C)                       \
-<<<<<<< HEAD
-  ((__m512bh)__builtin_ia32_vgetmantbf16512_mask(                             \
-=======
   ((__m512bh)__builtin_ia32_vgetmantbf16512_mask(                              \
->>>>>>> origin/sycl
       (__v32bf)(__m512bh)(__A), (int)(((__C) << 2) | (__B)),                   \
       (__v32bf)(__m512bh)(__W), (__mmask32)(__U)))
 
 #define _mm512_maskz_getmant_pbh(__U, __A, __B, __C)                           \
-<<<<<<< HEAD
-  ((__m512bh)__builtin_ia32_vgetmantbf16512_mask(                             \
-=======
   ((__m512bh)__builtin_ia32_vgetmantbf16512_mask(                              \
->>>>>>> origin/sycl
       (__v32bf)(__m512bh)(__A), (int)(((__C) << 2) | (__B)),                   \
       (__v32bf)_mm512_setzero_pbh(), (__mmask32)(__U)))
 

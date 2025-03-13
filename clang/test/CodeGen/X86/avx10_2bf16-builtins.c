@@ -648,42 +648,6 @@ __m128bh test_mm_maskz_min_pbh(__mmask16 __U, __m128bh __A, __m128bh __B) {
   return _mm_maskz_min_pbh(__U, __A, __B);
 }
 
-<<<<<<< HEAD
-int test_mm_comeqsbh(__m128bh __A, __m128bh __B) {
-  // CHECK-LABEL: test_mm_comeqsbh
-  // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16eq(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
-  return _mm_comeqsbh(__A, __B);
-}
-
-int test_mm_comltsbh(__m128bh __A, __m128bh __B) {
-  // CHECK-LABEL: test_mm_comltsbh
-  // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16lt(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
-  return _mm_comltsbh(__A, __B);
-}
-
-int test_mm_comlesbh(__m128bh __A, __m128bh __B) {
-  // CHECK-LABEL: test_mm_comlesbh
-  // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16le(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
-  return _mm_comlesbh(__A, __B);
-}
-
-int test_mm_comgtsbh(__m128bh __A, __m128bh __B) {
-  // CHECK-LABEL: test_mm_comgtsbh
-  // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16gt(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
-  return _mm_comgtsbh(__A, __B);
-}
-
-int test_mm_comgesbh(__m128bh __A, __m128bh __B) {
-  // CHECK-LABEL: test_mm_comgesbh
-  // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16ge(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
-  return _mm_comgesbh(__A, __B);
-}
-
-int test_mm_comneqsbh(__m128bh __A, __m128bh __B) {
-  // CHECK-LABEL: test_mm_comneqsbh
-  // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16neq(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
-  return _mm_comneqsbh(__A, __B);
-=======
 int test_mm_comieq_sbh(__m128bh __A, __m128bh __B) {
   // CHECK-LABEL: test_mm_comieq_sbh
   // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16eq(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
@@ -718,7 +682,6 @@ int test_mm_comineq_sbh(__m128bh __A, __m128bh __B) {
   // CHECK-LABEL: test_mm_comineq_sbh
   // CHECK: %{{.}} = call i32 @llvm.x86.avx10.vcomisbf16neq(<8 x bfloat> %{{.}}, <8 x bfloat> %{{.}})
   return _mm_comineq_sbh(__A, __B);
->>>>>>> origin/sycl
 }
 
 __mmask16 test_mm256_cmp_pbh_mask_eq_oq(__m256bh a, __m256bh b) {
@@ -1650,42 +1613,6 @@ __m256bh test_mm256_maskz_rsqrt_pbh(__mmask16 __U, __m256bh __A) {
   return _mm256_maskz_rsqrt_pbh(__U, __A);
 }
 
-<<<<<<< HEAD
-__m256bh test_mm256_reducene_pbh(__m256bh __A) {
-  // CHECK-LABEL: @test_mm256_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.256
-  return _mm256_reducene_pbh(__A, 3);
-}
-
-__m256bh test_mm256_mask_reducene_pbh(__m256bh __W, __mmask16 __U, __m256bh __A) {
-  // CHECK-LABEL: @test_mm256_mask_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.256
-  return _mm256_mask_reducene_pbh(__W, __U, __A, 1);
-}
-
-__m256bh test_mm256_maskz_reducene_pbh(__mmask16 __U, __m256bh __A) {
-  // CHECK-LABEL: @test_mm256_maskz_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.256
-  return _mm256_maskz_reducene_pbh(__U, __A, 1);
-}
-
-__m256bh test_mm256_roundscalene_pbh(__m256bh __A) {
-  // CHECK-LABEL: @test_mm256_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.256
-  return _mm256_roundscalene_pbh(__A, 3);
-}
-
-__m256bh test_mm256_mask_roundscalene_pbh(__m256bh __W, __mmask16 __U, __m256bh __A) {
-  // CHECK-LABEL: @test_mm256_mask_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.256
-  return _mm256_mask_roundscalene_pbh(__W, __U, __A, 1);
-}
-
-__m256bh test_mm256_maskz_roundscalene_pbh(__mmask16 __U, __m256bh __A) {
-  // CHECK-LABEL: @test_mm256_maskz_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.256
-  return _mm256_maskz_roundscalene_pbh(__U, __A, 1 );
-=======
 __m256bh test_mm256_reduce_pbh(__m256bh __A) {
   // CHECK-LABEL: @test_mm256_reduce_pbh
   // CHECK: @llvm.x86.avx10.mask.reduce.bf16.256
@@ -1720,7 +1647,6 @@ __m256bh test_mm256_maskz_roundscale_pbh(__mmask16 __U, __m256bh __A) {
   // CHECK-LABEL: @test_mm256_maskz_roundscale_pbh
   // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.256
   return _mm256_maskz_roundscale_pbh(__U, __A, 1 );
->>>>>>> origin/sycl
 }
 
 __m256bh test_mm256_getmant_pbh(__m256bh __A) {
@@ -1833,42 +1759,6 @@ __m128bh test_mm_maskz_rsqrt_pbh(__mmask8 __U, __m128bh __A) {
   return _mm_maskz_rsqrt_pbh(__U, __A);
 }
 
-<<<<<<< HEAD
-__m128bh test_mm_reducene_pbh(__m128bh __A) {
-  // CHECK-LABEL: @test_mm_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.128
-  return _mm_reducene_pbh(__A, 3);
-}
-
-__m128bh test_mm_mask_reducene_pbh(__m128bh __W, __mmask8 __U, __m128bh __A) {
-  // CHECK-LABEL: @test_mm_mask_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.128
-  return _mm_mask_reducene_pbh(__W, __U, __A, 1);
-}
-
-__m128bh test_mm_maskz_reducene_pbh(__mmask8 __U, __m128bh __A) {
-  // CHECK-LABEL: @test_mm_maskz_reducene_pbh
-  // CHECK: @llvm.x86.avx10.mask.reduce.bf16.128
-  return _mm_maskz_reducene_pbh(__U, __A, 1);
-}
-
-__m128bh test_mm_roundscalene_pbh(__m128bh __A) {
-  // CHECK-LABEL: @test_mm_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.128
-  return _mm_roundscalene_pbh(__A, 3);
-}
-
-__m128bh test_mm_mask_roundscalene_pbh(__m128bh __W, __mmask8 __U, __m128bh __A) {
-  // CHECK-LABEL: @test_mm_mask_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.128
-  return _mm_mask_roundscalene_pbh(__W, __U, __A, 1);
-}
-
-__m128bh test_mm_maskz_roundscalene_pbh(__mmask8 __U, __m128bh __A) {
-  // CHECK-LABEL: @test_mm_maskz_roundscalene_pbh
-  // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.128
-  return _mm_maskz_roundscalene_pbh(__U, __A, 1 );
-=======
 __m128bh test_mm_reduce_pbh(__m128bh __A) {
   // CHECK-LABEL: @test_mm_reduce_pbh
   // CHECK: @llvm.x86.avx10.mask.reduce.bf16.128
@@ -1903,7 +1793,6 @@ __m128bh test_mm_maskz_roundscale_pbh(__mmask8 __U, __m128bh __A) {
   // CHECK-LABEL: @test_mm_maskz_roundscale_pbh
   // CHECK: @llvm.x86.avx10.mask.rndscale.bf16.128
   return _mm_maskz_roundscale_pbh(__U, __A, 1 );
->>>>>>> origin/sycl
 }
 
 __m128bh test_mm_getmant_pbh(__m128bh __A) {
