@@ -187,24 +187,31 @@ inline unsigned int byte_level_permute(unsigned int a, unsigned int b,
   return ret;
 }
 
-/// \param [in] a The first value contains 4 bytes
-/// \param [in] b The second value contains 4 bytes
-/// \param [in] sel The selector value, only lower 16bit, used the permutation
-/// result of 4 bytes selected in the way
-/// \param [in] mode The mode of permutation, defines the permutation mode
-/// (default: 0). The available modes are:
-///             - 1: Forward 4-byte extract
-///             - 2: Backward 4-byte extract
-///             - 3: Replicate 8-bit values
-///             - 4: Edge clamp left
-///             - 5: Edge clamp right
-///             - 6: Replicate 16-bit values
-///             - Any other value: Uses `sel` directly without predefined
-///             mapping.
-/// \returns the permutation result of 4 bytes selected in the way
-/// specified by \p sel from \p a and \p b based on the mode \b mode.
-inline uint32_t custom_byte_level_permute(uint32_t a, uint32_t b, uint32_t sel,
-                                          int mode = 0) {
+/// \param [in] low32 The 4 bytes to construct the 8 bytes value as low32 bits.
+/// \param [in] high32 The 4 bytes to construct the 8 bytes value as high 32
+/// bits.
+/// \param [in] sel The selector value. It is used to generate selector which is
+/// used to fetch byte value from \p low32 and \p high32 to construct result
+/// value.
+/// \param [in] mode The mode of permutation, together with \p sel, it
+/// further defines the behavior of data selection. \p mode and \p sel define 4
+/// selectors (s[i], i=0, 1, 2, 3), which are used to fetch 4 bytes from the 8
+/// bytes value constructed by \p low32 and \p high32; the byte selected by s[i]
+/// is used to fill the i-th byte of the result.
+/// The available mode values are:
+/// mode value 0: s[i] = sel[i * 4 + 3 : i * 4]
+/// mode value 1: s[i] = sel[1 : 0] + i
+/// mode value 2: s[i] = (sel[1 : 0] + 7) % 8
+/// mode value 3: s[i] = sel[1 : 0]
+/// mode value 4: s[i] = max(sel[1 : 0], i)
+/// mode value 5: s[i] = min(sel[1 : 0], i)
+/// mode value 6: s[0] = sel[0 : 0] * 2
+///               s[1] = sel[0 : 0] * 2 + 1
+///               s[2] = s[0]
+///               s[3] = s[1]
+/// other value: illegal, undefined behavior.
+inline uint32_t byte_level_permute_custom(uint32_t low32, uint32_t high32,
+                                          uint32_t sel, int mode = 0) {
   constexpr uint16_t lookup[6][4] = {
       {0x3210, 0x4321, 0x5432, 0x6543}, // Forward 4-byte extract
       {0x5670, 0x6701, 0x7012, 0x0123}, // Backward 4-byte extract
@@ -215,9 +222,10 @@ inline uint32_t custom_byte_level_permute(uint32_t a, uint32_t b, uint32_t sel,
   };
 
   if (mode >= 1 && mode <= 6) {
-    return byte_level_permute(a, b, lookup[mode - 1][sel & 0x3]);
+    return byte_level_permute(low32, high32, lookup[mode - 1][sel & 0x3]);
+  } else if (!mode) {
+    return byte_level_permute(low32, high32, sel);
   }
-  return byte_level_permute(a, b, sel);
 }
 
 /// Find position of first least significant set bit in an integer.

@@ -13,25 +13,25 @@ __global__ void testKernel1(uint32_t *d_result, uint32_t a) {
   static constexpr uint32_t b = 0;
   uint32_t d;
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 0);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 0);
   asm volatile("prmt.b32 %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 1);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 1);
   asm volatile("prmt.b32.f4e %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 2);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 2);
   asm volatile("prmt.b32.b4e %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 3);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 3);
   asm volatile("prmt.b32.rc8 %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 4);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 4);
   asm volatile("prmt.b32.ecl  %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 5);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 5);
   asm volatile("prmt.b32.ecr %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 
-  // CHECK: d = dpct::custom_byte_level_permute(a, b, sel, 6);
+  // CHECK: d = dpct::byte_level_permute_custom(a, b, sel, 6);
   asm volatile("prmt.b32.rc16 %0, %1, %2, %3;\n" : "=r"(d) : "r"(a), "n"(b), "n"(sel));
 }
 

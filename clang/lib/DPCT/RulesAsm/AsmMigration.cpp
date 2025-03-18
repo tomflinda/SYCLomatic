@@ -2866,7 +2866,7 @@ protected:
     if (emitStmt(Inst->getOutputOperand()))
       return SYCLGenError();
     OS() << " = " << MapNames::getDpctNamespace()
-         << "custom_byte_level_permute(";
+         << "byte_level_permute_custom(";
 
     llvm::SaveAndRestore<const InlineAsmInstruction *> Save(CurrInst);
     CurrInst = Inst;
