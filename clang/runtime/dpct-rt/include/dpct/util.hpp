@@ -226,6 +226,7 @@ inline uint32_t byte_level_permute_custom(uint32_t low32, uint32_t high32,
   } else if (!mode) {
     return byte_level_permute(low32, high32, sel);
   }
+  return 0;
 }
 
 /// Find position of first least significant set bit in an integer.
