@@ -187,16 +187,16 @@ inline unsigned int byte_level_permute(unsigned int a, unsigned int b,
   return ret;
 }
 
-/// \param [in] low32 The 4 bytes to construct the 8 bytes value as low32 bits.
+/// \param [in] low32 The 4 bytes to construct the 8 bytes value as low 32 bits.
 /// \param [in] high32 The 4 bytes to construct the 8 bytes value as high 32
 /// bits.
-/// \param [in] sel The selector value. It is used to generate selector which is
+/// \param [in] sel The selector value. It is used to generate selectors which are
 /// used to fetch byte value from \p low32 and \p high32 to construct result
 /// value.
 /// \param [in] mode The mode of permutation, together with \p sel, it
 /// further defines the behavior of data selection. \p mode and \p sel define 4
-/// selectors (s[i], i=0, 1, 2, 3), which are used to fetch 4 bytes from the 8
-/// bytes value constructed by \p low32 and \p high32; the byte selected by s[i]
+/// selectors (s[i], i=0, 1, 2, 3), which are used as index to fetch 4 bytes from
+/// the 8 bytes value constructed by \p low32 and \p high32; the byte selected by s[i]
 /// is used to fill the i-th byte of the result.
 /// The available mode values are:
 /// mode value 0: s[i] = sel[i * 4 + 3 : i * 4]
@@ -209,7 +209,7 @@ inline unsigned int byte_level_permute(unsigned int a, unsigned int b,
 ///               s[1] = sel[0 : 0] * 2 + 1
 ///               s[2] = s[0]
 ///               s[3] = s[1]
-/// other value: illegal, undefined behavior.
+/// other value: illegal, undefined behavior, return 0.
 inline uint32_t byte_level_permute_custom(uint32_t low32, uint32_t high32,
                                           uint32_t sel, int mode = 0) {
   constexpr uint16_t lookup[6][4] = {
