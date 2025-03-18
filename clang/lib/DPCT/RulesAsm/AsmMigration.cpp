@@ -1043,10 +1043,12 @@ protected:
           BI->getKind() != InlineAsmBuiltinType::u32 &&
           BI->getKind() != InlineAsmBuiltinType::s64 &&
           BI->getKind() != InlineAsmBuiltinType::u64 &&
+          BI->getKind() != InlineAsmBuiltinType::f16x2 &&
           BI->getKind() != InlineAsmBuiltinType::s16x2 &&
           BI->getKind() != InlineAsmBuiltinType::u16x2)
         return false;
       isVec = BI->getKind() == InlineAsmBuiltinType::s16x2 ||
+              BI->getKind() == InlineAsmBuiltinType::f16x2 ||
               BI->getKind() == InlineAsmBuiltinType::u16x2;
     } else {
       return false;
@@ -1055,12 +1057,19 @@ protected:
   }
 
   bool HandleAddSub(const InlineAsmInstruction *Inst) {
+
+    printf("HandleAddSub Inst->getNumInputOperands(): %d\n",
+           Inst->getNumInputOperands());
+    printf("HandleAddSub Inst->getNumTypes(): %d\n", Inst->getNumTypes());
+
     if (Inst->getNumInputOperands() != 2 || Inst->getNumTypes() != 1)
       return SYCLGenError();
 
     bool isVec = false;
     if (!CheckAddSubMinMaxType(Inst, isVec))
       return SYCLGenError();
+
+    printf("run here ##########################\n");
 
     if (emitStmt(Inst->getOutputOperand()))
       return SYCLGenError();
@@ -1080,6 +1089,11 @@ protected:
             Cast(Inst->getType(0), Inst->getInputOperand(I)->getType(), Op[I]);
     }
 
+    printf("000 %s %s\n", Inst->is(asmtok::op_add) ? "add" : "sub",
+           Op[0].c_str());
+    printf("111 %s %s\n", Inst->is(asmtok::op_add) ? "add" : "sub",
+           Op[1].c_str());
+
     if (Inst->hasAttr(InstAttr::sat)) {
       if (Inst->is(asmtok::op_add))
         OS() << MapNames::getClNamespace()
@@ -1088,10 +1102,50 @@ protected:
         OS() << MapNames::getClNamespace()
              << llvm::formatv("sub_sat({0}, {1})", Op[0], Op[1]);
     } else {
-      if (Inst->is(asmtok::op_add))
-        OS() << llvm::formatv("{0} + {1}", Op[0], Op[1]);
-      else
-        OS() << llvm::formatv("{0} - {1}", Op[0], Op[1]);
+
+#if 0
+      if (Inst->is(asmtok::op_add)) {
+        if (const auto *BI = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0))) {
+          if (BI->getKind() == InlineAsmBuiltinType::f16x2) {
+            std::string FormatTemp =
+                "(((sycl::vec<int, 1>({0})).as<sycl::vec<sycl::half, 2>>() - "
+                "(sycl::vec<int, 1>({1})).as<sycl::vec<sycl::half, "
+                "2>>()).as<sycl::vec<int, 1>>()).x();";
+            OS() << llvm::formatv(FormatTemp.c_str(), Op[0], Op[1]);
+          } else {
+            OS() << llvm::formatv("{0} + {1}", Op[0], Op[1]);
+          }
+        }
+      } else {
+        if (const auto *BI = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0))) {
+          if (BI->getKind() == InlineAsmBuiltinType::f16x2) {
+            std::string FormatTemp =
+                "(((sycl::vec<int, 1>({0})).as<sycl::vec<sycl::half, 2>>() - "
+                "(sycl::vec<int, 1>({1})).as<sycl::vec<sycl::half, "
+                "2>>()).as<sycl::vec<int, 1>>()).x();";
+            OS() << llvm::formatv(FormatTemp.c_str(), Op[0], Op[1]);
+          } else {
+            OS() << llvm::formatv("{0} - {1}", Op[0], Op[1]);
+          }
+        }
+      }
+#else
+      if (const auto *BI = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0))) {
+        std::string operatorStr = Inst->is(asmtok::op_add) ? "+" : "-";
+
+        if (BI->getKind() == InlineAsmBuiltinType::f16x2) {
+          std::string FormatTemp =
+              "(((sycl::vec<int, 1>({0})).as<sycl::vec<sycl::half, 2>>() {1} "
+              "(sycl::vec<int, 1>({2})).as<sycl::vec<sycl::half, "
+              "2>>()).as<sycl::vec<int, 1>>()).x();";
+          OS() << llvm::formatv(FormatTemp.c_str(), Op[0], operatorStr, Op[1]);
+
+        } else {
+          OS() << llvm::formatv("{0} {1} {2}", Op[0], operatorStr, Op[1]);
+        }
+      }
+#endif
+
     }
 
     endstmt();
