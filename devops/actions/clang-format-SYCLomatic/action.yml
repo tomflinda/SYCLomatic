@@ -71,3 +71,4 @@ runs:
     - name: Check if clang-format patch is empty
       shell: bash
       run: bash -c "if [ -s ./clang-format.patch ]; then cat ./clang-format.patch; exit 1; fi"
+
