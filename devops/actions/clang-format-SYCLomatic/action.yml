@@ -34,8 +34,10 @@ runs:
         echo "Changed files:"
         echo "$CHANGED_FILES"
 
-        # Set the output for the next steps
-        echo "all_changed_files=$CHANGED_FILES" >> $GITHUB_ENV
+        CHANGED_FILES_JOINED=$(echo "$CHANGED_FILES" | tr '\n' ' ')
+
+        # Set the output for the next steps using environment files
+        echo "all_changed_files=$CHANGED_FILES_JOINED" >> $GITHUB_ENV
 
     - name: List Files
       shell: bash
