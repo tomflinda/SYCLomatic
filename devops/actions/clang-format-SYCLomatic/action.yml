@@ -35,12 +35,12 @@ runs:
         echo "$CHANGED_FILES"
 
         # Set the output for the next steps
-        echo "::set-output name=all_changed_files::$CHANGED_FILES"
+        echo "all_changed_files=$CHANGED_FILES" >> $GITHUB_ENV
 
     - name: List Files
       shell: bash
       env:
-        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        CHANGED_FILES: ${{ env.all_changed_files }}
       run: |
         pattern_to_exclude_from_clang=".*clang/test/dpct"
         files_to_be_check=""
