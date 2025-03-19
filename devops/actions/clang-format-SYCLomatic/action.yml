@@ -1,5 +1,10 @@
 name: 'clang-format'
 description: 'Run clang-format on pull request'
+inputs:
+  github_token:
+    description: 'GitHub Token'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -12,8 +17,9 @@ runs:
 
     - name: Get changed files
       id: changed-files
+      shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
         PR_NUMBER=${{ github.event.pull_request.number }}
         REPO_FULL_NAME=${{ github.repository }}
