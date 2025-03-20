@@ -494,8 +494,11 @@ int eaccess(const char *pathname, int mode) {
   }
 
   int nvcc_available = 0;
-  char *value = getenv("INTERCEPT_COMPILE_PATH");
-  if (value) {
+  char *value_compile = getenv("INTERCEPT_COMPILE_PATH");
+  char *value_env = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
+
+  // Consider tool chain is avaialbe only when it is available from env path.
+  if (value_env && *value_env == '1' && value_compile) {
     nvcc_available = 1;
   }
 
@@ -1727,17 +1730,20 @@ int is_tool_available(char const *argv[], size_t const argc) {
   int is_nvcc = 0;
   int is_nvcc_available = 0;
 
-  char *value = getenv("INTERCEPT_COMPILE_PATH");
-  if (value) {
-    is_nvcc_available = 1;
+  int nvcc_available = 0;
+  char *value_compile = getenv("INTERCEPT_COMPILE_PATH");
+  char *value_env = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
+
+  // Consider tool chain is avaialbe only when it is available from env path.
+  if (value_env && *value_env == '1' && value_compile) {
+    nvcc_available = 1;
   }
 
   if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc"
     is_nvcc = 1;
-    value = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
-    if (value && *value == '0') {
+    if (nvcc_available == '0') {
       return 0;
     }
   }
