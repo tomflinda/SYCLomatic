@@ -2436,26 +2436,6 @@ protected:
     if (tryEmitStmt(Op, Inst->getInputOperand(0)))
       return SYCLGenError();
     OS() << " = ";
-    const auto *DesType = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0));
-    const auto *SrcType = dyn_cast<InlineAsmBuiltinType>(Inst->getType(1));
-    const auto *RealDesType =
-        dyn_cast<InlineAsmBuiltinType>(Inst->getOutputOperand()->getType());
-    const auto *RealSrcType =
-        dyn_cast<InlineAsmBuiltinType>(Inst->getInputOperand(0)->getType());
-    std::string DesTypeStr, SrcTypeStr, RealDesTypeStr, RealSrcTypeStr;
-    if (tryEmitType(DesTypeStr, DesType))
-      return SYCLGenError();
-    if (tryEmitType(SrcTypeStr, SrcType))
-      return SYCLGenError();
-    if (tryEmitType(RealDesTypeStr, RealDesType))
-      return SYCLGenError();
-    if (tryEmitType(RealSrcTypeStr, RealSrcType))
-      return SYCLGenError();
-
-    printf("DesTypeStr: %s\n", DesTypeStr.c_str());
-    printf("SrcTypeStr: %s\n", SrcTypeStr.c_str());
-    printf("RealDesTypeStr: %s\n", RealDesTypeStr.c_str());
-    printf("RealSrcTypeStr: %s\n", RealSrcTypeStr.c_str());
     std::string FormatTemp =
         "(sycl::ushort2(sycl::vec<float, 1>({0}).convert<sycl::half, "
         "sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x(),"
@@ -2471,9 +2451,6 @@ protected:
         InputOp[I] = Cast(Inst->getType(0), Inst->getInputOperand(I)->getType(),
                           InputOp[I]);
     }
-
-    printf("InputOp[0]: %s\n", InputOp[0].c_str());
-    printf("InputOp[1]: %s\n", InputOp[1].c_str());
 
     OS() << llvm::formatv(FormatTemp.c_str(), InputOp[1], InputOp[0]);
 
