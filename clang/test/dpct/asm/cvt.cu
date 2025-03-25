@@ -405,7 +405,7 @@ __global__ void cvt() {
 // CHECK-NEXT:     uint32_t u32;
 // CHECK-NEXT:     uint16_t u16[2];
 // CHECK-NEXT:   } tmp;
-// CHECK-NEXT:   tmp.u32 = (sycl::ushort2(sycl::vec<float, 1>(f.x()).convert<sycl::half, sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x(),sycl::vec<float, 1>(f.y()).convert<sycl::half, sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x())).as<sycl::vec<int, 1>>().x();;
+// CHECK-NEXT:   tmp.u32 = (sycl::ushort2(sycl::vec<float, 1>(f.x()).convert<sycl::half, sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x(),sycl::vec<float, 1>(f.y()).convert<sycl::half, sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x())).as<sycl::vec<int, 1>>().x();
 // CHECK-NEXT:   return tmp.u32;
 // CHECK-NEXT: }
 inline __device__ uint32_t float2_to_half2(float2 f) {

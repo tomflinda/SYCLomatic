@@ -2441,7 +2441,7 @@ protected:
         "sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x(),"
         "sycl::vec<float, 1>({1}).convert<sycl::half, "
         "sycl::rounding_mode::rte>().as<sycl::vec<uint16_t, 1>>().x()))"
-        ".as<sycl::vec<int, 1>>().x();";
+        ".as<sycl::vec<int, 1>>().x()";
 
     std::string InputOp[2];
     for (unsigned I = 0; I < Inst->getNumInputOperands(); ++I) {
