@@ -36,7 +36,7 @@ using namespace clang::dpct;
 
 namespace {
 
-inline bool SYCLGenError() { return true; }
+inline bool SYCLGenError() { assert(0); return true; }
 inline bool SYCLGenSuccess() { return false; }
 
 /// This is used to handle all the AST nodes (except specific instructions, Eg.
@@ -650,6 +650,7 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
+    printf("############## emitAddressExpr:%s %s %ld\n", Type.c_str(), Reg.c_str(), Dst->getImmAddr()->getValue().getZExtValue());
     OS() << llvm::formatv("(({0} *)((uintptr_t)&{1} + {2}))", Type, Reg,
                           Dst->getImmAddr()->getValue().getZExtValue());
     break;
@@ -2691,10 +2692,70 @@ protected:
   }
 
   bool handle_st(const InlineAsmInstruction *Inst) override {
+    printf("Inst->getNumInputOperands():%d\n", Inst->getNumInputOperands());
     if (Inst->getNumInputOperands() != 1)
       return SYCLGenError();
     llvm::SaveAndRestore<const InlineAsmInstruction *> Store(CurrInst);
     CurrInst = Inst;
+
+    if(Inst->hasAttr(InstAttr::cs) && Inst->hasAttr(InstAttr::v4)) {
+      std::string Ops;
+     if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
+          return SYCLGenError();
+
+     std::vector<std::string> values;
+     size_t start = 1;                  // Skip the '{' character
+     size_t end = Ops.find(',', start); // Find the first comma
+
+     while (end != std::string::npos) {
+       // Extract substring
+       std::string token = Ops.substr(start, end - start);
+
+       // Trim leading and trailing spaces
+       size_t first = token.find_first_not_of(' ');
+       size_t last = token.find_last_not_of(' ');
+
+       if (first != std::string::npos && last != std::string::npos) {
+         values.push_back(token.substr(first, last - first + 1));
+       }
+
+       // Move to the next token (after the comma)
+       start = end + 1;
+       end = Ops.find(',', start);
+     }
+
+     // Extract the last value after the last comma
+     std::string token =
+         Ops.substr(start, Ops.size() - start - 1); // Skip the '}' at the end
+     size_t first = token.find_first_not_of(' ');
+     size_t last = token.find_last_not_of(' ');
+
+     if (first != std::string::npos && last != std::string::npos) {
+       values.push_back(token.substr(first, last - first + 1));
+     }
+
+     printf("op%d %s\n", 0, values[0].c_str());
+     printf("op%d %s\n", 1, values[1].c_str());
+     printf("op%d %s\n", 2, values[2].c_str());
+     printf("op%d %s\n", 3, values[3].c_str());
+
+    std::string Output;
+    if (tryEmitStmt(Output, Inst->getOutputOperand()))
+      return SYCLGenError();
+
+    printf("Output: %s\n", Output.c_str());
+    // auto CommonBody = [&](std::string Val) {
+    //   incIndent();
+    //   indent();
+    //   decIndent();
+    //   return "*(" + Op[2] + " + " + Val + ") = *(" + Op[0] + " + " + Val + ")";
+    // };
+
+
+
+
+    }
+
     const auto *Src = Inst->getInputOperand(0);
     const auto *Dst =
         dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());

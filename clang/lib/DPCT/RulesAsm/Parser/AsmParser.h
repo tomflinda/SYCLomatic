@@ -184,10 +184,10 @@ using InlineAsmDeclResult = clang::ActionResult<InlineAsmDecl *>;
 using InlineAsmStmtResult = clang::ActionResult<InlineAsmStmt *>;
 using InlineAsmExprResult = clang::ActionResult<InlineAsmExpr *>;
 
-inline InlineAsmExprResult AsmExprError() { return InlineAsmExprResult(true); }
-inline InlineAsmStmtResult AsmStmtError() { return InlineAsmStmtResult(true); }
-inline InlineAsmTypeResult AsmTypeError() { return InlineAsmTypeResult(true); }
-inline InlineAsmDeclResult AsmDeclError() { return InlineAsmDeclResult(true); }
+inline InlineAsmExprResult AsmExprError() {assert(0);  return InlineAsmExprResult(true); }
+inline InlineAsmStmtResult AsmStmtError() {assert(0);  return InlineAsmStmtResult(true); }
+inline InlineAsmTypeResult AsmTypeError() {assert(0);  return InlineAsmTypeResult(true); }
+inline InlineAsmDeclResult AsmDeclError() {assert(0);  return InlineAsmDeclResult(true); }
 
 // clang-format off
 namespace asm_precedence {
