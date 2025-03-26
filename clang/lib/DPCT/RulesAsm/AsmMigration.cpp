@@ -36,7 +36,7 @@ using namespace clang::dpct;
 
 namespace {
 
-inline bool SYCLGenError() { assert(0); return true; }
+inline bool SYCLGenError() { return true; }
 inline bool SYCLGenSuccess() { return false; }
 
 /// This is used to handle all the AST nodes (except specific instructions, Eg.
@@ -51,17 +51,19 @@ class SYCLGenBase {
   SmallString<4> NewLine;
   SmallVector<SmallString<10>, 4> VecExprTypeRecord;
   raw_ostream *Stream;
-  InlineAsmContext &Context;
+  
   bool MigrationStopped = false;
 
 protected:
   const InlineAsmInstruction *CurrInst = nullptr;
   const GCCAsmStmt *GAS;
-
+  InlineAsmContext &Context;
   class BlockDelimiterGuard {
     SYCLGenBase &CodeGen;
 
   public:
+    InlineAsmContext &getContext() { return CodeGen.Context; }
+
     BlockDelimiterGuard(SYCLGenBase &CG) : CodeGen(CG) {
       CodeGen.OS() << "{";
       CodeGen.endl();
@@ -609,14 +611,16 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     return false;
   };
 
-  if (CurrInst->is(asmtok::op_st, asmtok::op_ld, asmtok::op_red))
+  if (CurrInst->is( asmtok::op_ld, asmtok::op_red))
     OS() << "*";
   switch (Dst->getMemoryOpKind()) {
   case InlineAsmAddressExpr::Imm:
+    printf("00000000000000000000000000\n");
     OS() << llvm::formatv("(({0} *)(uintptr_t){1})", Type,
                           Dst->getImmAddr()->getValue().getZExtValue());
     break;
   case InlineAsmAddressExpr::Reg: {
+    printf("11111111111111111111111\n");
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
@@ -629,14 +633,21 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     break;
   }
   case InlineAsmAddressExpr::RegImm: {
+     printf("22222222222222222222222\n");
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
-    OS() << llvm::formatv("(({0} *)((uintptr_t){1} + {2}))", Type, Reg,
+
+    printf("###000 ########### emitAddressExpr:%s %s %ld\n", Type.c_str(), Reg.c_str(), Dst->getImmAddr()->getValue().getZExtValue());
+    if(CurrInst->is(asmtok::op_st))
+      OS() << llvm::formatv("(uintptr_t){0}",  Reg);
+    else
+      OS() << llvm::formatv("(({0} *)((uintptr_t){1} + {2}))", Type, Reg,
                           Dst->getImmAddr()->getValue().getZExtValue());
     break;
   }
   case InlineAsmAddressExpr::Var: {
+    printf("444444444444444444444444444\n");
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
@@ -2698,62 +2709,59 @@ protected:
     llvm::SaveAndRestore<const InlineAsmInstruction *> Store(CurrInst);
     CurrInst = Inst;
 
-    if(Inst->hasAttr(InstAttr::cs) && Inst->hasAttr(InstAttr::v4)) {
+    if (Inst->hasAttr(InstAttr::cs) && Inst->hasAttr(InstAttr::v4)) {
       std::string Ops;
-     if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
-          return SYCLGenError();
+      if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
+        return SYCLGenError();
 
-     std::vector<std::string> values;
-     size_t start = 1;                  // Skip the '{' character
-     size_t end = Ops.find(',', start); // Find the first comma
+      std::vector<std::string> values;
+      size_t start = 1;                  // Skip the '{' character
+      size_t end = Ops.find(',', start); // Find the first comma
 
-     while (end != std::string::npos) {
-       // Extract substring
-       std::string token = Ops.substr(start, end - start);
+      while (end != std::string::npos) {
+        // Extract substring
+        std::string token = Ops.substr(start, end - start);
 
-       // Trim leading and trailing spaces
-       size_t first = token.find_first_not_of(' ');
-       size_t last = token.find_last_not_of(' ');
+        // Trim leading and trailing spaces
+        size_t first = token.find_first_not_of(' ');
+        size_t last = token.find_last_not_of(' ');
 
-       if (first != std::string::npos && last != std::string::npos) {
-         values.push_back(token.substr(first, last - first + 1));
-       }
+        if (first != std::string::npos && last != std::string::npos) {
+          values.push_back(token.substr(first, last - first + 1));
+        }
 
-       // Move to the next token (after the comma)
-       start = end + 1;
-       end = Ops.find(',', start);
-     }
+        // Move to the next token (after the comma)
+        start = end + 1;
+        end = Ops.find(',', start);
+      }
 
-     // Extract the last value after the last comma
-     std::string token =
-         Ops.substr(start, Ops.size() - start - 1); // Skip the '}' at the end
-     size_t first = token.find_first_not_of(' ');
-     size_t last = token.find_last_not_of(' ');
+      // Extract the last value after the last comma
+      std::string token =
+          Ops.substr(start, Ops.size() - start - 1); // Skip the '}' at the end
+      size_t first = token.find_first_not_of(' ');
+      size_t last = token.find_last_not_of(' ');
 
-     if (first != std::string::npos && last != std::string::npos) {
-       values.push_back(token.substr(first, last - first + 1));
-     }
+      if (first != std::string::npos && last != std::string::npos) {
+        values.push_back(token.substr(first, last - first + 1));
+      }
 
-     printf("op%d %s\n", 0, values[0].c_str());
-     printf("op%d %s\n", 1, values[1].c_str());
-     printf("op%d %s\n", 2, values[2].c_str());
-     printf("op%d %s\n", 3, values[3].c_str());
+      printf("op%d %s\n", 0, values[0].c_str());
+      printf("op%d %s\n", 1, values[1].c_str());
+      printf("op%d %s\n", 2, values[2].c_str());
+      printf("op%d %s\n", 3, values[3].c_str());
 
-    std::string Output;
-    if (tryEmitStmt(Output, Inst->getOutputOperand()))
-      return SYCLGenError();
+      std::string Output;
+      if (tryEmitStmt(Output, Inst->getOutputOperand()))
+        return SYCLGenError();
 
-    printf("Output: %s\n", Output.c_str());
-    // auto CommonBody = [&](std::string Val) {
-    //   incIndent();
-    //   indent();
-    //   decIndent();
-    //   return "*(" + Op[2] + " + " + Val + ") = *(" + Op[0] + " + " + Val + ")";
-    // };
-
-
-
-
+      printf("Output: %s\n", Output.c_str());
+      // auto CommonBody = [&](std::string Val) {
+      //   incIndent();
+      //   indent();
+      //   decIndent();
+      //   return "*(" + Op[2] + " + " + Val + ") = *(" + Op[0] + " + " + Val +
+      //   ")";
+      // };
     }
 
     const auto *Src = Inst->getInputOperand(0);
@@ -2761,14 +2769,63 @@ protected:
         dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
     if (!Dst)
       return false;
+
+    auto CanSuppressCast = [&](InlineAsmDeclRefExpr *DRE) {
+      auto *VD = dyn_cast<InlineAsmVarDecl>(&Dst->getSymbol()->getDecl());
+      if (VD->getInlineAsmOp()) {
+        if (const auto *Ptr = dyn_cast<PointerType>(
+                VD->getInlineAsmOp()->getType().getTypePtr())) {
+          return Context.getTypeFromClangType(
+                     Ptr->getPointeeType().getTypePtr()) ==
+                 CurrInst->getType(0);
+        }
+      }
+      return false;
+    };
+
     std::string Type;
     if (tryEmitType(Type, Inst->getType(0)))
       return SYCLGenError();
-    if (emitStmt(Dst))
+
+    printf("Type:%s\n", Type.c_str());
+
+    std::string OutOp;
+    if (tryEmitStmt(OutOp, Inst->getOutputOperand()))
       return SYCLGenError();
+
+    // if(CanSuppressCast(Dst->getSymbol())) {
+    //   OutOp = OutOp;
+    // }
+
+    printf("handle_st Output: %s\n", OutOp.c_str());
+
+    // OutOp = "(" +Type +")" + OutOp;
+
+    if (Dst->getMemoryOpKind() == InlineAsmAddressExpr::RegImm) {
+
+      // std::string Reg;
+      // if (tryEmitStmt(Reg, Dst->getSymbol()))
+      //   return SYCLGenError();
+
+      printf("###1111 ########### handle_st:%s %s %ld\n", Type.c_str(),
+             OutOp.c_str(), Dst->getImmAddr()->getValue().getZExtValue());
+
+      auto Str = llvm::formatv("*(({0} *)({1} + {2}))", Type, OutOp,
+                               Dst->getImmAddr()->getValue().getZExtValue());
+      OS() << Str;
+    } else {
+      OutOp = "*" + OutOp;
+      auto Str = OutOp;
+      OS() << Str;
+    }
+
+    // if (emitStmt(Dst))
+    //   return SYCLGenError();
     OS() << " = ";
+
     if (emitStmt(Src))
       return SYCLGenError();
+
     endstmt();
     return SYCLGenSuccess();
   }
