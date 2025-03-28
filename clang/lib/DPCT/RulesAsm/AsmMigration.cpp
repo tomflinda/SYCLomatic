@@ -8,12 +8,12 @@
 
 #include "AsmMigration.h"
 #include "AnalysisInfo.h"
+#include "Diagnostics/Diagnostics.h"
+#include "ErrorHandle/CrashRecovery.h"
+#include "RuleInfra/MapNames.h"
 #include "RulesAsm/Parser/AsmNodes.h"
 #include "RulesAsm/Parser/AsmParser.h"
 #include "RulesAsm/Parser/AsmTokenKinds.h"
-#include "ErrorHandle/CrashRecovery.h"
-#include "Diagnostics/Diagnostics.h"
-#include "RuleInfra/MapNames.h"
 #include "TextModification.h"
 #include "Utility.h"
 #include "clang/AST/Expr.h"
@@ -51,7 +51,7 @@ class SYCLGenBase {
   SmallString<4> NewLine;
   SmallVector<SmallString<10>, 4> VecExprTypeRecord;
   raw_ostream *Stream;
-  
+
   bool MigrationStopped = false;
 
 protected:
@@ -611,16 +611,14 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     return false;
   };
 
-  if (CurrInst->is( asmtok::op_ld, asmtok::op_red))
+  if (CurrInst->is(asmtok::op_ld, asmtok::op_red))
     OS() << "*";
   switch (Dst->getMemoryOpKind()) {
   case InlineAsmAddressExpr::Imm:
-    printf("00000000000000000000000000\n");
     OS() << llvm::formatv("(({0} *)(uintptr_t){1})", Type,
                           Dst->getImmAddr()->getValue().getZExtValue());
     break;
   case InlineAsmAddressExpr::Reg: {
-    printf("11111111111111111111111\n");
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
@@ -633,21 +631,18 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     break;
   }
   case InlineAsmAddressExpr::RegImm: {
-     printf("22222222222222222222222\n");
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
 
-    printf("###000 ########### emitAddressExpr:%s %s %ld\n", Type.c_str(), Reg.c_str(), Dst->getImmAddr()->getValue().getZExtValue());
-    if(CurrInst->is(asmtok::op_st))
-      OS() << llvm::formatv("(uintptr_t){0}",  Reg);
+    if (CurrInst->is(asmtok::op_st))
+      OS() << llvm::formatv("(uintptr_t){0}", Reg);
     else
       OS() << llvm::formatv("(({0} *)((uintptr_t){1} + {2}))", Type, Reg,
-                          Dst->getImmAddr()->getValue().getZExtValue());
+                            Dst->getImmAddr()->getValue().getZExtValue());
     break;
   }
   case InlineAsmAddressExpr::Var: {
-    printf("444444444444444444444444444\n");
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
@@ -661,7 +656,6 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     std::string Reg;
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
-    printf("############## emitAddressExpr:%s %s %ld\n", Type.c_str(), Reg.c_str(), Dst->getImmAddr()->getValue().getZExtValue());
     OS() << llvm::formatv("(({0} *)((uintptr_t)&{1} + {2}))", Type, Reg,
                           Dst->getImmAddr()->getValue().getZExtValue());
     break;
@@ -1931,23 +1925,17 @@ protected:
     if (!Inst)
       return SYCLGenError();
     if (Inst->hasAttr(InstAttr::eq))
-      OS() << ", "
-           << "std::equal_to<>()";
+      OS() << ", " << "std::equal_to<>()";
     else if (Inst->hasAttr(InstAttr::ne))
-      OS() << ", "
-           << "std::not_equal_to<>()";
+      OS() << ", " << "std::not_equal_to<>()";
     else if (Inst->hasAttr(InstAttr::lt))
-      OS() << ", "
-           << "std::less<>()";
+      OS() << ", " << "std::less<>()";
     else if (Inst->hasAttr(InstAttr::le))
-      OS() << ", "
-           << "std::less_equal<>()";
+      OS() << ", " << "std::less_equal<>()";
     else if (Inst->hasAttr(InstAttr::gt))
-      OS() << ", "
-           << "std::greater<>()";
+      OS() << ", " << "std::greater<>()";
     else if (Inst->hasAttr(InstAttr::ge))
-      OS() << ", "
-           << "std::greater_equal<>()";
+      OS() << ", " << "std::greater_equal<>()";
     else
       return SYCLGenError();
     return SYCLGenSuccess();
@@ -2522,11 +2510,10 @@ protected:
       Op = std::move(NewOp);
     }
 
-    bool HasHalfOrBfloat16 =
-        SrcType->getKind() == InlineAsmBuiltinType::f16 ||
-        DesType->getKind() == InlineAsmBuiltinType::f16 ||
-        SrcType->getKind() == InlineAsmBuiltinType::bf16 ||
-        DesType->getKind() == InlineAsmBuiltinType::bf16;
+    bool HasHalfOrBfloat16 = SrcType->getKind() == InlineAsmBuiltinType::f16 ||
+                             DesType->getKind() == InlineAsmBuiltinType::f16 ||
+                             SrcType->getKind() == InlineAsmBuiltinType::bf16 ||
+                             DesType->getKind() == InlineAsmBuiltinType::bf16;
     if (DpctGlobalInfo::useIntelDeviceMath() && HasHalfOrBfloat16) {
       insertHeader(HeaderType::HT_SYCL_Math);
       if (SrcNeedBitCast)
@@ -2666,8 +2653,7 @@ protected:
         OS() << ')';
         if (Inst->getOutputOperand()->getType() != T) {
           OS() << ".template as<" << MapNames::getClNamespace() << "vec<"
-               << OpTyStr[3] << ", 1>"
-               << ">().x()";
+               << OpTyStr[3] << ", 1>" << ">().x()";
         }
       } else
         // fma.bf16 is not supported now.
@@ -2702,147 +2688,71 @@ protected:
     return SYCLGenSuccess();
   }
 
-  bool handle_st(const InlineAsmInstruction *Inst) override {
-    printf("Inst->getNumInputOperands():%d\n", Inst->getNumInputOperands());
-    if (Inst->getNumInputOperands() != 1)
+  bool HandleStVec(const InlineAsmInstruction *Inst, int VecNum) {
+    std::string Ops;
+    if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
       return SYCLGenError();
-    llvm::SaveAndRestore<const InlineAsmInstruction *> Store(CurrInst);
-    CurrInst = Inst;
 
-    if (Inst->hasAttr(InstAttr::cs) && Inst->hasAttr(InstAttr::v4)) {
-      std::string Ops;
-      if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
-        return SYCLGenError();
+    // To extract the values from the string like "{x, y, z, h}" and store them
+    // int Values vector
+    std::vector<std::string> Values;
+    size_t start = 1;                  // Skip the '{' character
+    size_t end = Ops.find(',', start); // Find the first comma
 
-      std::vector<std::string> values;
-      size_t start = 1;                  // Skip the '{' character
-      size_t end = Ops.find(',', start); // Find the first comma
-
-      while (end != std::string::npos) {
-        // Extract substring
-        std::string token = Ops.substr(start, end - start);
-
-        // Trim leading and trailing spaces
-        size_t first = token.find_first_not_of(' ');
-        size_t last = token.find_last_not_of(' ');
-
-        if (first != std::string::npos && last != std::string::npos) {
-          values.push_back(token.substr(first, last - first + 1));
-        }
-
-        // Move to the next token (after the comma)
-        start = end + 1;
-        end = Ops.find(',', start);
+    while (end != std::string::npos) {
+      std::string Token = Ops.substr(start, end - start);
+      size_t First = Token.find_first_not_of(' ');
+      size_t Last = Token.find_last_not_of(' ');
+      if (First != std::string::npos && Last != std::string::npos) {
+        Values.push_back(Token.substr(First, Last - First + 1));
       }
-
-      // Extract the last value after the last comma
-      std::string token =
-          Ops.substr(start, Ops.size() - start - 1); // Skip the '}' at the end
-      size_t first = token.find_first_not_of(' ');
-      size_t last = token.find_last_not_of(' ');
-
-      if (first != std::string::npos && last != std::string::npos) {
-        values.push_back(token.substr(first, last - first + 1));
-      }
-
-      std::string Output;
-      if (tryEmitStmt(Output, Inst->getOutputOperand()))
-        return SYCLGenError();
-
-      auto CommonBody = [&](std::string Type, std::string BasePtr,
-                            std::string Offset, std::string Val,
-                            std::string Semi) {
-        if (Offset != "0") {
-          indent();
-        }
-        return llvm::formatv("*(({0} *)({1}) + {2}) = {3}{4}", Type, BasePtr,
-                             Offset, Val, Semi);
-      };
-
-      std::string Type;
-      if (tryEmitType(Type, Inst->getType(0)))
-        return SYCLGenError();
-
-      printf("Type:%s\n", Type.c_str());
-
-      const auto *Dst =
-          dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
-      if (!Dst)
-        return false;
-
-      OS() << CommonBody(Type, Output, "0", values[0], ";\n");
-      OS() << CommonBody(Type, Output, "1", values[1], ";\n");
-      OS() << CommonBody(Type, Output, "2", values[2], ";\n");
-      OS() << CommonBody(Type, Output, "3", values[3], "");
-
-      endstmt();
-      return SYCLGenSuccess();
+      start = end + 1;
+      end = Ops.find(',', start);
     }
 
-    if (Inst->hasAttr(InstAttr::cs) && Inst->hasAttr(InstAttr::v2)) {
-      std::string Ops;
-      if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
-        return SYCLGenError();
+    // Extract the last value after the last comma
+    std::string token = Ops.substr(start, Ops.size() - start - 1);
+    size_t first = token.find_first_not_of(' ');
+    size_t last = token.find_last_not_of(' ');
 
-      std::vector<std::string> values;
-      size_t start = 1;                  // Skip the '{' character
-      size_t end = Ops.find(',', start); // Find the first comma
+    if (first != std::string::npos && last != std::string::npos) {
+      Values.push_back(token.substr(first, last - first + 1));
+    }
 
-      while (end != std::string::npos) {
-        // Extract substring
-        std::string token = Ops.substr(start, end - start);
+    std::string Output;
+    if (tryEmitStmt(Output, Inst->getOutputOperand()))
+      return SYCLGenError();
 
-        // Trim leading and trailing spaces
-        size_t first = token.find_first_not_of(' ');
-        size_t last = token.find_last_not_of(' ');
+    std::string Type;
+    if (tryEmitType(Type, Inst->getType(0)))
+      return SYCLGenError();
 
-        if (first != std::string::npos && last != std::string::npos) {
-          values.push_back(token.substr(first, last - first + 1));
-        }
+    const auto *Dst =
+        dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
+    if (!Dst)
+      return false;
 
-        // Move to the next token (after the comma)
-        start = end + 1;
-        end = Ops.find(',', start);
-      }
+    for (int Index = 0; Index < VecNum; Index++) {
+      OS() << llvm::formatv("*(({0} *)({1}) + {2}) = {3}{4}", Type, Output,
+                            Index, Values[Index],
+                            Index == VecNum - 1 ? "" : ";\n");
+    }
 
-      // Extract the last value after the last comma
-      std::string token =
-          Ops.substr(start, Ops.size() - start - 1); // Skip the '}' at the end
-      size_t first = token.find_first_not_of(' ');
-      size_t last = token.find_last_not_of(' ');
+    endstmt();
+    return SYCLGenSuccess();
+  }
 
-      if (first != std::string::npos && last != std::string::npos) {
-        values.push_back(token.substr(first, last - first + 1));
-      }
+  bool handle_st(const InlineAsmInstruction *Inst) override {
+    if (Inst->getNumInputOperands() != 1)
+      return SYCLGenError();
 
-      std::string Output;
-      if (tryEmitStmt(Output, Inst->getOutputOperand()))
-        return SYCLGenError();
+    llvm::SaveAndRestore<const InlineAsmInstruction *> Store(CurrInst, Inst);
 
-      auto CommonBody = [&](std::string Type, std::string BasePtr,
-                            std::string Offset, std::string Val,
-                            std::string Semi) {
-        if (Offset != "0") {
-          indent();
-        }
-        return llvm::formatv("*(({0} *)({1}) + {2}) = {3}{4}", Type, BasePtr,
-                             Offset, Val, Semi);
-      };
-
-      std::string Type;
-      if (tryEmitType(Type, Inst->getType(0)))
-        return SYCLGenError();
-
-      const auto *Dst =
-          dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
-      if (!Dst)
-        return false;
-
-      OS() << CommonBody(Type, Output, "0", values[0], ";\n");
-      OS() << CommonBody(Type, Output, "1", values[1], "");
-
-      endstmt();
-      return SYCLGenSuccess();
+    if (Inst->hasAttr(InstAttr::cs)) {
+      if (Inst->hasAttr(InstAttr::v4))
+        return HandleStVec(Inst, 4);
+      if (Inst->hasAttr(InstAttr::v2))
+        return HandleStVec(Inst, 2);
     }
 
     const auto *Src = Inst->getInputOperand(0);
@@ -2855,24 +2765,18 @@ protected:
     if (tryEmitType(Type, Inst->getType(0)))
       return SYCLGenError();
 
-    printf("Type:%s\n", Type.c_str());
-
     std::string OutOp;
     if (tryEmitStmt(OutOp, Inst->getOutputOperand()))
       return SYCLGenError();
 
     if (Dst->getMemoryOpKind() == InlineAsmAddressExpr::RegImm) {
-      auto Str = llvm::formatv("*(({0} *)({1} + {2}))", Type, OutOp,
-                               Dst->getImmAddr()->getValue().getZExtValue());
-      OS() << Str;
+      OS() << llvm::formatv("*(({0} *)({1} + {2}))", Type, OutOp,
+                            Dst->getImmAddr()->getValue().getZExtValue());
     } else {
-      OutOp = "*" + OutOp;
-      auto Str = OutOp;
-      OS() << Str;
+      OS() << "*" << OutOp;
     }
 
     OS() << " = ";
-
     if (emitStmt(Src))
       return SYCLGenError();
 
