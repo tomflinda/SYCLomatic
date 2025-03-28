@@ -358,7 +358,6 @@ InlineAsmStmtResult InlineAsmParser::ParseInstruction() {
     return AsmStmtError();
 
   while (TryConsumeToken(asmtok::comma)) {
-    printf("ParseInstruction Tok:%s\n", Tok.getName());
     InlineAsmExprResult E = ParseExpression();
     if (E.isInvalid())
       return AsmStmtError();

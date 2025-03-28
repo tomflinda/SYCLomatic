@@ -51,19 +51,17 @@ class SYCLGenBase {
   SmallString<4> NewLine;
   SmallVector<SmallString<10>, 4> VecExprTypeRecord;
   raw_ostream *Stream;
-
+  InlineAsmContext &Context;
   bool MigrationStopped = false;
 
 protected:
   const InlineAsmInstruction *CurrInst = nullptr;
   const GCCAsmStmt *GAS;
-  InlineAsmContext &Context;
+
   class BlockDelimiterGuard {
     SYCLGenBase &CodeGen;
 
   public:
-    InlineAsmContext &getContext() { return CodeGen.Context; }
-
     BlockDelimiterGuard(SYCLGenBase &CG) : CodeGen(CG) {
       CodeGen.OS() << "{";
       CodeGen.endl();
@@ -1925,17 +1923,23 @@ protected:
     if (!Inst)
       return SYCLGenError();
     if (Inst->hasAttr(InstAttr::eq))
-      OS() << ", " << "std::equal_to<>()";
+      OS() << ", "
+           << "std::equal_to<>()";
     else if (Inst->hasAttr(InstAttr::ne))
-      OS() << ", " << "std::not_equal_to<>()";
+      OS() << ", "
+           << "std::not_equal_to<>()";
     else if (Inst->hasAttr(InstAttr::lt))
-      OS() << ", " << "std::less<>()";
+      OS() << ", "
+           << "std::less<>()";
     else if (Inst->hasAttr(InstAttr::le))
-      OS() << ", " << "std::less_equal<>()";
+      OS() << ", "
+           << "std::less_equal<>()";
     else if (Inst->hasAttr(InstAttr::gt))
-      OS() << ", " << "std::greater<>()";
+      OS() << ", "
+           << "std::greater<>()";
     else if (Inst->hasAttr(InstAttr::ge))
-      OS() << ", " << "std::greater_equal<>()";
+      OS() << ", "
+           << "std::greater_equal<>()";
     else
       return SYCLGenError();
     return SYCLGenSuccess();
@@ -2510,10 +2514,11 @@ protected:
       Op = std::move(NewOp);
     }
 
-    bool HasHalfOrBfloat16 = SrcType->getKind() == InlineAsmBuiltinType::f16 ||
-                             DesType->getKind() == InlineAsmBuiltinType::f16 ||
-                             SrcType->getKind() == InlineAsmBuiltinType::bf16 ||
-                             DesType->getKind() == InlineAsmBuiltinType::bf16;
+    bool HasHalfOrBfloat16 =
+        SrcType->getKind() == InlineAsmBuiltinType::f16 ||
+        DesType->getKind() == InlineAsmBuiltinType::f16 ||
+        SrcType->getKind() == InlineAsmBuiltinType::bf16 ||
+        DesType->getKind() == InlineAsmBuiltinType::bf16;
     if (DpctGlobalInfo::useIntelDeviceMath() && HasHalfOrBfloat16) {
       insertHeader(HeaderType::HT_SYCL_Math);
       if (SrcNeedBitCast)
@@ -2653,7 +2658,8 @@ protected:
         OS() << ')';
         if (Inst->getOutputOperand()->getType() != T) {
           OS() << ".template as<" << MapNames::getClNamespace() << "vec<"
-               << OpTyStr[3] << ", 1>" << ">().x()";
+               << OpTyStr[3] << ", 1>"
+               << ">().x()";
         }
       } else
         // fma.bf16 is not supported now.
@@ -2693,7 +2699,7 @@ protected:
     if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
       return SYCLGenError();
 
-    // To extract the values from the string like "{x, y, z, h}" and store them
+    // To extract the values from the string like "{x, y, z, w}" and store them
     // int Values vector
     std::vector<std::string> Values;
     size_t start = 1;                  // Skip the '{' character
