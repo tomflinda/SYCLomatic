@@ -2736,7 +2736,7 @@ protected:
     const auto *Dst =
         dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
     if (!Dst)
-      return false;
+      return SYCLGenError();
 
     for (int Index = 0; Index < VecNum; Index++) {
       OS() << llvm::formatv("*(({0} *)({1}) + {2}) = {3}{4}", Type, Output,
@@ -2765,7 +2765,7 @@ protected:
     const auto *Dst =
         dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getOutputOperand());
     if (!Dst)
-      return false;
+      return SYCLGenError();
 
     std::string Type;
     if (tryEmitType(Type, Inst->getType(0)))
@@ -2800,7 +2800,7 @@ protected:
     const auto *Dst = Inst->getOutputOperand();
 
     if (!Src)
-      return false;
+      return SYCLGenError();
     std::string Type;
     if (tryEmitType(Type, Inst->getType(0)))
       return SYCLGenError();
