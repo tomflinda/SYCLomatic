@@ -609,7 +609,7 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     return false;
   };
 
-  if (CurrInst->is(asmtok::op_ld, asmtok::op_red))
+  if (CurrInst->is(asmtok::op_red))
     OS() << "*";
   switch (Dst->getMemoryOpKind()) {
   case InlineAsmAddressExpr::Imm:
@@ -633,7 +633,7 @@ bool SYCLGenBase::emitAddressExpr(const InlineAsmAddressExpr *Dst) {
     if (tryEmitStmt(Reg, Dst->getSymbol()))
       return SYCLGenSuccess();
 
-    if (CurrInst->is(asmtok::op_st))
+    if (CurrInst->is(asmtok::op_st, asmtok::op_ld))
       OS() << llvm::formatv("(uintptr_t){0}", Reg);
     else
       OS() << llvm::formatv("(({0} *)((uintptr_t){1} + {2}))", Type, Reg,
@@ -2790,6 +2790,64 @@ protected:
     return SYCLGenSuccess();
   }
 
+  bool HandleLdVec(const InlineAsmInstruction *Inst, int VecNum) {
+    std::string Ops;
+    if (tryEmitStmt(Ops, Inst->getOutputOperand()))
+      return SYCLGenError();
+
+    printf("HandleLdVec Ops:[%s]\n", Ops.c_str());
+    // To extract the values from the string like "{x, y, z, w}" and store them
+    // int Values vector
+    std::vector<std::string> Values;
+    size_t start = 1;                  // Skip the '{' character
+    size_t end = Ops.find(',', start); // Find the first comma
+
+    while (end != std::string::npos) {
+      std::string Token = Ops.substr(start, end - start);
+      size_t First = Token.find_first_not_of(' ');
+      size_t Last = Token.find_last_not_of(' ');
+      if (First != std::string::npos && Last != std::string::npos) {
+        Values.push_back(Token.substr(First, Last - First + 1));
+      }
+      start = end + 1;
+      end = Ops.find(',', start);
+    }
+
+    // Extract the last value after the last comma
+    std::string token = Ops.substr(start, Ops.size() - start - 1);
+    size_t first = token.find_first_not_of(' ');
+    size_t last = token.find_last_not_of(' ');
+
+    if (first != std::string::npos && last != std::string::npos) {
+      Values.push_back(token.substr(first, last - first + 1));
+    }
+
+    std::string Input;
+    if (tryEmitStmt(Input, Inst->getInputOperand(0)))
+      return SYCLGenError();
+
+    std::string Type;
+    if (tryEmitType(Type, Inst->getType(0)))
+      return SYCLGenError();
+
+    const auto *Src =
+        dyn_cast_or_null<InlineAsmAddressExpr>(Inst->getInputOperand(0));
+    if (!Src)
+      return SYCLGenError();
+
+    for (int Index = 0; Index < VecNum; Index++) {
+      OS() << llvm::formatv("*(({0} *)({1}) + {2}) = {3}{4}", Type, Input,
+                            Index, Values[Index],
+                            Index == VecNum - 1 ? "" : ";\n");
+      if (Index < VecNum - 1) {
+        indent();
+      }
+    }
+
+    endstmt();
+    return SYCLGenSuccess();
+  }
+
   bool handle_ld(const InlineAsmInstruction *Inst) override {
     if (Inst->getNumInputOperands() != 1)
       return SYCLGenError();
@@ -2801,14 +2859,43 @@ protected:
 
     if (!Src)
       return SYCLGenError();
+
+    // if (Inst->hasAttr(InstAttr::v4)) {
+
+    //   std::string Ops;
+    //   if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
+    //     return SYCLGenError();
+    //   printf("Ops:[%s]\n", Ops.c_str());
+
+    // }
+
+    if (Inst->hasAttr(InstAttr::cg)) {
+      if (Inst->hasAttr(InstAttr::v4))
+        return HandleLdVec(Inst, 4);
+      if (Inst->hasAttr(InstAttr::v2))
+        return HandleLdVec(Inst, 2);
+    }
+
     std::string Type;
     if (tryEmitType(Type, Inst->getType(0)))
       return SYCLGenError();
     if (emitStmt(Dst))
       return SYCLGenError();
     OS() << " = ";
-    if (emitStmt(Src))
+
+    std::string InOp;
+    if (tryEmitStmt(InOp, Inst->getInputOperand(0)))
       return SYCLGenError();
+
+    if (Src->getMemoryOpKind() == InlineAsmAddressExpr::RegImm) {
+      OS() << llvm::formatv("*(({0} *)({1} + {2}))", Type, InOp,
+                            Src->getImmAddr()->getValue().getZExtValue());
+    } else {
+      OS() << "*" << InOp;
+    }
+
+    // if (emitStmt(Src))
+    //   return SYCLGenError();
     endstmt();
     return SYCLGenSuccess();
   }
