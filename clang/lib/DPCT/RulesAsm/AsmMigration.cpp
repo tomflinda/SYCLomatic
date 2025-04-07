@@ -2748,6 +2748,34 @@ protected:
     return SYCLGenSuccess();
   }
 
+
+std::vector<std::string> extractValues(const std::string& Ops) {
+    std::vector<std::string> Values;
+    size_t start = 1; // Skip the '{' character
+    size_t end = Ops.find(',', start);
+
+    while (end != std::string::npos) {
+        std::string Token = Ops.substr(start, end - start);
+        size_t First = Token.find_first_not_of(' ');
+        size_t Last = Token.find_last_not_of(' ');
+        if (First != std::string::npos && Last != std::string::npos) {
+            Values.push_back(Token.substr(First, Last - First + 1));
+        }
+        start = end + 1;
+        end = Ops.find(',', start);
+    }
+
+    // Extract the last value after the last comma
+    std::string token = Ops.substr(start, Ops.size() - start - 1);
+    size_t first = token.find_first_not_of(' ');
+    size_t last = token.find_last_not_of(' ');
+    if (first != std::string::npos && last != std::string::npos) {
+        Values.push_back(token.substr(first, last - first + 1));
+    }
+
+    return Values;
+}
+
   bool handle_st(const InlineAsmInstruction *Inst) override {
     if (Inst->getNumInputOperands() != 1)
       return SYCLGenError();
@@ -2835,8 +2863,8 @@ protected:
       return SYCLGenError();
 
     for (int Index = 0; Index < VecNum; Index++) {
-      OS() << llvm::formatv("*(({0} *)({1}) + {2}) = {3}{4}", Type, Input,
-                            Index, Values[Index],
+      OS() << llvm::formatv("{0}  = *(({1} *){2} + {3}){4}", Values[Index],
+                            Type, Input, Index,
                             Index == VecNum - 1 ? "" : ";\n");
       if (Index < VecNum - 1) {
         indent();
