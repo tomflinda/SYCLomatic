@@ -2694,16 +2694,10 @@ protected:
     return SYCLGenSuccess();
   }
 
-  bool HandleStVec(const InlineAsmInstruction *Inst, int VecNum) {
-    std::string Ops;
-    if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
-      return SYCLGenError();
-
-    // To extract the values from the string like "{x, y, z, w}" and store them
-    // int Values vector
+  std::vector<std::string> extractValues(const std::string &Ops) {
     std::vector<std::string> Values;
-    size_t start = 1;                  // Skip the '{' character
-    size_t end = Ops.find(',', start); // Find the first comma
+    size_t start = 1; // Skip the '{' character
+    size_t end = Ops.find(',', start);
 
     while (end != std::string::npos) {
       std::string Token = Ops.substr(start, end - start);
@@ -2720,10 +2714,23 @@ protected:
     std::string token = Ops.substr(start, Ops.size() - start - 1);
     size_t first = token.find_first_not_of(' ');
     size_t last = token.find_last_not_of(' ');
-
     if (first != std::string::npos && last != std::string::npos) {
       Values.push_back(token.substr(first, last - first + 1));
     }
+
+    return Values;
+  }
+
+  bool HandleStVec(const InlineAsmInstruction *Inst, int VecNum) {
+    std::string Ops;
+    if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
+      return SYCLGenError();
+
+    // To extract the values from the string like "{x, y, z, w}" and store them
+    // int Values vector
+    std::vector<std::string> Values = extractValues(Ops);
+    if (Values.size() != (size_t)VecNum)
+      return SYCLGenError();
 
     std::string Output;
     if (tryEmitStmt(Output, Inst->getOutputOperand()))
@@ -2747,34 +2754,6 @@ protected:
     endstmt();
     return SYCLGenSuccess();
   }
-
-
-std::vector<std::string> extractValues(const std::string& Ops) {
-    std::vector<std::string> Values;
-    size_t start = 1; // Skip the '{' character
-    size_t end = Ops.find(',', start);
-
-    while (end != std::string::npos) {
-        std::string Token = Ops.substr(start, end - start);
-        size_t First = Token.find_first_not_of(' ');
-        size_t Last = Token.find_last_not_of(' ');
-        if (First != std::string::npos && Last != std::string::npos) {
-            Values.push_back(Token.substr(First, Last - First + 1));
-        }
-        start = end + 1;
-        end = Ops.find(',', start);
-    }
-
-    // Extract the last value after the last comma
-    std::string token = Ops.substr(start, Ops.size() - start - 1);
-    size_t first = token.find_first_not_of(' ');
-    size_t last = token.find_last_not_of(' ');
-    if (first != std::string::npos && last != std::string::npos) {
-        Values.push_back(token.substr(first, last - first + 1));
-    }
-
-    return Values;
-}
 
   bool handle_st(const InlineAsmInstruction *Inst) override {
     if (Inst->getNumInputOperands() != 1)
@@ -2825,29 +2804,9 @@ std::vector<std::string> extractValues(const std::string& Ops) {
 
     // To extract the values from the string like "{x, y, z, w}" and store them
     // int Values vector
-    std::vector<std::string> Values;
-    size_t start = 1;                  // Skip the '{' character
-    size_t end = Ops.find(',', start); // Find the first comma
-
-    while (end != std::string::npos) {
-      std::string Token = Ops.substr(start, end - start);
-      size_t First = Token.find_first_not_of(' ');
-      size_t Last = Token.find_last_not_of(' ');
-      if (First != std::string::npos && Last != std::string::npos) {
-        Values.push_back(Token.substr(First, Last - First + 1));
-      }
-      start = end + 1;
-      end = Ops.find(',', start);
-    }
-
-    // Extract the last value after the last comma
-    std::string token = Ops.substr(start, Ops.size() - start - 1);
-    size_t first = token.find_first_not_of(' ');
-    size_t last = token.find_last_not_of(' ');
-
-    if (first != std::string::npos && last != std::string::npos) {
-      Values.push_back(token.substr(first, last - first + 1));
-    }
+    std::vector<std::string> Values = extractValues(Ops);
+    if (Values.size() != (size_t)VecNum)
+      return SYCLGenError();
 
     std::string Input;
     if (tryEmitStmt(Input, Inst->getInputOperand(0)))
