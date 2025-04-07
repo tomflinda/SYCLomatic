@@ -2795,7 +2795,6 @@ protected:
     if (tryEmitStmt(Ops, Inst->getOutputOperand()))
       return SYCLGenError();
 
-    printf("HandleLdVec Ops:[%s]\n", Ops.c_str());
     // To extract the values from the string like "{x, y, z, w}" and store them
     // int Values vector
     std::vector<std::string> Values;
@@ -2860,15 +2859,6 @@ protected:
     if (!Src)
       return SYCLGenError();
 
-    // if (Inst->hasAttr(InstAttr::v4)) {
-
-    //   std::string Ops;
-    //   if (tryEmitStmt(Ops, Inst->getInputOperand(0)))
-    //     return SYCLGenError();
-    //   printf("Ops:[%s]\n", Ops.c_str());
-
-    // }
-
     if (Inst->hasAttr(InstAttr::cg)) {
       if (Inst->hasAttr(InstAttr::v4))
         return HandleLdVec(Inst, 4);
@@ -2894,8 +2884,6 @@ protected:
       OS() << "*" << InOp;
     }
 
-    // if (emitStmt(Src))
-    //   return SYCLGenError();
     endstmt();
     return SYCLGenSuccess();
   }
