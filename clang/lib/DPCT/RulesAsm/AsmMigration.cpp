@@ -1598,7 +1598,7 @@ protected:
     else if (Inst->is(asmtok::op_neg) &&
              Type->getKind() == InlineAsmBuiltinType::f16x2) {
       std::string FormatTemp =
-          "(-(sycl::vec<int, 1>({0})).as<sycl::vec<sycl::half, "
+          "(-sycl::vec<int, 1>({0}).as<sycl::vec<sycl::half, "
           "2>>()).as<sycl::vec<int, 1>>().x()";
 
       OS() << llvm::formatv(FormatTemp.c_str(), Op);
