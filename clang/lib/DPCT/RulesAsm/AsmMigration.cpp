@@ -1384,9 +1384,6 @@ protected:
   }
 
   bool handle_mul(const InlineAsmInstruction *Inst) override {
-
-    printf("getNumInputOperands:%d\n", Inst->getNumInputOperands());
-    printf("getNumTypes:%d\n", Inst->getNumTypes());
     if (Inst->getNumInputOperands() != 2 || Inst->getNumTypes() != 1)
       return SYCLGenError();
     const auto *Type = dyn_cast<InlineAsmBuiltinType>(Inst->getType(0));
