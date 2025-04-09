@@ -1363,6 +1363,7 @@ protected:
            Type->getKind() == InlineAsmBuiltinType::s32 ||
            Type->getKind() == InlineAsmBuiltinType::u32 ||
            Type->getKind() == InlineAsmBuiltinType::s64 ||
+           Type->getKind() == InlineAsmBuiltinType::f16x2 ||
            Type->getKind() == InlineAsmBuiltinType::u64;
   }
 
@@ -1419,6 +1420,13 @@ protected:
       OS() << Cast(GetWiderTypeAsString(Type), Op[0]) << " * "
            << Cast(GetWiderTypeAsString(Type), Op[1]);
       // mul.lo
+    } else if (Type->getKind() == InlineAsmBuiltinType::f16x2) {
+      std::string FormatTemp =
+          "((sycl::vec<int, 1>({0})).as<sycl::vec<sycl::half, 2>>() * "
+          "(sycl::vec<int, 1>({1})).as<sycl::vec<sycl::half, "
+          "2>>()).as<sycl::vec<int, 1>>().x()";
+
+      OS() << llvm::formatv(FormatTemp.c_str(), Op[0], Op[1]);
     } else {
       // Need to add a new help function.
       // OS() << Op[0] << " * " << Op[1];
