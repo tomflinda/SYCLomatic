@@ -26,11 +26,32 @@ __global__ void test_cvta_to_shared_u64(uint64_t* output) {
 }
 
 
-__global__ void test_cvta_to_shared_u32(uint32_t* output) {
-    __shared__ int shared_data[1]; // Shared memory
-    shared_data[0] = 0;
-    uint64_t shared_addr = 0;
-    asm volatile("cvta.to.shared.u32 %0, %1;" : "=l"(shared_addr) : "l"(&shared_data[0]));
-    output[threadIdx.x] = shared_addr;
+#define N 128
+// CHECK: void testKernel(unsigned int *addr_out, const sycl::nd_item<3> &item_ct1,
+// CHECK-NEXT:                 int *B_shared) {
+// CHECK-NEXT:      // Shared memory
+// CHECK-NEXT:     unsigned int addr1;
+// CHECK-NEXT:     int k_0_1 = item_ct1.get_group(2);
+// CHECK-NEXT:     int ax1_0 = item_ct1.get_local_id(2);
+// CHECK-NEXT:     {
+// CHECK-NEXT:         uint64_t addr;
+// CHECK-NEXT:         addr = (uint64_t)((void *)((&(B_shared[(((k_0_1 * (N * 16 + 128)) + (((int)item_ct1.get_local_id(1)) * (N / 2))) + (ax1_0 * 16))])) +
+// CHECK-NEXT:                        (((((int)item_ct1.get_local_id(2)) & 15) * (N + 8)) + ((((int)item_ct1.get_local_id(2)) >> 4) * 8))));
+// CHECK-NEXT:         addr1 = static_cast<uint32_t>(addr);
+// CHECK-NEXT:     }
+// CHECK-NEXT:     addr_out[item_ct1.get_local_id(2)] = addr1;
+// CHECK-NEXT: }
+__global__ void testKernel(unsigned int *addr_out) {
+    __shared__ int B_shared[N * 16 + 128]; // Shared memory
+    unsigned int addr1;
+    int k_0_1 = blockIdx.x;
+    int ax1_0 = threadIdx.x;
+    __asm__ __volatile__(
+        "{ .reg .u64 addr; cvta.to.shared.u64 addr, %1; cvt.u32.u64 %0, addr; }\n"
+        : "=r"(addr1)
+        : "l"((void *)((&(B_shared[(((k_0_1 * (N * 16 + 128)) + (((int)threadIdx.y) * (N / 2))) + (ax1_0 * 16))])) +
+                       (((((int)threadIdx.x) & 15) * (N + 8)) + ((((int)threadIdx.x) >> 4) * 8)))));
+    addr_out[threadIdx.x] = addr1;
 }
+
 // clang-format on
