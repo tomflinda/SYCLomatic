@@ -487,31 +487,39 @@ static int call_eaccess(const char *pathname, int mode) {
   return result;
 }
 
-int eaccess(const char *pathname, int mode) {
-  int ret = call_eaccess(pathname, mode);
-  if (ret == 0) {
-    return 0;
-  }
-
-  int nvcc_available = 0;
+int is_nvcc_available(const char *pathname) {
   char *value_compile = getenv("INTERCEPT_COMPILE_PATH");
   char *value_env = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
 
   // Consider tool chain is avaialbe only when it is available from env path.
   if (value_env && *value_env == '1' && value_compile) {
-    nvcc_available = 1;
+    return 1;
   }
+  return 0;
+}
 
+int is_nvcc_cmd(const char *pathname) {
   int len = strlen(pathname);
-  if (!nvcc_available && len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
+  if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
       pathname[1] == 'v' && pathname[0] == 'n') {
     // To handle case like "nvcc foo.cu ..."
+    return 1;
+  }
+  if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
+      pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
+      pathname[len - 5] == '/') {
+    // To handle case like "/path/to/nvcc foo.cu ..."
+    return 1;
+  }
+  return 0;
+}
+
+int eaccess(const char *pathname, int mode) {
+  int ret = call_eaccess(pathname, mode);
+  if (ret == 0) {
     return 0;
   }
-  if (!nvcc_available && len > 4 && pathname[len - 1] == 'c' &&
-      pathname[len - 2] == 'c' && pathname[len - 3] == 'v' &&
-      pathname[len - 4] == 'n' && pathname[len - 5] == '/') {
-    // To handle case like "/path/to/nvcc foo.cu ..."
+  if (!is_nvcc_available(pathname) && is_nvcc_cmd(pathname)) {
     return 0;
   }
   return ret;
@@ -541,35 +549,8 @@ int stat(const char *pathname, struct stat *statbuf) {
   if (ret == 0) {
     return 0;
   }
-  int len = strlen(pathname);
-  if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
-      pathname[1] == 'v' && pathname[0] == 'n') {
-    // To handle case like "nvcc foo.cu ..."
 
-    const char *nvcc_path = getenv("INTERCEPT_COMPILE_PATH");
-    if (nvcc_path) {
-      call_stat(nvcc_path, statbuf);
-      return 0;
-    }
-
-    pathname = get_intercept_stub_path();
-    call_stat(pathname, statbuf);
-    return 0;
-  }
-
-  if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
-      pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
-      pathname[len - 5] == '/') {
-    // To handle case like "/path/to/nvcc foo.cu ..."
-
-    const char *nvcc_path = getenv("INTERCEPT_COMPILE_PATH");
-    if (nvcc_path) {
-      call_stat(nvcc_path, statbuf);
-      return 0;
-    }
-
-    pathname = get_intercept_stub_path();
-    call_stat(pathname, statbuf);
+  if (!is_nvcc_available(pathname) && is_nvcc_cmd(pathname)) {
     return 0;
   }
   return ret;
@@ -1727,36 +1708,10 @@ char *replace_binary_name(const char *src, const char *pos, int compiler_idx,
 int is_tool_available(char const *argv[], size_t const argc) {
   const char *pathname = argv[0];
   int len = strlen(pathname);
-  int is_nvcc = 0;
-  int is_nvcc_available = 0;
 
-  int nvcc_available = 0;
-  char *value_compile = getenv("INTERCEPT_COMPILE_PATH");
-  char *value_env = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
-
-  // Consider tool chain is avaialbe only when it is available from env path.
-  if (value_env && *value_env == '1' && value_compile) {
-    nvcc_available = 1;
-  }
-
-  if (len == 4 && pathname[3] == 'c' && pathname[2] == 'c' &&
-      pathname[1] == 'v' && pathname[0] == 'n') {
-    // To handle case like "nvcc"
-    is_nvcc = 1;
-    if (nvcc_available == '0') {
-      return 0;
-    }
-  }
-  if (len > 4 && pathname[len - 1] == 'c' && pathname[len - 2] == 'c' &&
-      pathname[len - 3] == 'v' && pathname[len - 4] == 'n' &&
-      pathname[len - 5] == '/') {
-    // To handle case like "/path/to/nvcc"
-    is_nvcc = 1;
-  }
-  if (is_nvcc) {
-    if (is_nvcc_available) {
+  if (is_nvcc_cmd(pathname)) {
+    if (is_nvcc_available(pathname))
       return 1;
-    }
     return 0;
   }
 
@@ -1771,7 +1726,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
     is_ld = 1;
   }
   if (is_ld) {
-    if (!is_nvcc_available) {
+    if (!is_nvcc_available(pathname)) {
       for (size_t idx = 0; idx < argc; idx++) {
         // if ld linker command uses cuda libarary like libcuda.so or
         // libcudart.so, then the ld command should be intercepted.
@@ -1782,12 +1737,12 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
   }
 
-  if (!is_nvcc_available && argc == 3) {
+  if (!is_nvcc_available(pathname) && argc == 3) {
     // To handle case like "/bin/[sh/bash] -c '[echo or something]
     // [/path/to/]nvcc -c foo.cu -o foo.o'" on the environment where tool chain
     // is not available.
     int is_bash = 0;
-    is_nvcc = 0;
+    int is_nvcc_cmd = 0;
     const char *pathname = argv[0];
     len = strlen(pathname);
 
@@ -1811,7 +1766,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
 
     if (pos) {
-      is_nvcc =
+      is_nvcc_cmd =
           pos > argv[2]
               ? strlen(pos) >= 4 && isspace(*(pos + 4)) &&
                     (*(pos - 1) == '/' || *(pos - 1) == ';' ||
@@ -1822,7 +1777,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
                                          // sure it is a compiler command.
     }
 
-    if (is_bash && strcmp(argv[1], "-c") == 0 && is_nvcc) {
+    if (is_bash && strcmp(argv[1], "-c") == 0 && is_nvcc_cmd) {
       return 0;
     }
   }
