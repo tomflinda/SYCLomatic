@@ -54,4 +54,38 @@ __global__ void testKernel(unsigned int *addr_out) {
     addr_out[threadIdx.x] = addr1;
 }
 
+
+// CHECK: void read_shared_value(int *output, const sycl::nd_item<3> &item_ct1,
+// CHECK-NEXT:                       int *shared_data) {
+// CHECK-NEXT:   // Shared memory allocation
+// CHECK-NEXT:  if (item_ct1.get_local_id(2) == 0) {
+// CHECK-NEXT:    shared_data[0] = 42;
+// CHECK-NEXT:  }
+// CHECK-NEXT:  item_ct1.barrier(sycl::access::fence_space::local_space);
+// CHECK-NEXT:  unsigned long long shared_addr_u64;
+// CHECK-NEXT:  int value;
+// CHECK-NEXT:  shared_addr_u64 = (uint64_t)(shared_data);
+// CHECK-NEXT:  value = *((uint32_t *)(uintptr_t)shared_addr_u64);
+// CHECK-NEXT:  if (item_ct1.get_local_id(2) == 0) {
+// CHECK-NEXT:    output[0] = value;
+// CHECK-NEXT:  }
+// CHECK-NEXT:}
+__global__ void read_shared_value(int *output) {
+  __shared__ int shared_data[1]; // Shared memory allocation
+  if (threadIdx.x == 0) {
+    shared_data[0] = 42;
+  }
+  __syncthreads();
+  unsigned long long shared_addr_u64;
+  int value;
+  asm volatile(
+      "cvta.to.shared.u64 %0, %2;\n\t" // Properly uses input operand %2
+      "ld.shared.u32 %1, [%0];\n\t"    // Correctly assigns to output %1
+      : "=l"(shared_addr_u64), "=r"(value)
+      : "l"(shared_data));
+  if (threadIdx.x == 0) {
+    output[0] = value;
+  }
+}
+
 // clang-format on
