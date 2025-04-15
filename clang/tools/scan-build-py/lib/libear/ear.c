@@ -487,7 +487,7 @@ static int call_eaccess(const char *pathname, int mode) {
   return result;
 }
 
-int is_nvcc_available(const char *pathname) {
+int is_nvcc_available(void) {
   char *value_compile = getenv("INTERCEPT_COMPILE_PATH");
   char *value_env = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
 
@@ -519,7 +519,7 @@ int eaccess(const char *pathname, int mode) {
   if (ret == 0) {
     return 0;
   }
-  if (!is_nvcc_available(pathname) && is_nvcc_cmd(pathname)) {
+  if (!is_nvcc_available() && is_nvcc_cmd(pathname)) {
     return 0;
   }
   return ret;
@@ -550,7 +550,7 @@ int stat(const char *pathname, struct stat *statbuf) {
     return 0;
   }
 
-  if (!is_nvcc_available(pathname) && is_nvcc_cmd(pathname)) {
+  if (!is_nvcc_available() && is_nvcc_cmd(pathname)) {
     return 0;
   }
   return ret;
@@ -1710,7 +1710,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
   int len = strlen(pathname);
 
   if (is_nvcc_cmd(pathname)) {
-    if (is_nvcc_available(pathname))
+    if (is_nvcc_available())
       return 1;
     return 0;
   }
@@ -1726,7 +1726,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
     is_ld = 1;
   }
   if (is_ld) {
-    if (!is_nvcc_available(pathname)) {
+    if (!is_nvcc_available()) {
       for (size_t idx = 0; idx < argc; idx++) {
         // if ld linker command uses cuda libarary like libcuda.so or
         // libcudart.so, then the ld command should be intercepted.
@@ -1737,7 +1737,7 @@ int is_tool_available(char const *argv[], size_t const argc) {
     }
   }
 
-  if (!is_nvcc_available(pathname) && argc == 3) {
+  if (!is_nvcc_available() && argc == 3) {
     // To handle case like "/bin/[sh/bash] -c '[echo or something]
     // [/path/to/]nvcc -c foo.cu -o foo.o'" on the environment where tool chain
     // is not available.
