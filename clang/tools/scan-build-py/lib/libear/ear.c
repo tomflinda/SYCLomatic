@@ -488,11 +488,12 @@ static int call_eaccess(const char *pathname, int mode) {
 }
 
 int is_nvcc_available(void) {
-  char *value_compile = getenv("INTERCEPT_COMPILE_PATH");
-  char *value_env = getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
+  char *compiler = getenv("INTERCEPT_COMPILE_PATH");
+  char *is_compiler_exported =
+      getenv("IS_INTERCEPT_COMPILE_PATH_FROM_ENV_PATH");
 
   // Consider tool chain is avaialbe only when it is available from env path.
-  if (value_env && *value_env == '1' && value_compile) {
+  if (is_compiler_exported && *is_compiler_exported == '1' && compiler) {
     return 1;
   }
   return 0;
