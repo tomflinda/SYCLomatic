@@ -24,8 +24,7 @@ set_target_properties(target_one PROPERTIES CXX_Standard 14)
 set_target_properties(target_one PROPERTIES CXX_STANDARD 17)
 
 # Test CUDA_SEPARABLE_COMPILATION
-#[[
-set_target_properties(target_one PROPERTIES CUDA_SEPARABLE_COMPILATION Off)]]
+set_target_properties(target_one PROPERTIES "" "" )
 
 # No change unless property matches exactly
 set_target_properties(target_one PROPERTIES Cuda_SEPARABLE_COMPILATION Off)
