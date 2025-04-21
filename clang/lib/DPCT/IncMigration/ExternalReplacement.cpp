@@ -35,6 +35,8 @@ namespace path = llvm::sys::path;
 namespace fs = llvm::sys::fs;
 using clang::tooling::Replacements;
 
+extern int SDKVersionMajor;
+extern int SDKVersionMinor;
 namespace clang {
 namespace dpct {
 int save2Yaml(
@@ -62,6 +64,9 @@ int save2Yaml(
   }
 
   TUR.DpctVersion = clang::dpct::getDpctVersionStr();
+
+  TUR.CudaVersion = "cuda-" + std::to_string(SDKVersionMajor) + "." +
+                   std::to_string(SDKVersionMinor);
   TUR.OptionMap = clang::dpct::DpctGlobalInfo::getCurrentOptMap();
 
   YAMLOut << TUR;

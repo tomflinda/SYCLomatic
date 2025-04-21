@@ -59,6 +59,7 @@
 #include <algorithm>
 #include <cstring>
 #include <map>
+#include <regex>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -463,6 +464,64 @@ void parseFormatStyle() {
   DpctGlobalInfo::setCodeFormatStyle(Style);
 }
 
+bool extractCudaVersion(const std::string &input, int &major, int &minor) {
+  std::regex pattern(R"(cuda-(\d+)\.(\d+))");
+  std::smatch match;
+
+  if (std::regex_search(input, match, pattern) && match.size() == 3) {
+    major = std::stoi(match[1]);
+    minor = std::stoi(match[2]);
+    return true;
+  }
+  return false;
+}
+
+int updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
+                                   int Major, int Minor) {
+  const std::string CmakeHelpFile =
+      appendPath(OutRoot.getCanonicalPath().str(), "dpct.cmake");
+  std::ifstream inFile(CmakeHelpFile);
+  if (!inFile) {
+    std::cerr << "Failed to open file: " << CmakeHelpFile << std::endl;
+    return 1;
+  }
+
+  std::string fileContent((std::istreambuf_iterator<char>(inFile)),
+                          std::istreambuf_iterator<char>());
+  inFile.close();
+
+  const std::string VersionStr =
+      std::to_string(Major) + "." + std::to_string(Minor);
+  const int CompatibilityValue = Major * 10 + Minor;
+
+  // Defile replacement rules
+  std::vector<std::pair<std::regex, std::string>> Replacements = {
+      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION\s+[^\)]+\))"),
+       "set(COMPATIBILITY_VERSION " + VersionStr + ")"},
+      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VALUE\s+[^\)]+\))"),
+       "set(COMPATIBILITY_VALUE " + std::to_string(CompatibilityValue) + ")"},
+      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION_MAJOR\s+[^\)]+\))"),
+       "set(COMPATIBILITY_VERSION_MAJOR " + std::to_string(Major) + ")"},
+      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION_MINOR\s+[^\)]+\))"),
+       "set(COMPATIBILITY_VERSION_MINOR " + std::to_string(Minor) + ")"}};
+
+  for (const auto &[pattern, replacement] : Replacements) {
+    fileContent = std::regex_replace(fileContent, pattern, replacement);
+  }
+
+  std::ofstream outFile(CmakeHelpFile);
+  if (!outFile) {
+    std::cerr << "Failed to write to file: " << CmakeHelpFile << std::endl;
+    return 1;
+  }
+
+  outFile << fileContent;
+  outFile.close();
+
+  std::cout << "File updated successfully." << std::endl;
+  return 0;
+}
+
 static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
   std::string YamlFilePath = appendPath(OutRoot.getCanonicalPath().str(),
                                         DpctGlobalInfo::getYamlFileName());
@@ -471,7 +530,17 @@ static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
     if (loadFromYaml(YamlFilePath, *PreTU) != 0) {
       llvm::errs() << getLoadYamlFailWarning(YamlFilePath);
     }
+
+    std::string CudaVersion = PreTU->CudaVersion;
+    printf("#########################################CudaVersion:[%s]\n",
+           CudaVersion.c_str());
+
+    int Major, Minor;
+    extractCudaVersion(CudaVersion, Major, Minor);
+    printf("[%d %d]\n", Major, Minor);
+    updateCompatibilityVersionInfo(OutRoot, Major, Minor);
   }
+
   for (auto &Entry : PreTU->MainSourceFilesDigest) {
     if (Entry.HasCUDASyntax)
       MainSrcFilesHasCudaSyntex.insert(Entry.MainSourceFile);
