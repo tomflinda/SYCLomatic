@@ -476,19 +476,20 @@ bool extractCudaVersion(const std::string &input, int &major, int &minor) {
   return false;
 }
 
-int updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
-                                   int Major, int Minor) {
+void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
+                                    int Major, int Minor) {
   const std::string CmakeHelpFile =
       appendPath(OutRoot.getCanonicalPath().str(), "dpct.cmake");
-  std::ifstream inFile(CmakeHelpFile);
-  if (!inFile) {
-    std::cerr << "Failed to open file: " << CmakeHelpFile << std::endl;
-    return 1;
+  std::ifstream InFile(CmakeHelpFile);
+  if (!InFile) {
+    std::string ErrMsg = "Failed to open file: " + CmakeHelpFile;
+    ShowStatus(MigrationErrorReadWriteCMakeHelperFile, std::move(ErrMsg));
+    dpctExit(MigrationErrorReadWriteCMakeHelperFile);
   }
 
-  std::string fileContent((std::istreambuf_iterator<char>(inFile)),
+  std::string FileContent((std::istreambuf_iterator<char>(InFile)),
                           std::istreambuf_iterator<char>());
-  inFile.close();
+  InFile.close();
 
   const std::string VersionStr =
       std::to_string(Major) + "." + std::to_string(Minor);
@@ -505,21 +506,19 @@ int updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
       {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION_MINOR\s+[^\)]+\))"),
        "set(COMPATIBILITY_VERSION_MINOR " + std::to_string(Minor) + ")"}};
 
-  for (const auto &[pattern, replacement] : Replacements) {
-    fileContent = std::regex_replace(fileContent, pattern, replacement);
+  for (const auto &[Pattern, Replacement] : Replacements) {
+    FileContent = std::regex_replace(FileContent, Pattern, Replacement);
   }
 
-  std::ofstream outFile(CmakeHelpFile);
-  if (!outFile) {
-    std::cerr << "Failed to write to file: " << CmakeHelpFile << std::endl;
-    return 1;
+  std::ofstream OutFile(CmakeHelpFile);
+  if (!OutFile) {
+    std::string ErrMsg = "Failed to write to file: " + CmakeHelpFile;
+    ShowStatus(MigrationErrorReadWriteCMakeHelperFile, std::move(ErrMsg));
+    dpctExit(MigrationErrorReadWriteCMakeHelperFile);
   }
 
-  outFile << fileContent;
-  outFile.close();
-
-  std::cout << "File updated successfully." << std::endl;
-  return 0;
+  OutFile << FileContent;
+  OutFile.close();
 }
 
 static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
@@ -531,14 +530,13 @@ static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
       llvm::errs() << getLoadYamlFailWarning(YamlFilePath);
     }
 
-    std::string CudaVersion = PreTU->CudaVersion;
-    printf("#########################################CudaVersion:[%s]\n",
-           CudaVersion.c_str());
-
-    int Major, Minor;
-    extractCudaVersion(CudaVersion, Major, Minor);
-    printf("[%d %d]\n", Major, Minor);
-    updateCompatibilityVersionInfo(OutRoot, Major, Minor);
+    if (MigrateBuildScriptOnly || DpctGlobalInfo::migrateCMakeScripts()) {
+      std::string CudaVersion = PreTU->CudaVersion;
+      int Major, Minor;
+      if (extractCudaVersion(CudaVersion, Major, Minor)) {
+        updateCompatibilityVersionInfo(OutRoot, Major, Minor);
+      }
+    }
   }
 
   for (auto &Entry : PreTU->MainSourceFilesDigest) {
