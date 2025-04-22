@@ -29,15 +29,12 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
-#include <string>
 
 using namespace llvm;
 namespace path = llvm::sys::path;
 namespace fs = llvm::sys::fs;
 using clang::tooling::Replacements;
 
-extern int SDKVersionMajor;
-extern int SDKVersionMinor;
 namespace clang {
 namespace dpct {
 int save2Yaml(
