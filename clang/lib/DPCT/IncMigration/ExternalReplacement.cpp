@@ -29,6 +29,7 @@
 #include <algorithm>
 #include <cassert>
 #include <fstream>
+#include <string>
 
 using namespace llvm;
 namespace path = llvm::sys::path;
@@ -65,8 +66,10 @@ int save2Yaml(
 
   TUR.DpctVersion = clang::dpct::getDpctVersionStr();
 
-  TUR.CudaVersion = "cuda-" + std::to_string(SDKVersionMajor) + "." +
-                   std::to_string(SDKVersionMinor);
+  auto Ver = clang::getCudaVersionPair(DpctGlobalInfo::getSDKVersion());
+  TUR.SDKVersionMajor = std::to_string(Ver.first);
+  TUR.SDKVersionMinor = std::to_string(Ver.second);
+
   TUR.OptionMap = clang::dpct::DpctGlobalInfo::getCurrentOptMap();
 
   YAMLOut << TUR;

@@ -59,7 +59,6 @@
 #include <algorithm>
 #include <cstring>
 #include <map>
-#include <regex>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -464,20 +463,8 @@ void parseFormatStyle() {
   DpctGlobalInfo::setCodeFormatStyle(Style);
 }
 
-bool extractCudaVersion(const std::string &input, int &major, int &minor) {
-  std::regex pattern(R"(cuda-(\d+)\.(\d+))");
-  std::smatch match;
-
-  if (std::regex_search(input, match, pattern) && match.size() == 3) {
-    major = std::stoi(match[1]);
-    minor = std::stoi(match[2]);
-    return true;
-  }
-  return false;
-}
-
 void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
-                                    int Major, int Minor) {
+                                    std::string Major, std::string Minor) {
   const std::string CmakeHelpFile =
       appendPath(OutRoot.getCanonicalPath().str(), "dpct.cmake");
   std::ifstream InFile(CmakeHelpFile);
@@ -487,28 +474,29 @@ void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
     dpctExit(MigrationErrorReadWriteCMakeHelperFile);
   }
 
-  std::string FileContent((std::istreambuf_iterator<char>(InFile)),
-                          std::istreambuf_iterator<char>());
-  InFile.close();
+  const std::string VersionStr = Major + "." + Minor;
+  const int CompatibilityValue = std::stoi(Major) * 10 + std::stoi(Minor);
 
-  const std::string VersionStr =
-      std::to_string(Major) + "." + std::to_string(Minor);
-  const int CompatibilityValue = Major * 10 + Minor;
+  std::vector<std::string> Lines;
+  std::string Line;
+  while (std::getline(InFile, Line)) {
 
-  // Defile replacement rules
-  std::vector<std::pair<std::regex, std::string>> Replacements = {
-      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION\s+[^\)]+\))"),
-       "set(COMPATIBILITY_VERSION " + VersionStr + ")"},
-      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VALUE\s+[^\)]+\))"),
-       "set(COMPATIBILITY_VALUE " + std::to_string(CompatibilityValue) + ")"},
-      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION_MAJOR\s+[^\)]+\))"),
-       "set(COMPATIBILITY_VERSION_MAJOR " + std::to_string(Major) + ")"},
-      {std::regex(R"(set\s*\(\s*COMPATIBILITY_VERSION_MINOR\s+[^\)]+\))"),
-       "set(COMPATIBILITY_VERSION_MINOR " + std::to_string(Minor) + ")"}};
+    if (Line.find("set(COMPATIBILITY_VERSION ") != std::string::npos) {
+      Line = "set(COMPATIBILITY_VERSION " + VersionStr + ")";
+    } else if (Line.find("set(COMPATIBILITY_VALUE ") != std::string::npos) {
+      Line =
+          "set(COMPATIBILITY_VALUE " + std::to_string(CompatibilityValue) + ")";
+    } else if (Line.find("set(COMPATIBILITY_VERSION_MAJOR ") !=
+               std::string::npos) {
+      Line = "set(COMPATIBILITY_VERSION_MAJOR " + Major + ")";
+    } else if (Line.find("set(COMPATIBILITY_VERSION_MINOR ") !=
+               std::string::npos) {
+      Line = "set(COMPATIBILITY_VERSION_MINOR " + Minor + ")";
+    }
 
-  for (const auto &[Pattern, Replacement] : Replacements) {
-    FileContent = std::regex_replace(FileContent, Pattern, Replacement);
+    Lines.push_back(Line);
   }
+  InFile.close();
 
   std::ofstream OutFile(CmakeHelpFile);
   if (!OutFile) {
@@ -517,7 +505,10 @@ void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
     dpctExit(MigrationErrorReadWriteCMakeHelperFile);
   }
 
-  OutFile << FileContent;
+  for (const auto &Line : Lines) {
+    OutFile << Line << "\n";
+  }
+
   OutFile.close();
 }
 
@@ -531,9 +522,9 @@ static void loadMainSrcFileInfo(clang::tooling::UnifiedPath OutRoot) {
     }
 
     if (MigrateBuildScriptOnly || DpctGlobalInfo::migrateCMakeScripts()) {
-      std::string CudaVersion = PreTU->CudaVersion;
-      int Major, Minor;
-      if (extractCudaVersion(CudaVersion, Major, Minor)) {
+      std::string Major = PreTU->SDKVersionMajor;
+      std::string Minor = PreTU->SDKVersionMinor;
+      if (!Major.empty() && !Minor.empty()) {
         updateCompatibilityVersionInfo(OutRoot, Major, Minor);
       }
     }
