@@ -476,25 +476,30 @@ void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
 
   const std::string VersionStr = Major + "." + Minor;
   const int CompatibilityValue = std::stoi(Major) * 10 + std::stoi(Minor);
-
   std::vector<std::string> Lines;
   std::string Line;
+  bool Inserted = false;
+
+  // Constant block of content to insert
+  const std::vector<std::string> CompatibilityBlock = {
+      "set(COMPATIBILITY_VERSION " + VersionStr + ")",
+      "set(COMPATIBILITY_VALUE " + std::to_string(CompatibilityValue) + ")",
+      "set(COMPATIBILITY_VERSION_MAJOR " + Major + ")",
+      "set(COMPATIBILITY_VERSION_MINOR " + Minor + ")",
+  };
+
+  const std::string InsertAfterLine =
+      "#===--------------------------------------------------------------------"
+      "--===//";
+
   while (std::getline(InFile, Line)) {
-
-    if (Line.find("set(COMPATIBILITY_VERSION ") != std::string::npos) {
-      Line = "set(COMPATIBILITY_VERSION " + VersionStr + ")";
-    } else if (Line.find("set(COMPATIBILITY_VALUE ") != std::string::npos) {
-      Line =
-          "set(COMPATIBILITY_VALUE " + std::to_string(CompatibilityValue) + ")";
-    } else if (Line.find("set(COMPATIBILITY_VERSION_MAJOR ") !=
-               std::string::npos) {
-      Line = "set(COMPATIBILITY_VERSION_MAJOR " + Major + ")";
-    } else if (Line.find("set(COMPATIBILITY_VERSION_MINOR ") !=
-               std::string::npos) {
-      Line = "set(COMPATIBILITY_VERSION_MINOR " + Minor + ")";
-    }
-
     Lines.push_back(Line);
+    // Inserts the compatibility definition block after the comment section
+    if (!Inserted && Line.find(InsertAfterLine) != std::string::npos) {
+      Lines.insert(Lines.end(), CompatibilityBlock.begin(),
+                   CompatibilityBlock.end());
+      Inserted = true;
+    }
   }
   InFile.close();
 
@@ -504,11 +509,9 @@ void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
     ShowStatus(MigrationErrorReadWriteCMakeHelperFile, std::move(ErrMsg));
     dpctExit(MigrationErrorReadWriteCMakeHelperFile);
   }
-
   for (const auto &Line : Lines) {
     OutFile << Line << "\n";
   }
-
   OutFile.close();
 }
 
