@@ -5,6 +5,7 @@
 # See https://llvm.org/LICENSE.txt for license information.
 #
 #===----------------------------------------------------------------------===//
+
 set(COMPATIBILITY_VERSION 12.0)
 set(COMPATIBILITY_VALUE 120)
 set(COMPATIBILITY_VERSION_MAJOR 12)

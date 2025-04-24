@@ -486,20 +486,21 @@ void updateCompatibilityVersionInfo(clang::tooling::UnifiedPath OutRoot,
       "set(COMPATIBILITY_VALUE " + std::to_string(CompatibilityValue) + ")",
       "set(COMPATIBILITY_VERSION_MAJOR " + Major + ")",
       "set(COMPATIBILITY_VERSION_MINOR " + Minor + ")",
+      "" // Add an empty line for good format
   };
 
-  const std::string InsertAfterLine =
-      "#===--------------------------------------------------------------------"
-      "--===//";
+  auto isCommentOrEmpty = [](const std::string &Line) {
+    return Line.empty() || Line[0] == '#';
+  };
 
   while (std::getline(InFile, Line)) {
-    Lines.push_back(Line);
-    // Inserts the compatibility definition block after the comment section
-    if (!Inserted && Line.find(InsertAfterLine) != std::string::npos) {
+    // Insert the compatibility definition block after the first comment section
+    if (!Inserted && !isCommentOrEmpty(Line)) {
       Lines.insert(Lines.end(), CompatibilityBlock.begin(),
                    CompatibilityBlock.end());
       Inserted = true;
     }
+    Lines.push_back(Line);
   }
   InFile.close();
 
