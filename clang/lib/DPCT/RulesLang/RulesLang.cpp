@@ -2695,12 +2695,12 @@ void FunctionCallRule::runRule(const MatchFinder::MatchResult &Result) {
 EventAPICallRule *EventAPICallRule::CurrentRule = nullptr;
 void EventAPICallRule::registerMatcher(MatchFinder &MF) {
   auto eventAPIName = [&]() {
-    return hasAnyName(
-        "cudaEventCreate", "cudaEventCreateWithFlags", "cudaEventDestroy",
-        "cudaEventRecord", "cudaEventElapsedTime", "cudaEventSynchronize",
-                      "cudaEventQuery", "cuEventCreate", "cuEventRecord",
-        "cuEventSynchronize", "cuEventQuery", "cuEventElapsedTime",
-        "cuEventDestroy_v2");
+    return hasAnyName("cudaEventCreate", "cudaEventCreateWithFlags",
+                      "cudaEventDestroy", "cudaEventRecord",
+                      "cudaEventRecordWithFlags", "cudaEventElapsedTime",
+                      "cudaEventSynchronize", "cudaEventQuery", "cuEventCreate",
+                      "cuEventRecord", "cuEventSynchronize", "cuEventQuery",
+                      "cuEventElapsedTime", "cuEventDestroy_v2");
   };
 
   MF.addMatcher(
@@ -3095,7 +3095,8 @@ void EventAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
     }
     std::string ReplStr = MapNames::getDpctNamespace() + "sycl_event_query";
     emplaceTransformation(new ReplaceCalleeName(CE, std::move(ReplStr)));
-  } else if (FuncName == "cudaEventRecord" || FuncName == "cuEventRecord") {
+  } else if (FuncName == "cudaEventRecord" || FuncName == "cuEventRecord" ||
+             FuncName == "cudaEventRecordWithFlags") {
     handleEventRecord(CE, Result, IsAssigned);
   } else if (FuncName == "cudaEventElapsedTime" ||
              FuncName == "cuEventElapsedTime") {
@@ -3260,12 +3261,52 @@ void EventAPICallRule::findEventAPI(const Stmt *Node, const CallExpr *&Call,
 void EventAPICallRule::handleEventRecordWithProfilingEnabled(
     const CallExpr *CE, const MatchFinder::MatchResult &Result,
     bool IsAssigned) {
-  auto StreamArg = CE->getArg(CE->getNumArgs() - 1);
+  printf("Name:%s Num:%d\n", CE->getDirectCallee()->getNameInfo().getName().getAsString().data(), CE->getNumArgs());
+  printf("Line: %s\n", CE->getCallee()->getBeginLoc().printToString(DpctGlobalInfo::getSourceManager()).data());
+
+#if 1
+  int NumArgs = CE->getNumArgs();
+  const Expr *StreamArg = CE->getArg(NumArgs - 1);
+  if (NumArgs == 3) { // Specifial process for cudaEventRecordWithFlags(cudaEvent_t event, cudaStream_t stream = 0, unsigned int  flags = 0).
+    StreamArg = CE->getArg(1);
+    auto APIName = CE->getDirectCallee()->getNameInfo().getName().getAsString();
+    const Expr *SecArg = CE->getArg(2);
+    ExprAnalysis Arg2EA(SecArg);
+    auto Arg2Name = Arg2EA.getReplacedString();
+    if (Arg2Name != "cudaEventRecordDefault") {
+      report(CE->getBeginLoc(), Diagnostics::NOT_SUPPORTED_PARAMETER, false,
+             APIName, "parameter " + Arg2Name + " is unsupported");
+      return;
+    }
+    emplaceTransformation(removeArg(CE, 2, *Result.SourceManager));
+  }
+
+#else
+  const Expr *StreamArg = CE->getNumArgs() == 3
+                              ? CE->getArg(CE->getNumArgs() - 2)
+                              : CE->getArg(CE->getNumArgs() - 1);
+
+  if (CE->getNumArgs() == 3) {
+    auto APIName = CE->getDirectCallee()->getNameInfo().getName().getAsString();
+    const auto *SecArg = CE->getArg(2);
+    ExprAnalysis Arg2EA(SecArg);
+    auto Arg2Name = Arg2EA.getReplacedString();
+    if (Arg2Name != "cudaEventRecordDefault") {
+      report(CE->getBeginLoc(), Diagnostics::NOT_SUPPORTED_PARAMETER, false,
+             APIName,
+             "parameter " + getStmtSpelling(SecArg) + " is unsupported");
+      return;
+    }
+  }
+#endif
   auto EventArg = CE->getArg(0);
   ExprAnalysis StreamEA(StreamArg);
   ExprAnalysis Arg0EA(EventArg);
   auto StreamName = StreamEA.getReplacedString();
   auto ArgName = Arg0EA.getReplacedString();
+
+  printf("StreamName:%s ArgName:%s\n", StreamName.c_str(), ArgName.c_str());
+
   bool IsDefaultStream = isDefaultStream(StreamArg);
   auto IndentLoc = CE->getBeginLoc();
   auto &SM = DpctGlobalInfo::getSourceManager();
