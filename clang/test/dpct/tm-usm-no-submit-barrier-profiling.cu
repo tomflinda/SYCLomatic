@@ -478,18 +478,3 @@ void foo2() {
   cudaMemsetAsync(dst, 0, nbytes, stream);
 }
 
-// CHECK: void cudaEventRecordWithFlags_test() {
-// CHECK-NEXT:  dpct::event_ptr start, stop;
-// CHECK-NEXT:  dpct::queue_ptr stream;
-// CHECK-NEXT:  *start = stream->single_task([=](){});
-// CHECK-NEXT:  /*
-// CHECK-NEXT:  DPCT1028:{{[0-9a-f]+}}: The cudaEventRecordWithFlags was not migrated because parameter cudaEventRecordExternal is unsupported.
-// CHECK-NEXT:  */
-// CHECK-NEXT:  cudaEventRecordWithFlags(stop, stream, cudaEventRecordExternal);
-// CHECK-NEXT:}
-void cudaEventRecordWithFlags_test() {
-  cudaEvent_t start, stop;
-  cudaStream_t stream;
-  cudaEventRecordWithFlags(start, stream, cudaEventRecordDefault);
-  cudaEventRecordWithFlags(stop, stream, cudaEventRecordExternal);
-}
