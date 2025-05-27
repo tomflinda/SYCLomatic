@@ -583,7 +583,22 @@ static void reserveImplicitMigrationRules() {
   for (const auto &Rule : ImplicitMigrationRules) {
     MetaRuleObject::PatternRewriter PrePR;
     PrePR.BuildScriptSyntax = Rule;
-    CmakeBuildInRules[PrePR.BuildScriptSyntax] = PrePR;
+    PrePR.RuleId = "implicit_rule_" + Rule;
+
+    auto Iter = CmakeBuildInRules.find(PrePR.BuildScriptSyntax);
+    if (Iter != CmakeBuildInRules.end()) {
+      if (PrePR.Priority == RulePriority::Takeover &&
+          Iter->second.Priority > PrePR.Priority) {
+        CmakeBuildInRules[PrePR.BuildScriptSyntax] = PrePR;
+      } else {
+        llvm::outs() << "[Warning]: Two migration rules (Rule:" << PrePR.RuleId
+                     << ", Rule:" << Iter->second.RuleId
+                     << ") are duplicated, the migration rule (Rule:"
+                     << PrePR.RuleId << ") is ignored.\n";
+      }
+    } else {
+      CmakeBuildInRules[PrePR.BuildScriptSyntax] = PrePR;
+    }
   }
 }
 
@@ -610,7 +625,7 @@ void registerCmakeMigrationRule(MetaRuleObject &R) {
         Iter->second.Priority > PR.Priority) {
       CmakeBuildInRules[PR.BuildScriptSyntax] = PR;
     } else {
-      llvm::outs() << "[Warnning]: Two migration rules (Rule:" << R.RuleId
+      llvm::outs() << "[Warning]: Two migration rules (Rule:" << R.RuleId
                    << ", Rule:" << Iter->second.RuleId
                    << ") are duplicated, the migration rule (Rule:" << R.RuleId
                    << ") is ignored.\n";
