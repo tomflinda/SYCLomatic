@@ -586,6 +586,14 @@ public:
   std::optional<std::string> rewrite() override { return NewFuncName; }
 };
 
+// No replacement generated
+class EmptyRewriter : public CallExprRewriter {
+public:
+  EmptyRewriter(const CallExpr *, StringRef, StringRef)
+      : CallExprRewriter(Call, SourceCalleeName) {}
+  std::optional<std::string> rewrite() override { return std::nullopt; }
+};
+
 struct ThrustFunctor {
   ThrustFunctor(const clang::Expr *E) : E(E) {}
   const clang::Expr *E;
