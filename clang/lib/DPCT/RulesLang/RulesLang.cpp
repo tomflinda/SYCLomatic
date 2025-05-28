@@ -4515,6 +4515,50 @@ void StreamAPICallRule::runRule(const MatchFinder::MatchResult &Result) {
   }
 }
 
+void CastScopedEnumTypeRule::registerMatcher(ast_matchers::MatchFinder &MF) {
+  MF.addMatcher(binaryOperator(isComparisonOperator()).bind("binOp"), this);
+}
+void CastScopedEnumTypeRule::runRule(
+    const ast_matchers::MatchFinder::MatchResult &Result) {
+  auto BO = getNodeAsType<BinaryOperator>(Result, "binOp");
+  if (!BO)
+    return;
+
+  // List the types don't need to explicit cast type after migration.
+  const std::unordered_set<std::string> TypeNoCast = {
+      "int", MapNames::getDpctNamespace() + "err0",
+      MapNames::getDpctNamespace() + "err1",
+      MapNames::getDpctNamespace() + "pointer_attributes"};
+
+  auto InsertEnumCast = [&](const Expr *E) {
+    const clang::EnumDecl *EnumDecl =
+        E->getType().getCanonicalType()->getAs<clang::EnumType>()->getDecl();
+
+    std::string EnumName = EnumDecl->getNameAsString();
+    std::string ReplacedName =
+        MapNames::findReplacedName(MapNames::TypeNamesMap, EnumName);
+
+    if (TypeNoCast.count(ReplacedName) || ReplacedName == EnumName ||
+        EnumName.empty() ||
+        ReplacedName.empty()) // EnumName Empty means the enum is Anonymous
+      return;
+    if (dpct::DpctGlobalInfo::isInCudaPath(EnumDecl->getLocation())) {
+      insertAroundStmt(E, "static_cast<int>(", ")");
+    }
+  };
+  auto LHSExpr = BO->getLHS()->IgnoreImpCasts();
+  auto RHSExpr = BO->getRHS()->IgnoreImpCasts();
+
+  if (LHSExpr->getType()->isEnumeralType() && !dyn_cast<CallExpr>(LHSExpr) &&
+      !RHSExpr->getType()->isEnumeralType()) {
+    InsertEnumCast(LHSExpr);
+  } else if (!LHSExpr->getType()->isEnumeralType() &&
+             RHSExpr->getType()->isEnumeralType() &&
+             !dyn_cast<CallExpr>(RHSExpr)) {
+    InsertEnumCast(RHSExpr);
+  }
+}
+
 void KernelCallRefRule::registerMatcher(ast_matchers::MatchFinder &MF) {
   MF.addMatcher(
       functionDecl(
