@@ -955,15 +955,6 @@ void TypeInDeclRule::runRule(const MatchFinder::MatchResult &Result) {
       return;
     }
 
-    if (CanonicalTypeStr == "cudaGraphicsRegisterFlags" ||
-        CanonicalTypeStr == "cudaGraphicsMapFlags") {
-      if (!DpctGlobalInfo::useExtBindlessImages()) {
-        report(TL->getBeginLoc(), Diagnostics::TRY_EXPERIMENTAL_FEATURE, false,
-               CanonicalTypeStr,
-               "--use-experimental-features=bindless_images");
-      }
-    }
-
     if (CanonicalTypeStr == "CUdevice_P2PAttribute") {
       if (!DpctGlobalInfo::usePeerAccess()) {
         report(TL->getBeginLoc(), Diagnostics::API_NOT_MIGRATED, false,
@@ -1958,7 +1949,9 @@ void EnumConstantRule::registerMatcher(MatchFinder &MF) {
                           "cufftType", "cudaMemoryType", "CUctx_flags_enum",
                           "CUpointer_attribute_enum", "CUmemorytype_enum",
                           "cudaGraphicsMapFlags", "cudaGraphicsRegisterFlags",
-                          "cudaGraphNodeType", "CUdevice_P2PAttribute_enum"))),
+                          "cudaGraphNodeType", "CUdevice_P2PAttribute_enum",
+                          "cudaExternalMemoryHandleType",
+                          "cudaExternalSemaphoreHandleType"))),
                       matchesName("CUDNN_.*"), matchesName("CUSOLVER_.*")))))
           .bind("EnumConstant"),
       this);
@@ -2019,51 +2012,27 @@ void EnumConstantRule::runRule(const MatchFinder::MatchResult &Result) {
   if (!E)
     return;
   std::string EnumName = E->getNameInfo().getName().getAsString();
-  if (EnumName == "cudaStreamCaptureStatusInvalidated" ||
-      EnumName == "cudaExternalMemoryHandleTypeOpaqueWin32Kmt" ||
-      EnumName == "cudaExternalMemoryHandleTypeD3D12Heap" ||
-      EnumName == "cudaExternalMemoryHandleTypeD3D11Resource" ||
-      EnumName == "cudaExternalMemoryHandleTypeD3D11ResourceKmt" ||
-      EnumName == "cudaExternalMemoryHandleTypeNvSciBuf" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeOpaqueWin32Kmt" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeD3D11Fence" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeNvSciSync" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeKeyedMutex" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeKeyedMutexKmt" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeTimelineSemaphoreFd" ||
-      EnumName == "cudaExternalSemaphoreHandleTypeTimelineSemaphoreWin32" ||
-      EnumName == "cudaGraphNodeTypeWaitEvent" ||
-      EnumName == "cudaGraphNodeTypeEventRecord" ||
-      EnumName == "cudaGraphNodeTypeExtSemaphoreSignal" ||
-      EnumName == "cudaGraphNodeTypeExtSemaphoreWait" ||
-      EnumName == "cudaGraphNodeTypeMemAlloc" ||
-      EnumName == "cudaGraphNodeTypeMemFree" ||
-      EnumName == "cudaGraphNodeTypeConditional" ||
-      EnumName == "CU_DEVICE_P2P_ATTRIBUTE_PERFORMANCE_RANK") {
-    report(E->getBeginLoc(), Diagnostics::API_NOT_MIGRATED, false, EnumName);
-    return;
-  } else if (EnumName == "cudaComputeModeDefault" ||
-             EnumName == "cudaComputeModeExclusive" ||
-             EnumName == "cudaComputeModeProhibited" ||
-             EnumName == "cudaComputeModeExclusiveProcess") {
+
+  if (EnumName == "cudaComputeModeDefault" ||
+      EnumName == "cudaComputeModeExclusive" ||
+      EnumName == "cudaComputeModeProhibited" ||
+      EnumName == "cudaComputeModeExclusiveProcess") {
     handleComputeMode(EnumName, E);
     return;
   } else if ((EnumName == "cudaStreamCaptureStatusActive" ||
-              EnumName == "cudaStreamCaptureStatusNone") &&
+              EnumName == "cudaStreamCaptureStatusNone" ||
+              EnumName == "cudaGraphNodeTypeKernel" ||
+              EnumName == "cudaGraphNodeTypeMemcpy" ||
+              EnumName == "cudaGraphNodeTypeMemset" ||
+              EnumName == "cudaGraphNodeTypeHost" ||
+              EnumName == "cudaGraphNodeTypeGraph" ||
+              EnumName == "cudaGraphNodeTypeEmpty") &&
              !DpctGlobalInfo::useExtGraph()) {
     report(E->getBeginLoc(), Diagnostics::TRY_EXPERIMENTAL_FEATURE, false,
            EnumName, "--use-experimental-features=graph");
     return;
   } else if (!DpctGlobalInfo::useExtBindlessImages() &&
-             (EnumName == "cudaGraphicsRegisterFlagsNone" ||
-              EnumName == "cudaGraphicsRegisterFlagsReadOnly" ||
-              EnumName == "cudaGraphicsRegisterFlagsWriteDiscard" ||
-              EnumName == "cudaGraphicsRegisterFlagsSurfaceLoadStore" ||
-              EnumName == "cudaGraphicsRegisterFlagsTextureGather" ||
-              EnumName == "cudaGraphicsMapFlagsNone" ||
-              EnumName == "cudaGraphicsMapFlagsReadOnly" ||
-              EnumName == "cudaGraphicsMapFlagsWriteDiscard" ||
-              EnumName == "cudaExternalMemoryHandleTypeOpaqueFd" ||
+             (EnumName == "cudaExternalMemoryHandleTypeOpaqueFd" ||
               EnumName == "cudaExternalMemoryHandleTypeOpaqueWin32" ||
               EnumName == "cudaExternalMemoryHandleTypeD3D12Resource" ||
               EnumName == "cudaExternalSemaphoreHandleTypeOpaqueFd" ||
@@ -2071,16 +2040,6 @@ void EnumConstantRule::runRule(const MatchFinder::MatchResult &Result) {
               EnumName == "cudaExternalSemaphoreHandleTypeD3D12Fence")) {
     report(E->getBeginLoc(), Diagnostics::TRY_EXPERIMENTAL_FEATURE, false,
            EnumName, "--use-experimental-features=bindless_images");
-    return;
-  } else if (!DpctGlobalInfo::useExtGraph() &&
-             (EnumName == "cudaGraphNodeTypeKernel" ||
-              EnumName == "cudaGraphNodeTypeMemcpy" ||
-              EnumName == "cudaGraphNodeTypeMemset" ||
-              EnumName == "cudaGraphNodeTypeHost" ||
-              EnumName == "cudaGraphNodeTypeGraph" ||
-              EnumName == "cudaGraphNodeTypeEmpty")) {
-    report(E->getBeginLoc(), Diagnostics::TRY_EXPERIMENTAL_FEATURE, false,
-           EnumName, "--use-experimental-features=graph");
     return;
   } else if (auto ET = dyn_cast<EnumType>(E->getType())) {
     if (auto ETD = ET->getDecl()) {
@@ -2108,7 +2067,9 @@ void EnumConstantRule::runRule(const MatchFinder::MatchResult &Result) {
   }
 
   auto Search = MapNames::EnumNamesMap.find(EnumName);
-  if (Search == MapNames::EnumNamesMap.end()) {
+  if (Search == MapNames::EnumNamesMap.end() ||
+      Search->second->NewName == EnumName) {
+    report(E->getBeginLoc(), Diagnostics::API_NOT_MIGRATED, false, EnumName);
     return;
   }
   if (auto ET = dyn_cast<EnumType>(E->getType())) {
