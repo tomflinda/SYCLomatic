@@ -575,15 +575,15 @@ applyCmakeMigrationRules(const clang::tooling::UnifiedPath InRoot,
 
 // cmake systaxes need to be processed by implicit migration rules, as they are
 // difficult to be described with yaml based rule syntax.
-static const std::vector<std::string> ImplicitMigrationRules = {
+static const std::vector<std::string> BuiltinMigrationRules = {
     "cmake_minimum_required", "execute_process", "cuda_compile",
     "cuda_compile_fatbin"};
 
-static void reserveImplicitMigrationRules() {
-  for (const auto &Rule : ImplicitMigrationRules) {
+static void reserveBuiltinMigrationRules() {
+  for (const auto &Rule : BuiltinMigrationRules) {
     MetaRuleObject::PatternRewriter PrePR;
     PrePR.BuildScriptSyntax = Rule;
-    PrePR.RuleId = "implicit_rule_" + Rule;
+    PrePR.RuleId = "builtin_rule_" + Rule;
 
     auto Iter = CmakeBuildInRules.find(PrePR.BuildScriptSyntax);
     if (Iter != CmakeBuildInRules.end()) {
@@ -607,7 +607,7 @@ void doCmakeScriptMigration(const clang::tooling::UnifiedPath &InRoot,
   loadBufferFromFile(InRoot, OutRoot, CmakeScriptFileBufferMap);
   unifyInputFileFormat(CmakeScriptFileBufferMap, ScriptFileCRLFMap);
   convertAllCmakeCommandsToLowerCase();
-  reserveImplicitMigrationRules();
+  reserveBuiltinMigrationRules();
   doCmakeScriptAnalysis();
   applyCmakeMigrationRules(InRoot, OutRoot);
   storeBufferToFile(CmakeScriptFileBufferMap, ScriptFileCRLFMap);
