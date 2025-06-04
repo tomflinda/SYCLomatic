@@ -579,25 +579,20 @@ static const std::vector<std::string> BuiltinMigrationRules = {
     "cmake_minimum_required", "execute_process", "cuda_compile",
     "cuda_compile_fatbin"};
 
-static void reserveBuiltinMigrationRules() {
+static void applyBuiltinMigrationRules() {
   for (const auto &Rule : BuiltinMigrationRules) {
-    MetaRuleObject::PatternRewriter PrePR;
-    PrePR.BuildScriptSyntax = Rule;
-    PrePR.RuleId = "builtin_rule_" + Rule;
+    MetaRuleObject::PatternRewriter BuiltinPR;
+    BuiltinPR.BuildScriptSyntax = Rule;
+    BuiltinPR.RuleId = "builtin_rule_" + Rule;
 
-    auto Iter = CmakeBuildInRules.find(PrePR.BuildScriptSyntax);
-    if (Iter != CmakeBuildInRules.end()) {
-      if (PrePR.Priority == RulePriority::Takeover &&
-          Iter->second.Priority > PrePR.Priority) {
-        CmakeBuildInRules[PrePR.BuildScriptSyntax] = PrePR;
-      } else {
-        llvm::outs() << "[Warning]: Two migration rules (Rule:" << PrePR.RuleId
-                     << ", Rule:" << Iter->second.RuleId
-                     << ") are duplicated, the migration rule (Rule:"
-                     << PrePR.RuleId << ") is ignored.\n";
-      }
+    auto &PR = CmakeBuildInRules[Rule];
+    if (PR.Priority != RulePriority::Takeover) {
+      PR = BuiltinPR;
     } else {
-      CmakeBuildInRules[PrePR.BuildScriptSyntax] = PrePR;
+      llvm::outs() << "[Warning]: Two migration rules (Rule:"
+                   << BuiltinPR.RuleId << ", Rule:" << PR.RuleId
+                   << ") are duplicated, the migration rule (Rule:"
+                   << BuiltinPR.RuleId << ") is ignored.\n";
     }
   }
 }
@@ -607,7 +602,7 @@ void doCmakeScriptMigration(const clang::tooling::UnifiedPath &InRoot,
   loadBufferFromFile(InRoot, OutRoot, CmakeScriptFileBufferMap);
   unifyInputFileFormat(CmakeScriptFileBufferMap, ScriptFileCRLFMap);
   convertAllCmakeCommandsToLowerCase();
-  reserveBuiltinMigrationRules();
+  applyBuiltinMigrationRules();
   doCmakeScriptAnalysis();
   applyCmakeMigrationRules(InRoot, OutRoot);
   storeBufferToFile(CmakeScriptFileBufferMap, ScriptFileCRLFMap);
