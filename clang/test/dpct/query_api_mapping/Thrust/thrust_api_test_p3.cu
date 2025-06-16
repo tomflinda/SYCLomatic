@@ -43,9 +43,30 @@
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::conj --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_conj
 // thrust_conj:  std::conj(std::complex<float>(0.0));
 
-
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::proj --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_proj
 // thrust_proj:  std::proj(1);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::atan --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_atan
+// thrust_atan:  std::atan(std::complex<float>(0.0));
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::advance --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_advance
+// thrust_advance:   std::advance(iter, 2);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::arg --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_arg
+// thrust_arg:    std::arg(std::complex<double>(1.0));
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::distance --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_distance
+// thrust_distance:    int d = oneapi::dpl::distance(iter1, iter2);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::tie --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_tie
+// thrust_tie:    std::tie(a, b) = std::make_tuple(1.0, 2.0);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::not1 --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_not1
+// thrust_not1:   oneapi::dpl::not1(pred);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::not2 --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_not2
+// thrust_not2:   std::not2(std::greater_equal<int>());
+
 
 
 

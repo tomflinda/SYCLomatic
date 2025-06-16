@@ -2201,7 +2201,9 @@
 // CHECK-NEXT: thrust::abs
 // CHECK-NEXT: thrust::acos
 // CHECK-NEXT: thrust::acosh
+// CHECK-NEXT: thrust::advance
 // CHECK-NEXT: thrust::all_of
+// CHECK-NEXT: thrust::arg
 // CHECK-NEXT: thrust::asin
 // CHECK-NEXT: thrust::asinh
 // CHECK-NEXT: thrust::atan
@@ -2213,6 +2215,7 @@
 // CHECK-NEXT: thrust::device_new
 // CHECK-NEXT: thrust::device_pointer_cast
 // CHECK-NEXT: thrust::device_ptr
+// CHECK-NEXT: thrust::distance
 // CHECK-NEXT: thrust::equal
 // CHECK-NEXT: thrust::equal_range
 // CHECK-NEXT: thrust::exp
@@ -2229,6 +2232,8 @@
 // CHECK-NEXT: thrust::mismatch
 // CHECK-NEXT: thrust::none_of
 // CHECK-NEXT: thrust::norm
+// CHECK-NEXT: thrust::not1
+// CHECK-NEXT: thrust::not2
 // CHECK-NEXT: thrust::partition
 // CHECK-NEXT: thrust::partition_copy
 // CHECK-NEXT: thrust::partition_point
@@ -2262,6 +2267,7 @@
 // CHECK-NEXT: thrust::tabulate
 // CHECK-NEXT: thrust::tan
 // CHECK-NEXT: thrust::tanh
+// CHECK-NEXT: thrust::tie
 // CHECK-NEXT: thrust::transform_exclusive_scan
 // CHECK-NEXT: thrust::transform_inclusive_scan
 // CHECK-NEXT: thrust::uninitialized_copy
