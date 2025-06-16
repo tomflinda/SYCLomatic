@@ -67,12 +67,18 @@ private:
   bool isReplRedundant(std::shared_ptr<ExtReplacement> Repl,
                        std::shared_ptr<DpctFileInfo> FileInfo);
   inline bool checkLiveness(std::shared_ptr<ExtReplacement> Repl) {
+    bool ret = false;
     if (isAlive(Repl))
       // If a replacement in the same pair is alive, merge it anyway.
-      return true;
+      ret = true;
     // Check if it is duplicate replacement.
-    return !isDuplicated(Repl, ReplMap.lower_bound(Repl->getOffset()),
-                         ReplMap.upper_bound(Repl->getOffset()));
+    if (!isDuplicated(Repl, ReplMap.lower_bound(Repl->getOffset()),
+                      ReplMap.upper_bound(Repl->getOffset()))) {
+      ret = true;
+    } else {
+      ret = false;
+    }
+    return ret;
   }
 
   bool isDuplicated(std::shared_ptr<ExtReplacement> Repl, ReplIterator Begin,
@@ -137,9 +143,15 @@ private:
 
   // Mark a replacement as dead.
   void markAsDead(std::shared_ptr<ExtReplacement> Repl) {
-    if (auto PairID = Repl->getPairID())
-      PairReplsMap[PairID] =
-          std::make_shared<PairReplsStatus>(Repl, PairReplsStatus::Dead);
+    if (auto PairID = Repl->getPairID()) {
+      if (auto &R = PairReplsMap[PairID]) {
+        R->Status = PairReplsStatus::Dead;
+        ReplMap.erase(ReplMap.lower_bound(R->Repl->getOffset()));
+      } else {
+        PairReplsMap[PairID] =
+            std::make_shared<PairReplsStatus>(Repl, PairReplsStatus::Dead);
+      }
+    }
   }
 
   // Mark a replacement as alive and insert into ReplMap

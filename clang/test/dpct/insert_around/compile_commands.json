@@ -1,0 +1,12 @@
+[
+    {
+        "command": "nvcc -c -o test.o ./test.cu",
+        "directory": ".",
+        "file": "./test.cu"
+    },
+    {
+        "command": "c++ -c -o test.o ./test.cu",
+        "directory": ".",
+        "file": "./test.cu"
+    }
+]
