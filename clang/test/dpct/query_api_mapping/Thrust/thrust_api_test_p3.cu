@@ -67,6 +67,38 @@
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::not2 --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_not2
 // thrust_not2:   std::not2(std::greater_equal<int>());
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_transform_output_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_transform_output_iterator
+// thrust_make_transform_output_iterator:   auto output_iter = dpct::make_transform_output_iterator(vec.begin(), Square());
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::device_free --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_device_free
+// thrust_device_free:    dpct::free_device(d_ptr);
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::device_malloc --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_device_malloc
+// thrust_device_malloc:    dpct::device_pointer<std::complex<double>> d_ptr = dpct::malloc_device<std::complex<double>>(1);
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::free --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_free
+// thrust_free:    dpct::free(device_sys, ptr);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::get --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_get
+// thrust_get:     auto to = std::get<0>(ret);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_counting_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_counting_iterator
+// thrust_make_counting_iterator:      auto range = dpct::make_counting_iterator(0);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_discard_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_discard_iterator
+// thrust_make_discard_iterator:      oneapi::dpl::discard_iterator();
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_permutation_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_permutation_iterator
+// thrust_make_permutation_iterator:     oneapi::dpl::make_permutation_iterator(h_input.begin(), h_input2.begin());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_reverse_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_reverse_iterator
+// thrust_make_reverse_iterator:      auto iter = oneapi::dpl::make_reverse_iterator(d_vec.begin());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_transform_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_transform_iterator
+// thrust_make_transform_iterator:      oneapi::dpl::make_transform_iterator(h_input.begin(), std::negate<int>());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_tuple --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_tuple
+// thrust_make_tuple:       auto ret = std::make_tuple(3, 4);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::make_zip_iterator --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_make_zip_iterator
+// thrust_make_zip_iterator:       dpct::zip_iterator<iterator_tuple> ret = oneapi::dpl::make_zip_iterator(std::make_tuple(int_in.begin(), float_in.begin()));
