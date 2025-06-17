@@ -4,11 +4,9 @@
 
 void thrust_advance() {
   const int N = 5;
+  // Start
   thrust::device_vector<int> vec(N);
   thrust::device_vector<int>::iterator iter = vec.begin();
-  // clang-format off
-  // Start
-    thrust::advance(iter, 2);
+  thrust::advance(iter, 2);
   // End
-  // clang-format on
 }

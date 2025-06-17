@@ -6,13 +6,12 @@
 #include <thrust/memory.h>
 
 void thrust_free() {
-  const int N = 100;
-  thrust::device_system_tag device_sys;
-  thrust::pointer<int, thrust::device_system_tag> ptr =
-      thrust::malloc<int>(device_sys, N);
   // clang-format off
   // Start
-    thrust::free(device_sys, ptr);
+  const int N = 100;
+  thrust::device_system_tag device_sys;
+  thrust::pointer<int, thrust::device_system_tag> ptr = thrust::malloc<int>(device_sys, N);
+  thrust::free(device_sys, ptr);
   // End
   // clang-format on
 }
