@@ -98,7 +98,12 @@
 // thrust_atan-NEXT:  std::atan(std::complex<float>(0.0));
 
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::advance --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_advance
-// thrust_advance:  dpct::device_vector<int> vec(N);
+// thrust_advance:CUDA API:
+// thrust_advance-NEXT:  thrust::device_vector<int> vec(N);
+// thrust_advance-NEXT:  thrust::device_vector<int>::iterator iter = vec.begin();
+// thrust_advance-NEXT:  thrust::advance(iter, 2);
+// thrust_advance-NEXT:Is migrated to:
+// thrust_advance-NEXT:  dpct::device_vector<int> vec(N);
 // thrust_advance-NEXT:  dpct::device_vector<int>::iterator iter = vec.begin();
 // thrust_advance-NEXT:  std::advance(iter, 2);
 
