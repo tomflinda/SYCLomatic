@@ -6,20 +6,18 @@
 void stable_sort_by_key() {
   // clang-format off
   // Start
-struct is_odd {
-  __host__ __device__ bool operator()(const int x) const {
-    return x % 2;
-  }
-};
-
-struct identity {
-  __host__ __device__ bool operator()(const int x) const {
-    return x;
-  }
-};
-
-thrust::negate<int> neg;
-thrust::plus<int> plus;
+  struct is_odd {
+    __host__ __device__ bool operator()(const int x) const {
+      return x % 2;
+    }
+  };
+  struct identity {
+    __host__ __device__ bool operator()(const int x) const {
+      return x;
+    }
+  };
+  thrust::negate<int> neg;
+  thrust::plus<int> plus;
   const int dataLen = 10;
   int inDataH[dataLen]  = {-5, 0, 2, -3, 2, 4, 0, -1, 2, 8};
   int outDataH[dataLen];

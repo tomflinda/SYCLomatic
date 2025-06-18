@@ -20,8 +20,8 @@ void exclusive_scan_test() {
   // Start
   std::vector<int> v, v2, v3, v4;
   auto gen = []() -> int { return 23; };
-  /*1*/ thrust::generate_n(thrust::seq, v.begin(), 23, gen);
-  /*1*/ thrust::generate_n(v.begin(), 23, gen);
+  /*1*/ thrust::generate(thrust::seq, v.begin(), v.end(), gen);
+  /*2*/ thrust::generate(v.begin(), v.end(), gen);
   // End
   // clang-format on
 }

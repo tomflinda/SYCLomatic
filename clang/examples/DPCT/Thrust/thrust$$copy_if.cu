@@ -3,7 +3,7 @@
 #include <thrust/copy.h>
 #include <thrust/execution_policy.h>
 
-void copy_test() {
+void copy_if() {
   // clang-format off
   // Start
   auto is_even = [] __host__ __device__(int v) { return (v % 2) == 0; };

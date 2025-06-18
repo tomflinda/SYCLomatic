@@ -5,7 +5,7 @@
 #include <thrust/copy.h>
 #include <thrust/execution_policy.h>
 
-void copy_test() {
+void copy_n() {
   // clang-format off
   // Start
   const char data[] = "aaabbbbbcddeeeeeeeeeff";

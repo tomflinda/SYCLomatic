@@ -9,7 +9,7 @@ void min_element_test() {
   // clang-format off
   // Start
   thrust::host_vector<int> h_input(10);
-  thrust::min_element(h_input.begin(), h_input.end());
+  thrust::max_element(h_input.begin(), h_input.end());
   // End
   // clang-format on
 }
