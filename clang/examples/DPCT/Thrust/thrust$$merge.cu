@@ -30,7 +30,7 @@
 #include <thrust/partition.h>
 #include <thrust/scatter.h>
 
-void inclusive_scan_by_key_test() {
+void merge_test() {
   // clang-format off
   // Start
   std::vector<int> v, v2, v3, v4;

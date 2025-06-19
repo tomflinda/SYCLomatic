@@ -6,7 +6,7 @@
 #include <thrust/execution_policy.h>
 #include <thrust/remove.h>
 
-void exclusive_scan_test() {
+void inclusive_scan_test() {
   // clang-format off
   // Start
   thrust::device_vector<int> A(4);

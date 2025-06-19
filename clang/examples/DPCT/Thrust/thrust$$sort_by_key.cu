@@ -27,7 +27,7 @@
 #include <thrust/partition.h>
 #include <thrust/scatter.h>
 
-void scatter() {
+void sort_by_key() {
   // clang-format off
   // Start
   thrust::host_vector<int> h;

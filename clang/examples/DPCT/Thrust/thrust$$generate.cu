@@ -15,7 +15,7 @@
 #include <thrust/sort.h>
 #include <thrust/unique.h>
 
-void exclusive_scan_test() {
+void generate_test() {
   // clang-format off
   // Start
   std::vector<int> v, v2, v3, v4;

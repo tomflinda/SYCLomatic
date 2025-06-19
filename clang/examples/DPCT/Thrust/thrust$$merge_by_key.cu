@@ -2,7 +2,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/execution_policy.h>
 
-void inclusive_scan_by_key_test() {
+void merge_by_key_test() {
   // clang-format off
   // Start
   thrust::host_vector<int> AH(4);

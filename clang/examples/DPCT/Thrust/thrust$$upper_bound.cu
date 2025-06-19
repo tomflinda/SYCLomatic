@@ -29,7 +29,7 @@
 #include <thrust/partition.h>
 #include <thrust/scatter.h>
 
-void stable_sort_by_key() {
+void upper_bound() {
   // clang-format off
   // Start
   std::vector<int> v, v2, v3, v4;

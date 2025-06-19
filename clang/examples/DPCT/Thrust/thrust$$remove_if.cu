@@ -7,7 +7,7 @@
 #include <thrust/execution_policy.h>
 #include <thrust/remove.h>
 
-void reduce_test() {
+void remove_if_test() {
   // clang-format off
   // Start
   struct greater_than_zero {

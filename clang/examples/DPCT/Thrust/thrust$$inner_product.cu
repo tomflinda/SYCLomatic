@@ -8,7 +8,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/inner_product.h>
 
-void inclusive_scan_by_key_test() {
+void inner_product_test() {
   // clang-format off
   // Start
   thrust::multiplies<int> bo1;

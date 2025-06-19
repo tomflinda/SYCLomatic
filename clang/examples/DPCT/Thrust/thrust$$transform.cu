@@ -3,7 +3,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/sort.h>
 
-void stable_sort_by_key() {
+void transform() {
   // clang-format off
   // Start
   const int N = 1000;

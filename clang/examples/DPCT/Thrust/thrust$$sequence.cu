@@ -4,7 +4,7 @@
 #include <thrust/sequence.h>
 #include <thrust/transform.h>
 
-void scatter() {
+void sequence() {
   // clang-format off
   // Start
   const int N = 5;

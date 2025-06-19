@@ -4,7 +4,7 @@
 
 auto square = [] __device__(int x) { return x * x; };
 
-void stable_sort_by_key() {
+void transform_reduce() {
   // clang-format off
   // Start
   int data[10];

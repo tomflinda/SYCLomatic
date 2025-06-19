@@ -25,7 +25,7 @@
 #include <thrust/equal.h>
 #include <thrust/uninitialized_copy.h>
 
-void inclusive_scan_by_key_test() {
+void lower_bound_test() {
   // clang-format off
   // Start
   std::vector<int> v, v2, v3, v4;

@@ -7,7 +7,7 @@
 #include <thrust/reduce.h>
 #include <thrust/transform_reduce.h>
 
-void reduce_test() {
+void reduce_by_key_test() {
   // clang-format off
   // Start
   thrust::host_vector<int> h;

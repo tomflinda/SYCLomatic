@@ -3,7 +3,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/replace.h>
 
-void replace_if() {
+void replace_copy_if() {
   // clang-format off
   // Start
   struct is_less_than_zero {

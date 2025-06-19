@@ -5,7 +5,7 @@
 #include <thrust/extrema.h>
 #include <thrust/unique.h>
 
-void inclusive_scan_by_key_test() {
+void min_element_test() {
   // clang-format off
   // Start
   thrust::host_vector<int> h_input(10);

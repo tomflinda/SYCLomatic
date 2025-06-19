@@ -787,3 +787,57 @@
 // thrust_gather_if-NEXT:   /*2*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin(), pred);
 // thrust_gather_if-NEXT:   /*3*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin());
 // thrust_gather_if-NEXT:   /*4*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::transform_if --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_transform_if
+// thrust_transform_if: CUDA API:
+// thrust_transform_if-NEXT:   struct is_odd {
+// thrust_transform_if-NEXT:     __host__ __device__ bool operator()(const int x) const {
+// thrust_transform_if-NEXT:       return x % 2;
+// thrust_transform_if-NEXT:     }
+// thrust_transform_if-NEXT:   };
+// thrust_transform_if-NEXT:   struct identity {
+// thrust_transform_if-NEXT:     __host__ __device__ bool operator()(const int x) const {
+// thrust_transform_if-NEXT:       return x;
+// thrust_transform_if-NEXT:     }
+// thrust_transform_if-NEXT:   };
+// thrust_transform_if-NEXT:   thrust::negate<int> neg;
+// thrust_transform_if-NEXT:   thrust::plus<int> plus;
+// thrust_transform_if-NEXT:   const int dataLen = 10;
+// thrust_transform_if-NEXT:   int inDataH[dataLen]  = {-5, 0, 2, -3, 2, 4, 0, -1, 2, 8};
+// thrust_transform_if-NEXT:   int outDataH[dataLen];
+// thrust_transform_if-NEXT:   int stencilH[dataLen] = {1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
+// thrust_transform_if-NEXT:   thrust::device_vector<int> inDataD(dataLen);
+// thrust_transform_if-NEXT:   thrust::device_vector<int> outDataD(dataLen);
+// thrust_transform_if-NEXT:   thrust::device_vector<int> stencilD(dataLen);
+// thrust_transform_if-NEXT:   /*1*/ thrust::transform_if(thrust::host, inDataH, inDataH + dataLen, outDataH, neg, is_odd());
+// thrust_transform_if-NEXT:   /*2*/ thrust::transform_if(thrust::host, inDataH, inDataH + dataLen, stencilH, outDataH, neg, identity());
+// thrust_transform_if-NEXT:   /*3*/ thrust::transform_if(thrust::host, inDataH, inDataH + dataLen, inDataH, stencilH, outDataH, plus, identity());
+// thrust_transform_if-NEXT:   /*4*/ thrust::transform_if(inDataD.begin(), inDataD.end(), outDataD.begin(), neg, is_odd());
+// thrust_transform_if-NEXT:   /*5*/ thrust::transform_if(inDataD.begin(), inDataD.end(), stencilD.begin(), outDataD.begin(), neg, identity());
+// thrust_transform_if-NEXT:   /*6*/ thrust::transform_if(inDataD.begin(), inDataD.end(), inDataD.begin(), stencilD.begin(), outDataD.begin(), plus, identity());
+// thrust_transform_if-NEXT: Is migrated to:
+// thrust_transform_if-NEXT:   struct is_odd {
+// thrust_transform_if-NEXT:     bool operator()(const int x) const {
+// thrust_transform_if-NEXT:       return x % 2;
+// thrust_transform_if-NEXT:     }
+// thrust_transform_if-NEXT:   };
+// thrust_transform_if-NEXT:   struct identity {
+// thrust_transform_if-NEXT:     bool operator()(const int x) const {
+// thrust_transform_if-NEXT:       return x;
+// thrust_transform_if-NEXT:     }
+// thrust_transform_if-NEXT:   };
+// thrust_transform_if-NEXT:   std::negate<int> neg;
+// thrust_transform_if-NEXT:   std::plus<int> plus;
+// thrust_transform_if-NEXT:   const int dataLen = 10;
+// thrust_transform_if-NEXT:   int inDataH[dataLen]  = {-5, 0, 2, -3, 2, 4, 0, -1, 2, 8};
+// thrust_transform_if-NEXT:   int outDataH[dataLen];
+// thrust_transform_if-NEXT:   int stencilH[dataLen] = {1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
+// thrust_transform_if-NEXT:   dpct::device_vector<int> inDataD(dataLen);
+// thrust_transform_if-NEXT:   dpct::device_vector<int> outDataD(dataLen);
+// thrust_transform_if-NEXT:   dpct::device_vector<int> stencilD(dataLen);
+// thrust_transform_if-NEXT:   /*1*/ dpct::transform_if(oneapi::dpl::execution::seq, inDataH, inDataH + dataLen, outDataH, neg, is_odd());
+// thrust_transform_if-NEXT:   /*2*/ dpct::transform_if(oneapi::dpl::execution::seq, inDataH, inDataH + dataLen, stencilH, outDataH, neg, identity());
+// thrust_transform_if-NEXT:   /*3*/ dpct::transform_if(oneapi::dpl::execution::seq, inDataH, inDataH + dataLen, inDataH, stencilH, outDataH, plus, identity());
+// thrust_transform_if-NEXT:   /*4*/ dpct::transform_if(oneapi::dpl::execution::make_device_policy(q_ct1), inDataD.begin(), inDataD.end(), outDataD.begin(), neg, is_odd());
+// thrust_transform_if-NEXT:   /*5*/ dpct::transform_if(oneapi::dpl::execution::make_device_policy(q_ct1), inDataD.begin(), inDataD.end(), stencilD.begin(), outDataD.begin(), neg, identity());
+// thrust_transform_if-NEXT:   /*6*/ dpct::transform_if(oneapi::dpl::execution::make_device_policy(q_ct1), inDataD.begin(), inDataD.end(), inDataD.begin(), stencilD.begin(), outDataD.begin(), plus, identity());
