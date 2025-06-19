@@ -3,7 +3,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/execution_policy.h>
 
-void exclusive_scan_test() {
+void for_each_test() {
   // clang-format off
   // Start
   struct add_functor {

@@ -10,7 +10,7 @@
 #include <thrust/scatter.h>
 #include <thrust/tuple.h>
 
-void exclusive_scan_test() {
+void exclusive_scan_by_key_test() {
   // clang-format off
   // Start
   std::vector<int> v, v2, v3, v4;

@@ -7,7 +7,7 @@
 #include <thrust/gather.h>
 #include <thrust/host_vector.h>
 
-void exclusive_scan_test() {
+void fill_test() {
   // clang-format off
   // Start
   float *_de = NULL;

@@ -15,13 +15,9 @@
 #include <thrust/sort.h>
 #include <thrust/unique.h>
 
-void exclusive_scan_test() {
+void gather_if_test() {
   // clang-format off
   // Start
-  thrust::device_vector<int> AD(4);
-  thrust::device_vector<int> BD(4);
-  thrust::device_vector<int> SD(4);
-  thrust::device_vector<int> RD(4);
   thrust::host_vector<int> AH(4);
   thrust::host_vector<int> BH(4);
   thrust::host_vector<int> SH(4);

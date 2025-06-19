@@ -706,3 +706,84 @@
 // thrust_upper_bound-NEXT:   /*3*/ oneapi::dpl::upper_bound(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
 // thrust_upper_bound-NEXT:   /*4*/ oneapi::dpl::upper_bound(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::transform_reduce --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_transform_reduce
+// thrust_transform_reduce: CUDA API:
+// thrust_transform_reduce-NEXT:   int data[10];
+// thrust_transform_reduce-NEXT:   cudaStream_t stream;
+// thrust_transform_reduce-NEXT:   thrust::device_ptr<int> begin = thrust::device_pointer_cast(&data[0]);
+// thrust_transform_reduce-NEXT:   thrust::device_ptr<int> end = begin + 10;
+// thrust_transform_reduce-NEXT:   /*1*/ bool h_result = thrust::transform_reduce(begin, end, square, 0, thrust::plus<bool>());
+// thrust_transform_reduce-NEXT:   /*2*/ bool h_result_1 = thrust::transform_reduce(thrust::seq, begin, end, square, 0, thrust::plus<bool>());
+// thrust_transform_reduce-NEXT:   /*3*/ bool h_result_2 = thrust::transform_reduce(thrust::cuda::par.on(stream), begin, end, square, 0, thrust::plus<bool>());
+// thrust_transform_reduce-NEXT: Is migrated to:
+// thrust_transform_reduce-NEXT:   int data[10];
+// thrust_transform_reduce-NEXT:   dpct::queue_ptr stream;
+// thrust_transform_reduce-NEXT:   dpct::device_pointer<int> begin = dpct::get_device_pointer(&data[0]);
+// thrust_transform_reduce-NEXT:   dpct::device_pointer<int> end = begin + 10;
+// thrust_transform_reduce-NEXT:   /*1*/ bool h_result = std::transform_reduce(oneapi::dpl::execution::make_device_policy(dpct::get_in_order_queue()), begin, end, 0, std::plus<bool>(), square);
+// thrust_transform_reduce-NEXT:   /*2*/ bool h_result_1 = std::transform_reduce(oneapi::dpl::execution::seq, begin, end, 0, std::plus<bool>(), square);
+// thrust_transform_reduce-NEXT:   /*3*/ bool h_result_2 = std::transform_reduce(oneapi::dpl::execution::make_device_policy(*stream), begin, end, 0, std::plus<bool>(), square);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::copy --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_copy
+// thrust_copy: CUDA API:
+// thrust_copy-NEXT:   const char data[] = "abc";
+// thrust_copy-NEXT:   const size_t N = (sizeof(data) / sizeof(char)) - 1;
+// thrust_copy-NEXT:   char dst_data[N];
+// thrust_copy-NEXT:   thrust::device_vector<char> input(data, data + N);
+// thrust_copy-NEXT:   thrust::device_vector<char> dst(data, data + N);
+// thrust_copy-NEXT:   /*1*/ thrust::copy(data, data + N, dst_data);
+// thrust_copy-NEXT:   /*2*/ thrust::copy(thrust::device, input.begin(), input.begin() + N, dst.begin());
+// thrust_copy-NEXT: Is migrated to:
+// thrust_copy-NEXT:   const char data[] = "abc";
+// thrust_copy-NEXT:   const size_t N = (sizeof(data) / sizeof(char)) - 1;
+// thrust_copy-NEXT:   char dst_data[N];
+// thrust_copy-NEXT:   dpct::device_vector<char> input(data, data + N);
+// thrust_copy-NEXT:   dpct::device_vector<char> dst(data, data + N);
+// thrust_copy-NEXT:   /*1*/ std::copy(oneapi::dpl::execution::seq, data, data + N, dst_data);
+// thrust_copy-NEXT:   /*2*/ std::copy(oneapi::dpl::execution::make_device_policy(q_ct1), input.begin(), input.begin() + N, dst.begin());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::copy_n --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_copy_n
+// thrust_copy_n: CUDA API:
+// thrust_copy_n-NEXT:   const char data[] = "abc";
+// thrust_copy_n-NEXT:   const size_t N = (sizeof(data) / sizeof(char)) - 1;
+// thrust_copy_n-NEXT:   char dst_data[N];
+// thrust_copy_n-NEXT:   thrust::device_vector<char> input(data, data + N);
+// thrust_copy_n-NEXT:   thrust::device_vector<char> dst(data, data + N);
+// thrust_copy_n-NEXT:   /*1*/ thrust::copy_n(data, N, dst_data);
+// thrust_copy_n-NEXT:   /*2*/ thrust::copy_n(thrust::device, input.begin(), N, dst.begin());
+// thrust_copy_n-NEXT: Is migrated to:
+// thrust_copy_n-NEXT:   const char data[] = "abc";
+// thrust_copy_n-NEXT:   const size_t N = (sizeof(data) / sizeof(char)) - 1;
+// thrust_copy_n-NEXT:   char dst_data[N];
+// thrust_copy_n-NEXT:   dpct::device_vector<char> input(data, data + N);
+// thrust_copy_n-NEXT:   dpct::device_vector<char> dst(data, data + N);
+// thrust_copy_n-NEXT:   /*1*/ std::copy_n(oneapi::dpl::execution::seq, data, N, dst_data);
+// thrust_copy_n-NEXT:   /*2*/ std::copy_n(oneapi::dpl::execution::make_device_policy(q_ct1), input.begin(), N, dst.begin());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::gather_if --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_gather_if
+// thrust_gather_if: CUDA API:
+// thrust_gather_if-NEXT:   thrust::host_vector<int> AH(4);
+// thrust_gather_if-NEXT:   thrust::host_vector<int> BH(4);
+// thrust_gather_if-NEXT:   thrust::host_vector<int> SH(4);
+// thrust_gather_if-NEXT:   thrust::host_vector<int> RH(4);
+// thrust_gather_if-NEXT:   struct is_less_than_zero {
+// thrust_gather_if-NEXT:     __host__ __device__ bool operator()(int x) const { return x < 0; }
+// thrust_gather_if-NEXT:   };
+// thrust_gather_if-NEXT:   is_less_than_zero pred;
+// thrust_gather_if-NEXT:   /*1*/ thrust::gather_if(AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin(),pred);
+// thrust_gather_if-NEXT:   /*2*/ thrust::gather_if(thrust::host, AH.begin(), AH.end(), SH.begin(), BH.begin(),RH.begin(), pred);
+// thrust_gather_if-NEXT:   /*3*/ thrust::gather_if(AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin());
+// thrust_gather_if-NEXT:   /*4*/ thrust::gather_if(thrust::host, AH.begin(), AH.end(), SH.begin(), BH.begin(),RH.begin());
+// thrust_gather_if-NEXT: Is migrated to:
+// thrust_gather_if-NEXT:   std::vector<int> AH(4);
+// thrust_gather_if-NEXT:   std::vector<int> BH(4);
+// thrust_gather_if-NEXT:   std::vector<int> SH(4);
+// thrust_gather_if-NEXT:   std::vector<int> RH(4);
+// thrust_gather_if-NEXT:   struct is_less_than_zero {
+// thrust_gather_if-NEXT:     bool operator()(int x) const { return x < 0; }
+// thrust_gather_if-NEXT:   };
+// thrust_gather_if-NEXT:   is_less_than_zero pred;
+// thrust_gather_if-NEXT:   /*1*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin(), pred);
+// thrust_gather_if-NEXT:   /*2*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin(), pred);
+// thrust_gather_if-NEXT:   /*3*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin());
+// thrust_gather_if-NEXT:   /*4*/ dpct::gather_if(oneapi::dpl::execution::seq, AH.begin(), AH.end(), SH.begin(), BH.begin(), RH.begin());

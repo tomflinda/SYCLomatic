@@ -16,7 +16,7 @@
 #include <thrust/sort.h>
 #include <thrust/unique.h>
 
-void exclusive_scan_test() {
+void gather_test() {
   // clang-format off
   // Start
   int values[10] = {1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
