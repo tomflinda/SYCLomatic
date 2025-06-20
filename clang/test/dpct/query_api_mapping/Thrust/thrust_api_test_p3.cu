@@ -1,5 +1,4 @@
-
-// UNSUPPORTED: v8.0, v9.0, v9.1, v9.2, v10.0, v10.1
+// UNSUPPORTED: system-windows
 // UNSUPPORTED: cuda-8.0, cuda-9.0, cuda-9.1, cuda-9.2, cuda-10.0, cuda-10.1
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::abs --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_abs
 // thrust_abs:CUDA API:
@@ -180,6 +179,12 @@
 // thrust_make_transform_output_iterator-NEXT:  const int N = 5;
 // thrust_make_transform_output_iterator-NEXT:  dpct::device_vector<int> vec(N);
 // thrust_make_transform_output_iterator-NEXT:  auto output_iter = dpct::make_transform_output_iterator(vec.begin(), square());
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::device_malloc --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_device_malloc
+// thrust_device_malloc:CUDA API:
+// thrust_device_malloc-NEXT:  thrust::device_ptr<thrust::complex<double>> d_ptr = thrust::device_malloc<thrust::complex<double>>(1);
+// thrust_device_malloc-NEXT:Is migrated to:
+// thrust_device_malloc-NEXT:  dpct::device_pointer<std::complex<double>> d_ptr = dpct::malloc_device<std::complex<double>>(1);
 
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::free --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_free
 // thrust_free:CUDA API:
