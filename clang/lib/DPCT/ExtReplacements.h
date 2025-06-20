@@ -67,7 +67,6 @@ private:
   bool isReplRedundant(std::shared_ptr<ExtReplacement> Repl,
                        std::shared_ptr<DpctFileInfo> FileInfo);
   inline bool checkLiveness(std::shared_ptr<ExtReplacement> Repl) {
-    bool ret = false;
     if (isAlive(Repl))
       // If a replacement in the same pair is alive, merge it anyway.
       return true;
