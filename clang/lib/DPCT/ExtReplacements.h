@@ -70,15 +70,10 @@ private:
     bool ret = false;
     if (isAlive(Repl))
       // If a replacement in the same pair is alive, merge it anyway.
-      ret = true;
+      return true;
     // Check if it is duplicate replacement.
-    if (!isDuplicated(Repl, ReplMap.lower_bound(Repl->getOffset()),
-                      ReplMap.upper_bound(Repl->getOffset()))) {
-      ret = true;
-    } else {
-      ret = false;
-    }
-    return ret;
+    return !isDuplicated(Repl, ReplMap.lower_bound(Repl->getOffset()),
+                         ReplMap.upper_bound(Repl->getOffset()));
   }
 
   bool isDuplicated(std::shared_ptr<ExtReplacement> Repl, ReplIterator Begin,
