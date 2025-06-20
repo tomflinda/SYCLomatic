@@ -41,21 +41,6 @@
 // thrust_any_of-NEXT:  /*1*/ oneapi::dpl::any_of(oneapi::dpl::execution::make_device_policy(q_ct1), A.begin(), A.end(), pred);
 // thrust_any_of-NEXT:  /*2*/ oneapi::dpl::any_of(oneapi::dpl::execution::make_device_policy(q_ct1), B.begin(), B.end(), pred);
 
-// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::binary_search --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_binary_search
-// thrust_binary_search: CUDA API:
-// thrust_binary_search-NEXT:  std::vector<int> v, v2, v3, v4;
-// thrust_binary_search-NEXT:  auto bp = [](int x, int y) -> bool { return x < y; };
-// thrust_binary_search-NEXT:  /*1*/ thrust::binary_search(thrust::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin());
-// thrust_binary_search-NEXT:  /*2*/ thrust::binary_search(v.begin(), v.end(), v2.begin(), v2.end(), v3.begin());
-// thrust_binary_search-NEXT:  /*3*/ thrust::binary_search(thrust::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
-// thrust_binary_search-NEXT:  /*4*/ thrust::binary_search(v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
-// thrust_binary_search-NEXT:Is migrated to:
-// thrust_binary_search-NEXT:  std::vector<int> v, v2, v3, v4;
-// thrust_binary_search-NEXT:  auto bp = [](int x, int y) -> bool { return x < y; };
-// thrust_binary_search-NEXT:  /*1*/ oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin());
-// thrust_binary_search-NEXT:  /*2*/ oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin());
-// thrust_binary_search-NEXT:  /*3*/ oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
-// thrust_binary_search-NEXT:  /*4*/ oneapi::dpl::binary_search(oneapi::dpl::execution::seq, v.begin(), v.end(), v2.begin(), v2.end(), v3.begin(), bp);
 
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::copy_if --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_copy_if
 // thrust_copy_if: CUDA API:

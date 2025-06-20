@@ -181,12 +181,6 @@
 // thrust_make_transform_output_iterator-NEXT:  dpct::device_vector<int> vec(N);
 // thrust_make_transform_output_iterator-NEXT:  auto output_iter = dpct::make_transform_output_iterator(vec.begin(), square());
 
-// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::device_malloc --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_device_malloc
-// thrust_device_malloc:CUDA API:
-// thrust_device_malloc-NEXT:  thrust::device_ptr<thrust::complex<double>> d_ptr = thrust::device_malloc<thrust::complex<double>>(1);
-// thrust_device_malloc-NEXT:Is migrated to:
-// thrust_device_malloc-NEXT:  dpct::device_pointer<std::complex<double>> d_ptr = dpct::malloc_device<std::complex<double>>(1);
-
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::free --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_free
 // thrust_free:CUDA API:
 // thrust_free-NEXT:  const int N = 100;

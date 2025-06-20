@@ -8,3 +8,9 @@
 // thrust_device_free-NEXT:Is migrated to:
 // thrust_device_free-NEXT:  dpct::device_pointer<std::complex<double>> d_ptr = dpct::malloc_device<std::complex<double>>(1);
 // thrust_device_free-NEXT:  dpct::free_device(d_ptr);
+
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::device_malloc --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_device_malloc
+// thrust_device_malloc:CUDA API:
+// thrust_device_malloc-NEXT:  thrust::device_ptr<thrust::complex<double>> d_ptr = thrust::device_malloc<thrust::complex<double>>(1);
+// thrust_device_malloc-NEXT:Is migrated to:
+// thrust_device_malloc-NEXT:  dpct::device_pointer<std::complex<double>> d_ptr = dpct::malloc_device<std::complex<double>>(1);
