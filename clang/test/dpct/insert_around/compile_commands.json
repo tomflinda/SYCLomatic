@@ -1,12 +1,12 @@
 [
     {
-        "command": "nvcc -c -o test.o ./test.cu",
+        "command": "nvcc -c -o float_vector.o ./float_vector.cpp",
         "directory": ".",
-        "file": "./test.cu"
+        "file": "./float_vector.cpp"
     },
     {
-        "command": "c++ -c -o test.o ./test.cu",
+        "command": "c++ -c -o float_vector.o ./float_vector.cpp",
         "directory": ".",
-        "file": "./test.cu"
+        "file": "./float_vector.cpp"
     }
 ]
