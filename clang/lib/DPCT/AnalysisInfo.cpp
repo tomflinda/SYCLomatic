@@ -1487,9 +1487,21 @@ std::string DpctGlobalInfo::getStringForRegexReplacement(StringRef MatchedStr) {
         HelperFuncType::HFT_DefaultQueuePtr, Index);
   case 'E': {
     auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
-    return DpctGlobalInfo::hasCUDASyntax(Vec[Index])
-               ? ("c" + DpctGlobalInfo::getSYCLSourceExtension())
-               : "c";
+     SourceProcessType FileType = GetSourceFileType(Vec[Index]);
+     if (Vec[Index + 1] == ".h")
+       return DpctGlobalInfo::hasCUDASyntax(Vec[Index]) &&
+                      (FileType & SPT_CppSource)
+                  ? ("h" + DpctGlobalInfo::getSYCLSourceExtension())
+                  : "h";
+     if (Vec[Index + 1] == ".cc")
+       return DpctGlobalInfo::hasCUDASyntax(Vec[Index])&&
+                      (FileType & SPT_CppSource)
+                  ? ("cc" + DpctGlobalInfo::getSYCLSourceExtension())
+                  : "cc";
+
+     return DpctGlobalInfo::hasCUDASyntax(Vec[Index]) 
+                ? ("c" + DpctGlobalInfo::getSYCLSourceExtension())
+                : "c";
   }
   case 'P': {
     std::string ReplStr;
