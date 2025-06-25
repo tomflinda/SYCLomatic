@@ -1493,11 +1493,6 @@ std::string DpctGlobalInfo::getStringForRegexReplacement(StringRef MatchedStr) {
     const bool IsCppSource = (FileType & SPT_CppSource);
     const auto Extention = Vec[Index + 1];
 
-    if (Extention == ".h") {
-      return (HasCUDASyntax && IsCppSource)
-                 ? "h" + DpctGlobalInfo::getSYCLSourceExtension()
-                 : "h";
-    }
     if (Extention == ".cc") {
       return (HasCUDASyntax && IsCppSource)
                  ? "cc" + DpctGlobalInfo::getSYCLSourceExtension()
