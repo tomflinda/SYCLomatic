@@ -205,7 +205,6 @@ void rewriteFileName(std::string &FileName, const std::string &FullPathName) {
   const auto Extension = path::extension(CanonicalPathStr);
   SourceProcessType FileType = GetSourceFileType(FullPathName);
 
-  printf("FileType:%d %s\n", FileType, FullPathName.c_str());
   // If user does not specify which extension need be changed, we change all the
   // SPT_CudaSource, SPT_CppSource and SPT_CudaHeader files.
   if (DpctGlobalInfo::getChangeExtensions().empty() ||
@@ -215,20 +214,10 @@ void rewriteFileName(std::string &FileName, const std::string &FullPathName) {
                               DpctGlobalInfo::getSYCLSourceExtension());
     } else if ((FileType & SPT_CppSource) &&
                DpctGlobalInfo::hasCUDASyntax(FileName)) {
-      if (Extension == ".c") {
-        path::replace_extension(CanonicalPathStr,
-                                Extension +
-                                    DpctGlobalInfo::getSYCLSourceExtension());
+      path::replace_extension(CanonicalPathStr,
+                              Extension +
+                                  DpctGlobalInfo::getSYCLSourceExtension());
 
-      } else {
-        printf("######################## %s\n", FileName.c_str());
-        path::replace_extension(CanonicalPathStr,
-                                Extension +
-                                    DpctGlobalInfo::getSYCLSourceExtension());
-        printf("CanonicalPathStr:%s\n", CanonicalPathStr.c_str());
-         printf("########################0  %s\n", Extension.str().c_str());
-          printf("########################1 %s\n", DpctGlobalInfo::getSYCLSourceExtension().c_str());
-      }
     } else if (FileType & SPT_CudaHeader) {
       path::replace_extension(CanonicalPathStr,
                               DpctGlobalInfo::getSYCLHeaderExtension());

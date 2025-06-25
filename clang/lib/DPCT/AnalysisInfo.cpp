@@ -1487,21 +1487,23 @@ std::string DpctGlobalInfo::getStringForRegexReplacement(StringRef MatchedStr) {
         HelperFuncType::HFT_DefaultQueuePtr, Index);
   case 'E': {
     auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
-     SourceProcessType FileType = GetSourceFileType(Vec[Index]);
-     if (Vec[Index + 1] == ".h")
-       return DpctGlobalInfo::hasCUDASyntax(Vec[Index]) &&
-                      (FileType & SPT_CppSource)
-                  ? ("h" + DpctGlobalInfo::getSYCLSourceExtension())
-                  : "h";
-     if (Vec[Index + 1] == ".cc")
-       return DpctGlobalInfo::hasCUDASyntax(Vec[Index])&&
-                      (FileType & SPT_CppSource)
-                  ? ("cc" + DpctGlobalInfo::getSYCLSourceExtension())
-                  : "cc";
+    SourceProcessType FileType = GetSourceFileType(Vec[Index]);
 
-     return DpctGlobalInfo::hasCUDASyntax(Vec[Index]) 
-                ? ("c" + DpctGlobalInfo::getSYCLSourceExtension())
-                : "c";
+    const bool HasCUDASyntax = DpctGlobalInfo::hasCUDASyntax(Vec[Index]);
+    const bool IsCppSource = (FileType & SPT_CppSource);
+    const auto Extention = Vec[Index + 1];
+
+    if (Extention == ".h") {
+      return (HasCUDASyntax && IsCppSource)
+                 ? "h" + DpctGlobalInfo::getSYCLSourceExtension()
+                 : "h";
+    }
+    if (Extention == ".cc") {
+      return (HasCUDASyntax && IsCppSource)
+                 ? "cc" + DpctGlobalInfo::getSYCLSourceExtension()
+                 : "cc";
+    }
+    return HasCUDASyntax ? "c" + DpctGlobalInfo::getSYCLSourceExtension() : "c";
   }
   case 'P': {
     std::string ReplStr;
