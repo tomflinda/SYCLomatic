@@ -2424,6 +2424,7 @@
 // CHECK-NEXT: thrust::copy_n
 // CHECK-NEXT: thrust::cos
 // CHECK-NEXT: thrust::cosh
+// CHECK-NEXT: thrust::count
 // CHECK-NEXT: thrust::count_if
 // CHECK-NEXT: thrust::device_delete
 // CHECK-NEXT: thrust::device_free
@@ -2450,6 +2451,7 @@
 // CHECK-NEXT: thrust::generate
 // CHECK-NEXT: thrust::generate_n
 // CHECK-NEXT: thrust::get
+// CHECK-NEXT: thrust::get_temporary_buffer
 // CHECK-NEXT: thrust::inclusive_scan
 // CHECK-NEXT: thrust::inclusive_scan_by_key
 // CHECK-NEXT: thrust::inner_product
@@ -2513,6 +2515,7 @@
 // CHECK-NEXT: thrust::set_union_by_key
 // CHECK-NEXT: thrust::sin
 // CHECK-NEXT: thrust::sinh
+// CHECK-NEXT: thrust::sort
 // CHECK-NEXT: thrust::sort_by_key
 // CHECK-NEXT: thrust::sqrt
 // CHECK-NEXT: thrust::stable_partition
