@@ -10,6 +10,7 @@
 #include "PreProcessor.h"
 #include "UserDefinedRules/UserDefinedRules.h"
 #include <optional>
+#include <string>
 
 namespace clang {
 namespace dpct {
@@ -179,8 +180,8 @@ void IncludesCallbacks::InclusionDirective(
       auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
       path::replace_extension(
           NewFileName, "{{NEEDREPLACEE" + std::to_string(Vec.size()) + "}}");
-      Vec.push_back(IncludedFile);
-      Vec.push_back(Extension);
+      Vec.push_back(std::pair<tooling::UnifiedPath, std::string>(IncludedFile,
+                                                                 Extension));
     } else {
       clang::tooling::UnifiedPath NewFilePath = FileName;
       rewriteFileName(NewFilePath, IncludedFile);

@@ -1487,11 +1487,11 @@ std::string DpctGlobalInfo::getStringForRegexReplacement(StringRef MatchedStr) {
         HelperFuncType::HFT_DefaultQueuePtr, Index);
   case 'E': {
     auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
-    SourceProcessType FileType = GetSourceFileType(Vec[Index]);
+    SourceProcessType FileType = GetSourceFileType(Vec[Index].first);
 
-    const bool HasCUDASyntax = DpctGlobalInfo::hasCUDASyntax(Vec[Index]);
+    const bool HasCUDASyntax = DpctGlobalInfo::hasCUDASyntax(Vec[Index].first);
     const bool IsCppSource = (FileType & SPT_CppSource);
-    const auto Extention = Vec[Index + 1];
+    const auto Extention = Vec[Index].second;
 
     if (Extention == ".cc") {
       return (HasCUDASyntax && IsCppSource)
@@ -2532,7 +2532,9 @@ bool DpctGlobalInfo::CVersionCUDALaunchUsedFlag = false;
 unsigned int DpctGlobalInfo::ColorOption = 1;
 std::unordered_map<int, std::shared_ptr<DeviceFunctionInfo>>
     DpctGlobalInfo::CubPlaceholderIndexMap;
-std::vector<tooling::UnifiedPath> DpctGlobalInfo::CSourceFileList;
+std::vector<std::pair<tooling::UnifiedPath /*including filename*/,
+                      std::string /*extention name*/>>
+    DpctGlobalInfo::CSourceFileList;
 bool DpctGlobalInfo::OptimizeMigrationFlag = false;
 std::unordered_map<std::string, std::shared_ptr<PriorityReplInfo>>
     DpctGlobalInfo::PriorityReplInfoMap;
