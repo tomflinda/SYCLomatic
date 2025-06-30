@@ -5,7 +5,7 @@
 #include <thrust/execution_policy.h>
 #include <thrust/memory.h>
 
-void return_temporary_buffer_test() {
+void get_temporary_buffer_test() {
 
   // clang-format off
   // Start

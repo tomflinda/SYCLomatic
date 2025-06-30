@@ -7,7 +7,7 @@
 #include <thrust/sort.h>
 #include <thrust/unique.h>
 
-void count_test() {
+void sort_test() {
   // clang-format off
   // Start
   thrust::host_vector<int> h_vec(10);
@@ -16,9 +16,4 @@ void count_test() {
   /*2*/ thrust::sort(thrust::device, d_vec.begin(), d_vec.end());
   // End
   // clang-format on
-
-
-
-
-
 }
