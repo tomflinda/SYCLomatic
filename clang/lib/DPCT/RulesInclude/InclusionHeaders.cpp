@@ -180,8 +180,8 @@ void IncludesCallbacks::InclusionDirective(
       auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
       path::replace_extension(
           NewFileName, "{{NEEDREPLACEE" + std::to_string(Vec.size()) + "}}");
-      Vec.push_back(std::pair<tooling::UnifiedPath, std::string>(IncludedFile,
-                                                                 Extension));
+      Vec.push_back(std::pair<tooling::UnifiedPath, std::string>(
+          IncludedFile, Extension.substr(1)));
     } else {
       clang::tooling::UnifiedPath NewFilePath = FileName;
       rewriteFileName(NewFilePath, IncludedFile);

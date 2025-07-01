@@ -66,7 +66,7 @@
 // CHECK: #include "test9.cc.dp.cpp"
 #include "test9.cc"
 // case 10: source file has CUDA syntax, not in database.
-// CHECK: #include "test10.cc"
+// CHECK: #include "test10.cc.dp.cpp"
 #include "test10.cc"
 // case 11: source file does not have CUDA syntax, in database.
 // CHECK: #include "test11.cc"

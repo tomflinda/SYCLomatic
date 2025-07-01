@@ -1487,18 +1487,9 @@ std::string DpctGlobalInfo::getStringForRegexReplacement(StringRef MatchedStr) {
         HelperFuncType::HFT_DefaultQueuePtr, Index);
   case 'E': {
     auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
-    SourceProcessType FileType = GetSourceFileType(Vec[Index].first);
-
     const bool HasCUDASyntax = DpctGlobalInfo::hasCUDASyntax(Vec[Index].first);
-    const bool IsCppSource = (FileType & SPT_CppSource);
     const auto Extention = Vec[Index].second;
-
-    if (Extention == ".cc") {
-      return (HasCUDASyntax && IsCppSource)
-                 ? "cc" + DpctGlobalInfo::getSYCLSourceExtension()
-                 : "cc";
-    }
-    return HasCUDASyntax ? "c" + DpctGlobalInfo::getSYCLSourceExtension() : "c";
+    return HasCUDASyntax ? Extention + DpctGlobalInfo::getSYCLSourceExtension() : Extention;
   }
   case 'P': {
     std::string ReplStr;
