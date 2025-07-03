@@ -1489,7 +1489,10 @@ std::string DpctGlobalInfo::getStringForRegexReplacement(StringRef MatchedStr) {
     auto &Vec = DpctGlobalInfo::getInstance().getCSourceFileList();
     const bool HasCUDASyntax = DpctGlobalInfo::hasCUDASyntax(Vec[Index].first);
     const auto Extention = Vec[Index].second;
-    return HasCUDASyntax ? Extention + DpctGlobalInfo::getSYCLSourceExtension() : Extention;
+    SourceProcessType FileType = GetSourceFileType(Vec[Index].first);
+    return HasCUDASyntax && (FileType & SPT_CppSource)
+               ? Extention + DpctGlobalInfo::getSYCLSourceExtension()
+               : Extention;
   }
   case 'P': {
     std::string ReplStr;

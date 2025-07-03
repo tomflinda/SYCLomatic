@@ -10,7 +10,6 @@
 #include "PreProcessor.h"
 #include "UserDefinedRules/UserDefinedRules.h"
 #include <optional>
-#include <string>
 
 namespace clang {
 namespace dpct {
