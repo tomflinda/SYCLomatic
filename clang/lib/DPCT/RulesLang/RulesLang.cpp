@@ -3276,6 +3276,19 @@ void EventAPICallRule::handleEventRecordWithProfilingDisabled(
   static std::set<std::pair<const Decl *, std::string>> DeclDupFilter;
   auto &SM = DpctGlobalInfo::getSourceManager();
 
+  int NumArgs = CE->getNumArgs();
+  if (NumArgs == 3) { // Special process for cudaEventRecordWithFlags().
+    auto APIName = CE->getDirectCallee()->getNameInfo().getName().getAsString();
+    const Expr *SecArg = CE->getArg(2);
+    ExprAnalysis Arg2EA(SecArg);
+    auto Arg2Name = Arg2EA.getReplacedString();
+    if (Arg2Name != "cudaEventRecordDefault") {
+      report(CE->getBeginLoc(), Diagnostics::NOT_SUPPORTED_PARAMETER, false,
+             APIName, "parameter " + Arg2Name + " is unsupported");
+      return;
+    }
+  }
+
   const ValueDecl *MD = nullptr;
   if ((MD = getDecl(CE->getArg(0))) == nullptr)
     return;

@@ -520,8 +520,6 @@
 // CUDARUNTIMEGETVERSION-NEXT: Is migrated to:
 // CUDARUNTIMEGETVERSION-NEXT:   *pi = dpct::get_major_version(dpct::get_current_device());
 
-
-
 // RUN: dpct --cuda-include-path="%cuda-path/include" -query-api-mapping=cudaMemcpy3DPeer | FileCheck %s -check-prefix=CUDAMEMCPY3DPEER
 // CUDAMEMCPY3DPEER: CUDA API:
 // CUDAMEMCPY3DPEER-NEXT:   cudaMemcpy3DPeer(p/*const cudaMemcpy3DPeerParms**/);
@@ -557,3 +555,9 @@
 // CUDAPROFILERSTOP-NEXT:   cudaProfilerStop();
 // CUDAPROFILERSTOP-NEXT: The API is Removed.
 // CUDAPROFILERSTOP-EMPTY: 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=cudaEventRecordWithFlags | FileCheck %s -check-prefix=cudaEventRecordWithFlags
+// cudaEventRecordWithFlags: CUDA API:
+// cudaEventRecordWithFlags-NEXT:   cudaEventRecordWithFlags(event /*cudaEvent_t*/, stream /*cudaStream_t*/,
+// cudaEventRecordWithFlags-NEXT:                            cudaEventRecordDefault /*unsigned int*/);
+// cudaEventRecordWithFlags-NEXT: Is migrated to:
+// cudaEventRecordWithFlags-NEXT:     *event = dpct::get_in_order_queue().ext_oneapi_submit_barrier();
