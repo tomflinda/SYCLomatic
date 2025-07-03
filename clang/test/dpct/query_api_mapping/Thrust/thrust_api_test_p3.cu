@@ -302,4 +302,62 @@
 // thrust_get_temporary_buffer-NEXT:   dpct::device_sys_tag device_sys;
 // thrust_get_temporary_buffer-NEXT:   ptr_and_size_t ptr_and_size = dpct::get_temporary_allocation<int>(device_sys, N);
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::max --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_max
+// thrust_max: CUDA API:
+// thrust_max-NEXT:   struct key_value {
+// thrust_max-NEXT:     int key;
+// thrust_max-NEXT:     int value;
+// thrust_max-NEXT:   };
+// thrust_max-NEXT:   struct compare_key_value {
+// thrust_max-NEXT:     __host__ __device__ bool operator()(key_value lhs, key_value rhs) {
+// thrust_max-NEXT:       return lhs.key < rhs.key;
+// thrust_max-NEXT:     }
+// thrust_max-NEXT:   };
+// thrust_max-NEXT:   key_value a = {13, 0};
+// thrust_max-NEXT:   key_value b = {7, 1};
+// thrust_max-NEXT:   key_value smaller = thrust::max(a, b, compare_key_value());
+// thrust_max-NEXT:   int value = thrust::max(1, 2);
+// thrust_max-NEXT: Is migrated to:
+// thrust_max-NEXT:   struct key_value {
+// thrust_max-NEXT:     int key;
+// thrust_max-NEXT:     int value;
+// thrust_max-NEXT:   };
+// thrust_max-NEXT:   struct compare_key_value {
+// thrust_max-NEXT:     bool operator()(key_value lhs, key_value rhs) {
+// thrust_max-NEXT:       return lhs.key < rhs.key;
+// thrust_max-NEXT:     }
+// thrust_max-NEXT:   };
+// thrust_max-NEXT:   key_value a = {13, 0};
+// thrust_max-NEXT:   key_value b = {7, 1};
+// thrust_max-NEXT:   key_value smaller = std::max(a, b, compare_key_value());
+// thrust_max-NEXT:   int value = std::max(1, 2);
 
+// RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=thrust::min --extra-arg="-std=c++14"| FileCheck %s -check-prefix=thrust_min
+// thrust_min: CUDA API:
+// thrust_min-NEXT:   struct key_value {
+// thrust_min-NEXT:     int key;
+// thrust_min-NEXT:     int value;
+// thrust_min-NEXT:   };
+// thrust_min-NEXT:   struct compare_key_value {
+// thrust_min-NEXT:     __host__ __device__ bool operator()(key_value lhs, key_value rhs) {
+// thrust_min-NEXT:       return lhs.key < rhs.key;
+// thrust_min-NEXT:     }
+// thrust_min-NEXT:   };
+// thrust_min-NEXT:   key_value a = {13, 0};
+// thrust_min-NEXT:   key_value b = {7, 1};
+// thrust_min-NEXT:   key_value smaller = thrust::min(a, b, compare_key_value());
+// thrust_min-NEXT:   int value = thrust::min(1, 2);
+// thrust_min-NEXT: Is migrated to:
+// thrust_min-NEXT:   struct key_value {
+// thrust_min-NEXT:     int key;
+// thrust_min-NEXT:     int value;
+// thrust_min-NEXT:   };
+// thrust_min-NEXT:   struct compare_key_value {
+// thrust_min-NEXT:     bool operator()(key_value lhs, key_value rhs) {
+// thrust_min-NEXT:       return lhs.key < rhs.key;
+// thrust_min-NEXT:     }
+// thrust_min-NEXT:   };
+// thrust_min-NEXT:   key_value a = {13, 0};
+// thrust_min-NEXT:   key_value b = {7, 1};
+// thrust_min-NEXT:   key_value smaller = std::min(a, b, compare_key_value());
+// thrust_min-NEXT:   int value = std::min(1, 2);

@@ -2476,9 +2476,11 @@
 // CHECK-NEXT: thrust::make_tuple
 // CHECK-NEXT: thrust::make_zip_iterator
 // CHECK-NEXT: thrust::malloc
+// CHECK-NEXT: thrust::max
 // CHECK-NEXT: thrust::max_element
 // CHECK-NEXT: thrust::merge
 // CHECK-NEXT: thrust::merge_by_key
+// CHECK-NEXT: thrust::min
 // CHECK-NEXT: thrust::min_element
 // CHECK-NEXT: thrust::minmax_element
 // CHECK-NEXT: thrust::mismatch
