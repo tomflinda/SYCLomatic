@@ -97,8 +97,6 @@ list(APPEND CLANG_TEST_DEPS
   pattern-rewriter-binary
   )
 
-<<<<<<< HEAD
-=======
 if(CLANG_ENABLE_CIR)
   list(APPEND CLANG_TEST_DEPS
     cir-opt
@@ -106,7 +104,6 @@ if(CLANG_ENABLE_CIR)
     )
 endif()
 
->>>>>>> opensrc/sycl
 if(CLANG_ENABLE_STATIC_ANALYZER)
   list(APPEND CLANG_TEST_DEPS
     clang-check

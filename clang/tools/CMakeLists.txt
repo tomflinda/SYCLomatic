@@ -56,12 +56,9 @@ add_llvm_external_project(clang-tools-extra extra)
 # libclang may require clang-tidy in clang-tools-extra.
 add_clang_subdirectory(libclang)
 
-<<<<<<< HEAD
 add_clang_subdirectory(dpct)
 add_clang_subdirectory(pattern-rewriter)
 add_clang_subdirectory(scan-build-py)
 add_clang_subdirectory(amdgpu-arch)
 add_clang_subdirectory(nvptx-arch)
-=======
 add_clang_subdirectory(offload-arch)
->>>>>>> opensrc/sycl

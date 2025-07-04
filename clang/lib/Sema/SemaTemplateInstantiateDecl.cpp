@@ -2086,18 +2086,8 @@ Decl *TemplateDeclInstantiator::VisitDecompositionDecl(DecompositionDecl *D) {
   if (!NewDD || NewDD->isInvalidDecl()) {
     for (auto *NewBD : NewBindings)
       NewBD->setInvalidDecl();
-<<<<<<< HEAD
-#ifdef SYCLomatic_CUSTOMIZATION
-  if (NewDD && OldResolvedPack) {
-#else
-  if (OldResolvedPack) {
-#endif
-    // Mark the holding vars (if any) in the pack as instantiated since
-    // they are created implicitly.
-=======
   } else if (OldBindingPack) {
     // Mark the bindings in the pack as instantiated.
->>>>>>> opensrc/sycl
     auto Bindings = NewDD->bindings();
     BindingDecl *NewBindingPack = *llvm::find_if(
         Bindings, [](BindingDecl *D) -> bool { return D->isParameterPack(); });

@@ -424,7 +424,6 @@ CudaInstallationDetector::CudaInstallationDetector(
       Candidates.emplace_back(D.SysRoot + "/usr/lib/cuda");
   }
 
-<<<<<<< HEAD
 #ifdef SYCLomatic_CUSTOMIZATION
   Args.hasArg(options::OPT_nogpulib);
   bool IsCudaHeaderFilesIncluded = false;
@@ -457,11 +456,8 @@ CudaInstallationDetector::CudaInstallationDetector(
     }
   }
 #else
-  bool NoCudaLib = Args.hasArg(options::OPT_nogpulib);
-=======
   bool NoCudaLib =
       !Args.hasFlag(options::OPT_offloadlib, options::OPT_no_offloadlib, true);
->>>>>>> opensrc/sycl
 
   for (const auto &Candidate : Candidates) {
     InstallPath = Candidate.Path;

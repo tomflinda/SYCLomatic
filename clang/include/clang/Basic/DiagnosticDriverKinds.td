@@ -129,12 +129,8 @@ def err_drv_no_sycl_libspirv : Error<
 def warn_flag_no_sycl_libspirv
     : Warning<"'-fno-sycl-libspirv' should not be used with target '%0'; "
               "libspirv is required for correct behavior">,
-<<<<<<< HEAD
-      InGroup<NoLibspirvHipCuda>;
-// SYCLomatic_CUSTOMIZATION begin
-=======
       InGroup<UnsafeLibspirvNotLinked>;
->>>>>>> opensrc/sycl
+// SYCLomatic_CUSTOMIZATION begin
 def err_drv_mix_cuda_hip : Error<
   "mixed CUDA and HIP migration is not supported">;
 // SYCLomatic_CUSTOMIZATION end

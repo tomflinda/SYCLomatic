@@ -9,13 +9,10 @@
 #ifndef LLVM_CLANG_BASIC_CUDA_H
 #define LLVM_CLANG_BASIC_CUDA_H
 
-<<<<<<< HEAD
 #ifdef SYCLomatic_CUSTOMIZATION
 #include <string>
 #endif // SYCLomatic_CUSTOMIZATION
-=======
 #include "clang/Basic/OffloadArch.h"
->>>>>>> opensrc/sycl
 
 namespace llvm {
 class StringRef;

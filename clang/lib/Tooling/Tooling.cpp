@@ -567,29 +567,21 @@ bool ToolInvocation::run() {
   for (const std::string &Str : CommandLine)
     Argv.push_back(Str.c_str());
   const char *const BinaryName = Argv[0];
-<<<<<<< HEAD
-  IntrusiveRefCntPtr<DiagnosticOptions> ParsedDiagOpts;
-=======
 
   // Parse diagnostic options from the driver command-line only if none were
   // explicitly set.
   std::unique_ptr<DiagnosticOptions> ParsedDiagOpts;
->>>>>>> opensrc/sycl
   DiagnosticOptions *DiagOpts = this->DiagOpts;
   if (!DiagOpts) {
     ParsedDiagOpts = CreateAndPopulateDiagOpts(Argv);
     DiagOpts = &*ParsedDiagOpts;
   }
-<<<<<<< HEAD
 #ifdef SYCLomatic_CUSTOMIZATION
   DiagnosticPrinter =new TextDiagnosticPrinter(DiagnosticsOS(), &*DiagOpts);
   DiagConsumer = DiagnosticPrinter;
 #endif // SYCLomatic_CUSTOMIZATION
   TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), DiagOpts);
-=======
 
-  TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DiagOpts);
->>>>>>> opensrc/sycl
   IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics =
       CompilerInstance::createDiagnostics(
           Files->getVirtualFileSystem(), *DiagOpts,

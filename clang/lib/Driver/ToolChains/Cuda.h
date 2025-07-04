@@ -92,8 +92,7 @@ public:
   std::string getLibDeviceFile(StringRef Gpu) const {
     return LibDeviceMap.lookup(Gpu);
   }
-<<<<<<< HEAD
-  void WarnIfUnsupportedVersion();
+  void WarnIfUnsupportedVersion() const;
 
 #ifdef SYCLomatic_CUSTOMIZATION
 private:
@@ -102,9 +101,7 @@ private:
   bool FindTargetVersion(const std::string &Line, const std::string DefineStr,
                          const std::string VersionStr, std::string &Result);
 #endif // SYCLomatic_CUSTOMIZATION
-=======
-  void WarnIfUnsupportedVersion() const;
->>>>>>> opensrc/sycl
+
 };
 
 namespace tools {

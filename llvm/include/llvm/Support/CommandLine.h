@@ -196,8 +196,7 @@ public:
 };
 
 // The general Option Category (used as default category).
-<<<<<<< HEAD
-OptionCategory &getGeneralCategory();
+LLVM_ABI OptionCategory &getGeneralCategory();
 #ifdef SYCLomatic_CUSTOMIZATION
 OptionCategory &getCtHelpCat();
 OptionCategory &getCtHelpCatBasic();
@@ -211,9 +210,6 @@ OptionCategory &getCtHelpCatHelpInfo();
 OptionCategory &getCtHelpCatInterceptBuild();
 OptionCategory &getCtExamplesCategory();
 #endif // SYCLomatic_CUSTOMIZATION
-=======
-LLVM_ABI OptionCategory &getGeneralCategory();
->>>>>>> opensrc/sycl
 
 //===----------------------------------------------------------------------===//
 //

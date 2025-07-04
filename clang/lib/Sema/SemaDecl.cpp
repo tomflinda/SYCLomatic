@@ -461,14 +461,10 @@ ParsedType Sema::getTypeName(const IdentifierInfo &II, SourceLocation NameLoc,
     }
     Result.suppressDiagnostics();
     return nullptr;
-<<<<<<< HEAD
-  case LookupResult::NotFoundInCurrentInstantiation:
+  case LookupResultKind::NotFoundInCurrentInstantiation:
 #ifdef SYCLomatic_CUSTOMIZATION
     if (SS && AllowImplicitTypename == ImplicitTypenameContext::Yes) {
 #else
-=======
-  case LookupResultKind::NotFoundInCurrentInstantiation:
->>>>>>> opensrc/sycl
     if (AllowImplicitTypename == ImplicitTypenameContext::Yes) {
 #endif //SYCLomatic_CUSTOMIZATION
       QualType T = Context.getDependentNameType(ElaboratedTypeKeyword::None,
