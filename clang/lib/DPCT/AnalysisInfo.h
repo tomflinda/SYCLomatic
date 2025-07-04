@@ -1450,7 +1450,9 @@ public:
   getCubPlaceholderIndexMap() {
     return CubPlaceholderIndexMap;
   }
-  std::vector<tooling::UnifiedPath> &getCSourceFileList() {
+  std::vector<std::pair<tooling::UnifiedPath /*including filename*/,
+                        std::string /*extention name*/>> &
+  getCSourceFileList() {
     return CSourceFileList;
   }
   static std::unordered_map<std::string, std::shared_ptr<PriorityReplInfo>> &
@@ -1703,7 +1705,9 @@ private:
   static unsigned int ColorOption;
   static std::unordered_map<int, std::shared_ptr<DeviceFunctionInfo>>
       CubPlaceholderIndexMap;
-  static std::vector<tooling::UnifiedPath> CSourceFileList;
+  static std::vector<std::pair<tooling::UnifiedPath /*including filename*/,
+                               std::string /*extention name*/>>
+      CSourceFileList;
   static bool OptimizeMigrationFlag;
   static std::unordered_map<std::string, std::shared_ptr<PriorityReplInfo>>
       PriorityReplInfoMap;

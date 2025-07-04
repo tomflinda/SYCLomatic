@@ -211,18 +211,12 @@ void rewriteFileName(std::string &FileName, const std::string &FullPathName) {
     if (FileType & SPT_CudaSource) {
       path::replace_extension(CanonicalPathStr,
                               DpctGlobalInfo::getSYCLSourceExtension());
-    } else if (FileType & SPT_CppSource) {
-      if (Extension == ".c") {
-        if (DpctGlobalInfo::hasCUDASyntax(FileName)) {
-          path::replace_extension(CanonicalPathStr,
-                                  Extension +
-                                      DpctGlobalInfo::getSYCLSourceExtension());
-        }
-      } else {
-        path::replace_extension(CanonicalPathStr,
-                                Extension +
-                                    DpctGlobalInfo::getSYCLSourceExtension());
-      }
+    } else if ((FileType & SPT_CppSource) &&
+               DpctGlobalInfo::hasCUDASyntax(FileName)) {
+      path::replace_extension(CanonicalPathStr,
+                              Extension +
+                                  DpctGlobalInfo::getSYCLSourceExtension());
+
     } else if (FileType & SPT_CudaHeader) {
       path::replace_extension(CanonicalPathStr,
                               DpctGlobalInfo::getSYCLHeaderExtension());
