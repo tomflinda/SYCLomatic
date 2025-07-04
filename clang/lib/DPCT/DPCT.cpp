@@ -1072,6 +1072,8 @@ int runDPCT(int argc, const char **argv) {
             Experimentals.addValue(ExperimentalFeatures::Exp_NonUniformGroups);
         } else if (Option == "--no-dry-pattern") {
           NoDRYPattern.setValue(true);
+        } else if (Option == "--enable-profiling") {
+          EnablepProfiling.setValue(true);
         }
         // Need add more option.
       }

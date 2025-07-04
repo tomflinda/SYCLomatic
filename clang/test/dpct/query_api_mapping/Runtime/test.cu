@@ -559,5 +559,5 @@
 // cudaEventRecordWithFlags: CUDA API:
 // cudaEventRecordWithFlags-NEXT:   cudaEventRecordWithFlags(event /*cudaEvent_t*/, stream /*cudaStream_t*/,
 // cudaEventRecordWithFlags-NEXT:                            cudaEventRecordDefault /*unsigned int*/);
-// cudaEventRecordWithFlags-NEXT: Is migrated to:
-// cudaEventRecordWithFlags-NEXT:     *event = dpct::get_in_order_queue().ext_oneapi_submit_barrier();
+// cudaEventRecordWithFlags-NEXT: Is migrated to (with the option --enable-profiling):
+// cudaEventRecordWithFlags-NEXT:   dpct::sync_barrier(event /*cudaEvent_t*/, stream /*unsigned int*/);
