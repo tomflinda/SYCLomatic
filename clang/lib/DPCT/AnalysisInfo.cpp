@@ -2101,21 +2101,20 @@ std::shared_ptr<CudaMallocInfo> DpctGlobalInfo::findCudaMalloc(const Expr *E) {
     return findCudaMallocInfo(Src);
   return std::shared_ptr<CudaMallocInfo>();
 }
-void DpctGlobalInfo::insertReplInfoFromYAMLToFileInfo(
+void DpctGlobalInfo::insertReplVecFromYAMLToFileInfo(
     const clang::tooling::UnifiedPath &FilePath,
-    std::shared_ptr<tooling::TranslationUnitReplacements> TUR) {
+    std::vector<tooling::Replacement> Vec) {
   auto FileInfo = insertFile(FilePath);
-  if (FileInfo->PreviousTUReplFromYAML == nullptr)
-    FileInfo->PreviousTUReplFromYAML = TUR;
+  FileInfo->PreviousReplVecFromYAML = Vec;
 }
-std::shared_ptr<tooling::TranslationUnitReplacements>
-DpctGlobalInfo::getReplInfoFromYAMLSavedInFileInfo(
+std::optional<std::vector<tooling::Replacement>>
+DpctGlobalInfo::getReplVecFromYAMLSavedInFileInfo(
     clang::tooling::UnifiedPath FilePath) {
   auto FileInfo = findObject(FileMap, FilePath);
   if (FileInfo)
-    return FileInfo->PreviousTUReplFromYAML;
+    return FileInfo->PreviousReplVecFromYAML;
   else
-    return nullptr;
+    return std::nullopt;
 }
 void DpctGlobalInfo::insertEventSyncTypeInfo(
     const std::shared_ptr<clang::dpct::ExtReplacement> Repl, bool NeedReport,
@@ -2311,8 +2310,6 @@ void DpctGlobalInfo::resetInfo() {
   FunctionCallInMacroMigrateRecord.clear();
   EndOfEmptyMacros.clear();
   BeginOfEmptyMacros.clear();
-  FileRelpsMap.clear();
-  MsfInfoMap.clear();
   MacroDefines.clear();
   CAPPInfoMap.clear();
   CurrentMaxIndex = 0;
@@ -2414,8 +2411,7 @@ void DpctGlobalInfo::recordTokenSplit(SourceLocation SL, unsigned Len) {
 /// MainSourceFiles.yaml file. This variable is valid after
 /// canContinueMigration() is called.
 std::shared_ptr<clang::tooling::TranslationUnitReplacements>
-    DpctGlobalInfo::MainSourceYamlTUR =
-        std::make_shared<clang::tooling::TranslationUnitReplacements>();
+    DpctGlobalInfo::MainSourceYamlTUR = nullptr;
 clang::tooling::UnifiedPath DpctGlobalInfo::InRoot;
 clang::tooling::UnifiedPath DpctGlobalInfo::OutRoot;
 std::vector<clang::tooling::UnifiedPath> DpctGlobalInfo::AnalysisScope;
@@ -2473,11 +2469,6 @@ std::map<std::string, std::string>
     DpctGlobalInfo::FunctionCallInMacroMigrateRecord;
 std::map<std::string, SourceLocation> DpctGlobalInfo::EndOfEmptyMacros;
 std::map<std::string, unsigned int> DpctGlobalInfo::BeginOfEmptyMacros;
-std::unordered_map<std::string, std::vector<clang::tooling::Replacement>>
-    DpctGlobalInfo::FileRelpsMap;
-std::unordered_map<std::string, clang::tooling::MainSourceFileInfo>
-    DpctGlobalInfo::MsfInfoMap;
-const std::string DpctGlobalInfo::YamlFileName = "MainSourceFiles.yaml";
 std::map<std::string, bool> DpctGlobalInfo::MacroDefines;
 int DpctGlobalInfo::CurrentMaxIndex = 0;
 int DpctGlobalInfo::CurrentIndexInRule = 0;
