@@ -1446,9 +1446,9 @@ int runDPCT(int argc, const char **argv) {
             std::string Err = getDpctTermStr();
             StringRef ErrStr = Err;
             // Avoid the "Visual Studio version" error on windows platform.
-            if (ErrStr.find("error:") == ErrStr.rfind("error:") &&
+            if (ErrStr.find("error:") == ErrStr.rfind("error:") && (ErrStr.contains("no function template matches function template specialization 'this_multi_grid'") ||
                 ErrStr.contains(
-                    "error -- unsupported Microsoft Visual Studio version")) {
+                    "error -- unsupported Microsoft Visual Studio version"))) {
               break;
             }
             if (ErrStr.contains("use of undeclared identifier")) {
