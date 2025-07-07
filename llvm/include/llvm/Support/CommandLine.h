@@ -198,17 +198,17 @@ public:
 // The general Option Category (used as default category).
 LLVM_ABI OptionCategory &getGeneralCategory();
 #ifdef SYCLomatic_CUSTOMIZATION
-OptionCategory &getCtHelpCat();
-OptionCategory &getCtHelpCatBasic();
-OptionCategory &getCtHelpCatAdvanced();
-OptionCategory &getCtHelpCatCodeGen();
-OptionCategory &getCtHelpCatReportGen();
-OptionCategory &getCtHelpCatBuildScript();
-OptionCategory &getCtHelpCatQueryAPI();
-OptionCategory &getCtHelpCatWarnings();
-OptionCategory &getCtHelpCatHelpInfo();
-OptionCategory &getCtHelpCatInterceptBuild();
-OptionCategory &getCtExamplesCategory();
+LLVM_ABI OptionCategory &getCtHelpCat();
+LLVM_ABI OptionCategory &getCtHelpCatBasic();
+LLVM_ABI OptionCategory &getCtHelpCatAdvanced();
+LLVM_ABI OptionCategory &getCtHelpCatCodeGen();
+LLVM_ABI OptionCategory &getCtHelpCatReportGen();
+LLVM_ABI OptionCategory &getCtHelpCatBuildScript();
+LLVM_ABI OptionCategory &getCtHelpCatQueryAPI();
+LLVM_ABI OptionCategory &getCtHelpCatWarnings();
+LLVM_ABI OptionCategory &getCtHelpCatHelpInfo();
+LLVM_ABI OptionCategory &getCtHelpCatInterceptBuild();
+LLVM_ABI OptionCategory &getCtExamplesCategory();
 #endif // SYCLomatic_CUSTOMIZATION
 
 //===----------------------------------------------------------------------===//

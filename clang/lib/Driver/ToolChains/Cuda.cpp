@@ -425,7 +425,6 @@ CudaInstallationDetector::CudaInstallationDetector(
   }
 
 #ifdef SYCLomatic_CUSTOMIZATION
-  Args.hasArg(options::OPT_nogpulib);
   bool IsCudaHeaderFilesIncluded = false;
   for (auto &IncPath : ExtraIncPaths) {
     IsCudaHeaderFilesIncluded = validateCudaHeaderDirectory(IncPath, D);

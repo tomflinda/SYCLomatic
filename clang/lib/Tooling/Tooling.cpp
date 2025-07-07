@@ -577,10 +577,10 @@ bool ToolInvocation::run() {
     DiagOpts = &*ParsedDiagOpts;
   }
 #ifdef SYCLomatic_CUSTOMIZATION
-  DiagnosticPrinter =new TextDiagnosticPrinter(DiagnosticsOS(), &*DiagOpts);
+  DiagnosticPrinter =new TextDiagnosticPrinter(DiagnosticsOS(), *DiagOpts);
   DiagConsumer = DiagnosticPrinter;
 #endif // SYCLomatic_CUSTOMIZATION
-  TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), DiagOpts);
+  TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DiagOpts);
 
   IntrusiveRefCntPtr<DiagnosticsEngine> Diagnostics =
       CompilerInstance::createDiagnostics(

@@ -1207,9 +1207,7 @@ void UnwrappedLineParser::parsePPDefine() {
     return;
   }
 
-#ifdef SYCLomatic_CUSTOMIZATION
   bool MaybeIncludeGuard = false;
-#endif // SYCLomatic_CUSTOMIZATION
   if (IncludeGuard == IG_IfNdefed &&
       IncludeGuardToken->TokenText == FormatTok->TokenText) {
     IncludeGuard = IG_Defined;
@@ -1220,9 +1218,7 @@ void UnwrappedLineParser::parsePPDefine() {
         break;
       }
     }
-#ifdef SYCLomatic_CUSTOMIZATION
     MaybeIncludeGuard = IncludeGuard == IG_Defined;
-#endif // SYCLomatic_CUSTOMIZATION
   }
 
   // In the context of a define, even keywords should be treated as normal
@@ -1234,11 +1230,9 @@ void UnwrappedLineParser::parsePPDefine() {
   FormatTok->Tok.setIdentifierInfo(Keywords.kw_internal_ident_after_define);
   nextToken();
 
-#ifdef SYCLomatic_CUSTOMIZATION
   // IncludeGuard can't have a non-empty macro definition.
   if (MaybeIncludeGuard && !eof())
     IncludeGuard = IG_Rejected;
-#endif // SYCLomatic_CUSTOMIZATION
 
   if (FormatTok->Tok.getKind() == tok::l_paren &&
       !FormatTok->hasWhitespaceBefore()) {
