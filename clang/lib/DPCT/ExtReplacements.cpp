@@ -309,11 +309,11 @@ void ExtReplacements::markAsDead(std::shared_ptr<ExtReplacement> Repl) {
   if (auto PairID = Repl->getPairID()) {
     if (auto &R = PairReplsMap[PairID]) {
       R->Status = PairReplsStatus::Dead;
-      auto beginIter = ReplMap.lower_bound(R->Repl->getOffset());
-      auto endIter = ReplMap.upper_bound(R->Repl->getOffset());
-      for (auto start = beginIter; start != endIter; start++) {
-        if (*beginIter->second == *R->Repl) {
-          ReplMap.erase(beginIter);
+      auto BeginIter = ReplMap.lower_bound(R->Repl->getOffset());
+      auto EndIter = ReplMap.upper_bound(R->Repl->getOffset());
+      for (auto start = BeginIter; start != EndIter; start++) {
+        if (*BeginIter->second == *R->Repl) {
+          ReplMap.erase(BeginIter);
           break;
         }
       }
