@@ -630,6 +630,8 @@
 // CHECK-NEXT: cooperative_groups::coalesced_group::thread_rank
 // CHECK-NEXT: cooperative_groups::coalesced_threads
 // CHECK-NEXT: cooperative_groups::exclusive_scan
+// CHECK-NEXT: cooperative_groups::experimental::this_thread_block
+// CHECK-NEXT: cooperative_groups::experimental::tiled_partition
 // CHECK-NEXT: cooperative_groups::greater
 // CHECK-NEXT: cooperative_groups::grid_group::block_rank
 // CHECK-NEXT: cooperative_groups::grid_group::num_blocks

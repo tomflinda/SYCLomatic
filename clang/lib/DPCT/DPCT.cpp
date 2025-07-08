@@ -1433,8 +1433,10 @@ int runDPCT(int argc, const char **argv) {
             StringRef ErrStr = Err;
             // Avoid the "Visual Studio version" error on windows platform.
             if (ErrStr.find("error:") == ErrStr.rfind("error:") &&
-                ErrStr.contains(
-                    "error -- unsupported Microsoft Visual Studio version")) {
+                (ErrStr.contains("no function template matches function "
+                                 "template specialization 'this_multi_grid'") ||
+                 ErrStr.contains(
+                     "error -- unsupported Microsoft Visual Studio version"))) {
               break;
             }
             if (ErrStr.contains("use of undeclared identifier")) {
