@@ -111,7 +111,7 @@ static bool formatFile(const clang::tooling::UnifiedPath &FileName,
   // the first input (the original output of dpct without format), then the
   // result is wrong.
   clang::LangOptions DefaultLangOptions;
-  auto *DO = new DiagnosticOptions;
+  auto *DO = std::make_shared<DiagnosticOptions>();
   clang::TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DO);
   clang::DiagnosticsEngine Diagnostics(
       IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs()),
@@ -909,7 +909,7 @@ int saveNewFiles(clang::tooling::RefactoringTool &Tool,
   volatile ProcessStatus status = MigrationSucceeded;
   // Set up Rewriter.
   LangOptions DefaultLangOptions;
-    auto DiagOpts = std::make_shared<DiagnosticOptions>();
+  auto DiagOpts = std::make_shared<DiagnosticOptions>();
   TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DiagOpts);
   DiagnosticsEngine Diagnostics(
       IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), *DiagOpts,
