@@ -353,7 +353,6 @@ public:
 
 private:
   SourceManagerForWarning() {
-
     DiagOpts = std::make_shared<DiagnosticOptions>();
     DiagOpts->ShowColors = DpctGlobalInfo::getInstance().getColorOption();
     DiagnosticPrinter = new TextDiagnosticPrinter(llvm::errs(), *DiagOpts);
