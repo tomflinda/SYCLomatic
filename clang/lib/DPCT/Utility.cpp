@@ -22,7 +22,6 @@
 #include "clang/AST/DeclBase.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
-#include "clang/Basic/OperatorKinds.h"
 #include "clang/Basic/SourceLocation.h"
 #include "clang/Basic/SourceManager.h"
 #include "clang/Basic/TokenKinds.h"
@@ -4794,7 +4793,6 @@ void PrintFullTemplateName(raw_ostream &OS, const PrintingPolicy &Policy, Templa
     OS << *QTN->getUnderlyingTemplate().getAsTemplateDecl();
   } else if (DependentTemplateName *DTN = Name.getAsDependentTemplateName()) {
     OS << "template ";
-
     
     if (DTN->getName().getOperator() == OO_None)
       OS << DTN->getName().getIdentifier()->getName();
