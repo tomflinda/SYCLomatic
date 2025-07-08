@@ -184,7 +184,8 @@ UnifiedPath getCudaInstallPath(int argc, const char **argv) {
       Opts.ParseArgs(Argv, MissingArgIndex, MissingArgCount);
 
   // Create minimalist CudaInstallationDetector and return the InstallPath.
-  DiagnosticsEngine E(nullptr, nullptr, nullptr, false);
+  auto DiagOpts = std::make_shared<DiagnosticOptions>();
+  DiagnosticsEngine E(nullptr, *DiagOpts, nullptr, false);
   driver::Driver Driver("", llvm::sys::getDefaultTargetTriple(), E);
   driver::CudaInstallationDetector CudaIncludeDetector(
       Driver, llvm::Triple(Driver.getTargetTriple()), ParsedArgs);
@@ -243,10 +244,13 @@ unsigned int GetLinesNumber(clang::tooling::RefactoringTool &Tool,
                             UnifiedPath Path) {
   // Set up Rewriter and to get source manager.
   LangOptions DefaultLangOptions;
-  IntrusiveRefCntPtr<DiagnosticOptions> DiagOpts = new DiagnosticOptions();
-  TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), &*DiagOpts);
+  auto DiagOpts = std::make_shared<DiagnosticOptions>();
+
+  
+
+  TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DiagOpts);
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), &*DiagOpts,
+      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), *DiagOpts,
       &DiagnosticPrinter, false);
   SourceManager Sources(Diagnostics, Tool.getFiles());
   Rewriter Rewrite(Sources, DefaultLangOptions);
@@ -679,9 +683,9 @@ int showAPIMapping(StringRef SrcAPI, StringRef Option, RefactoringTool &Tool,
                    ReplTy &ReplSYCL) {
   llvm::outs() << "CUDA API:" << llvm::raw_ostream::GREEN << SrcAPI
                << llvm::raw_ostream::RESET;
+  auto DiagOpts = std::make_shared<DiagnosticOptions>();
   DiagnosticsEngine Diagnostics(
-      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()),
-      IntrusiveRefCntPtr<DiagnosticOptions>(new DiagnosticOptions()));
+      IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), *DiagOpts);
   SourceManager Sources(Diagnostics, Tool.getFiles());
   LangOptions DefaultLangOptions;
   Rewriter Rewrite(Sources, DefaultLangOptions);
