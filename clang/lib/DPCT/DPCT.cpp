@@ -245,9 +245,6 @@ unsigned int GetLinesNumber(clang::tooling::RefactoringTool &Tool,
   // Set up Rewriter and to get source manager.
   LangOptions DefaultLangOptions;
   auto DiagOpts = std::make_shared<DiagnosticOptions>();
-
-  
-
   TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DiagOpts);
   DiagnosticsEngine Diagnostics(
       IntrusiveRefCntPtr<DiagnosticIDs>(new DiagnosticIDs()), *DiagOpts,
