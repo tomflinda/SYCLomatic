@@ -111,11 +111,11 @@ static bool formatFile(const clang::tooling::UnifiedPath &FileName,
   // the first input (the original output of dpct without format), then the
   // result is wrong.
   clang::LangOptions DefaultLangOptions;
-  auto *DO = std::make_shared<DiagnosticOptions>();
-  clang::TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DO);
+  auto DiagOptions = std::make_shared<DiagnosticOptions>();
+  clang::TextDiagnosticPrinter DiagnosticPrinter(llvm::errs(), *DiagOptions);
   clang::DiagnosticsEngine Diagnostics(
       IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs()),
-      *DO, &DiagnosticPrinter, false);
+      *DiagOptions, &DiagnosticPrinter, false);
 
   clang::FileSystemOptions FSO;
   FSO.WorkingDir = ".";
