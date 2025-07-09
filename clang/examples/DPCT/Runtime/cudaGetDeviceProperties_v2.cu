@@ -3,6 +3,6 @@
 void test(int i) {
   // Start
   cudaDeviceProp *pd;
-  cudaGetDeviceProperties_v2(pd, i /*int*/);
+  cudaGetDeviceProperties_v2(pd /*cudaDeviceProp* */, i /*int*/);
   // End
 }
