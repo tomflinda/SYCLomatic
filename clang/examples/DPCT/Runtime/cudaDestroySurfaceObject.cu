@@ -6,7 +6,7 @@ void test() {
   cudaSurfaceObject_t surf;
   // clang-format off
   // Start
-  cudaDestroySurfaceObject(surf);
+  cudaDestroySurfaceObject(surf /*cudaSurfaceObject_t*/);
   // End
   // clang-format on
 }

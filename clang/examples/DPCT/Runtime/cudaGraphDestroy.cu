@@ -4,11 +4,9 @@
 
 void test() {
   cudaGraph_t graph;
-  cudaGraph_t *graph2;
   // clang-format off
   // Start
-  cudaGraphDestroy(graph);
-  cudaGraphDestroy(*graph2);
+  cudaGraphDestroy(graph /*cudaGraph_t*/);
   // End
   // clang-format on
 }

@@ -8,7 +8,7 @@ void test() {
   cudaGraphNode_t node5[10];
   // clang-format off
   // Start
-  cudaGraphAddDependencies(graph, node4, node5, 10);
+  cudaGraphAddDependencies(graph /*cudaGraph_t*/, node4 /*const cudaGraphNode_t* */, node5 /*const cudaGraphNode_t* */, 10 /*size_t */);
   // End
   // clang-format on
 }

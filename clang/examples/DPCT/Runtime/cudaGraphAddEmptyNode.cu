@@ -8,7 +8,7 @@ void test() {
   cudaGraphNode_t node;
   // clang-format off
   // Start
-  cudaGraphAddEmptyNode(&node, graph, node4, 10);
+  cudaGraphAddEmptyNode(&node /*cudaGraphNode_t* */, graph /*cudaGraph_t*/, node4 /*const cudaGraphNode_t* */, 10 /*size_t*/);
   // End
   // clang-format on
 }
