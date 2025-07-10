@@ -591,7 +591,7 @@
 
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=cuTexRefGetArray | FileCheck %s -check-prefix=CUTEXREFGETARRAY
 // CUTEXREFGETARRAY: CUDA API:
-// CUTEXREFGETARRAY-NEXT:   cuTexRefGetArray(phArray /*CUarray **/, hTexRef /*CUtexref*/);
+// CUTEXREFGETARRAY-NEXT:   cuTexRefGetArray(&a/*CUarray **/, r/*CUtexref*/);
 // CUTEXREFGETARRAY-NEXT: Is migrated to (with the option --use-experimental-features=bindless_images):
 // CUTEXREFGETARRAY-NEXT:   a = dpct::experimental::get_img_mem(r);
 
