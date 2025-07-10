@@ -7,7 +7,7 @@ void test() {
   cudaResourceDesc resDesc;
   // clang-format off
   // Start
-  cudaCreateSurfaceObject(&surf /*cudaSurfaceObject_t* */, &resDesc /*const cudaResourceDesc* pResDesc */);
+  cudaCreateSurfaceObject(&surf /*cudaSurfaceObject_t* */, &resDesc /*const cudaResourceDesc* */);
   // End
   // clang-format on
 }

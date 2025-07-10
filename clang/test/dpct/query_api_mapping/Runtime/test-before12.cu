@@ -69,7 +69,7 @@
 
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=cudaCreateSurfaceObject | FileCheck %s -check-prefix=cudaCreateSurfaceObject
 // cudaCreateSurfaceObject: CUDA API:
-// cudaCreateSurfaceObject-NEXT:   cudaCreateSurfaceObject(&surf /*cudaSurfaceObject_t* */, &resDesc /*const cudaResourceDesc* pResDesc */);
+// cudaCreateSurfaceObject-NEXT:   cudaCreateSurfaceObject(&surf /*cudaSurfaceObject_t* */, &resDesc /*const cudaResourceDesc* */);
 // cudaCreateSurfaceObject-NEXT: Is migrated to (with the option --use-experimental-features=bindless_images):
 // cudaCreateSurfaceObject-NEXT:   surf = dpct::experimental::create_bindless_image(resDesc);
 
@@ -87,7 +87,7 @@
 
 // RUN: dpct --cuda-include-path="%cuda-path/include" --query-api-mapping=cudaGraphAddDependencies | FileCheck %s -check-prefix=cudaGraphAddDependencies
 // cudaGraphAddDependencies: CUDA API:
-// cudaGraphAddDependencies-NEXT:   cudaGraphAddDependencies(graph /*cudaGraph_t*/, node4 /*const cudaGraphNode_t* */, node5 /*const cudaGraphNode_t* */, 10 /*size_t */);
+// cudaGraphAddDependencies-NEXT:   cudaGraphAddDependencies(graph /*cudaGraph_t*/, node4 /*const cudaGraphNode_t* */, node5 /*const cudaGraphNode_t* */, 10 /*size_t*/);
 // cudaGraphAddDependencies-NEXT: Is migrated to (with the option --use-experimental-features=graph):
 // cudaGraphAddDependencies-NEXT:   dpct::experimental::add_dependencies(graph, node4, node5, 10);
 
