@@ -1488,6 +1488,8 @@ protected:
     // Data types of A, B & C matrices respectively in the PTX arguments
     std::string InMatrixType[3];
 
+    InMatrixType[2] = CDType;
+
     if (Inst->hasAttr(InstAttr::m8n8k4)) {
       M = "8";
       N = "8";
@@ -1560,13 +1562,22 @@ protected:
         InMatrixType[0] = "uint32_t"; // A type is .f16/.bf16x2
         InMatrixType[1] = "uint32_t"; // B type is .f16/.bf16x2
 
-        // If A matrix type is f16, then C&D matrix types can only be f32
+        // If A matrix type is f16, then C&D matrix types can be f32
         if (CType->getKind() == InlineAsmBuiltinType::f32) {
           NumVecElements[0] = 4; // A
           NumVecElements[1] = 2; // B
           NumVecElements[2] = 4; // C
           NumVecElements[3] = 4; // D
-        } else
+        } 
+        // C &D matrix types can be f16.
+        else if (CType->getKind() == InlineAsmBuiltinType::f16) {
+          NumVecElements[0] = 4; // A
+          NumVecElements[1] = 2; // B
+          NumVecElements[2] = 2; // C
+          NumVecElements[3] = 2; // D
+          InMatrixType[2] = "uint32_t";  // C type is f16*2
+        }
+        else
           return SYCLGenError();
       } else if (AType->getKind() == InlineAsmBuiltinType::s8) {
         InMatrixType[0] = "uint32_t"; // A type is .s8x4
@@ -1604,8 +1615,6 @@ protected:
         return SYCLGenError();
     } else
       return SYCLGenError();
-
-    InMatrixType[2] = CDType;
 
     // Check the register sizes for vector elements of A, B, C & D matrices
     for (unsigned InputOp = 0; InputOp < Inst->getNumInputOperands();

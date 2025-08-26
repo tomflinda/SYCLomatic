@@ -19,7 +19,8 @@ m8n8k16         .s8          .s8          .s32
 m16n8k8       .f16/.bf16  .f16/.bf16      .f32    
 m16n8k16        .f16         .f16         .f32
                 .bf16        .bf16        .f32
-                .s8          .s8          .s32    
+                .s8          .s8          .s32  
+                .f16         .f16         .f16     
 m16n8k32        .s8          .s8          .s32    
 
 Except for m8n8k4, all other shapes are supported for row/col layout of A/B matrices respectively.
@@ -98,6 +99,25 @@ __global__ void mma_kernel_m16n8k8(int *a, int *b, float *fc, float *fd) {
         "r"(*(reinterpret_cast<int *>(&a[1]))),
         "r"(*(reinterpret_cast<int *>(&b[0]))),
         "f"(fc[0]), "f"(fc[1]), "f"(fc[2]), "f"(fc[3]));
+}
+
+__global__ void mma_kernel_m16n8k16(int *a, int *b, int *c, int *d) {
+  // CHECK: {
+  // CHECK-NEXT:   volatile void *d_mat_frag_ct1[2] = { &d[0], &d[1] };
+  // CHECK-NEXT:   sycl::vec<uint32_t, 4> a_mat_frag_ct1(a[0], a[1], a[2], a[3]);
+  // CHECK-NEXT:   sycl::vec<uint32_t, 2> b_mat_frag_ct1(b[0], b[1]);
+  // CHECK-NEXT:   sycl::vec<uint32_t, 2> c_mat_frag_ct1(c[0], c[1]);
+  // CHECK-NEXT:   dpct::experimental::matrix::mma<16, 8, 16, sycl::half, sycl::half>(reinterpret_cast<volatile void **>(d_mat_frag_ct1), &a_mat_frag_ct1, &b_mat_frag_ct1, &c_mat_frag_ct1);
+  // CHECK-NEXT: }
+  asm("mma.sync.aligned.m16n8k16.row.col.f16.f16.f16.f16 "
+        " { %0, %1 }, "
+        " { %2, %3, %4, %5 }, "
+        " { %6, %7 }, "
+        " { %8, %9 };"
+        : "+r"(d[0]), "+r"(d[1])
+        : "r"(a[0]), "r"(a[1]), "r"(a[2]), "r"(a[3]),
+          "r"(b[0]), "r"(b[1]),
+          "r"(c[0]), "r"(c[1]));
 }
 
 __global__ void mma_kernel_m16n8k16(int *a, int *b, int *c, float *fc, int *d) {

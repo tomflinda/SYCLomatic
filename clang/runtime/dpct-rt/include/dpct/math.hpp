@@ -2394,7 +2394,7 @@ template <typename T> struct MMAType {
 /// - m8n8k4 (f32.f16.f16.f32)
 /// - m8n8k16 (s32.s8.s8.s32)
 /// - m16n8k8 (f32.f16.f16.f32 & f32.bf16.bf16.f32)
-/// - m16n8k16 (f32.f16.f16.f32 & f32.bf16.bf16.f32 & s32.s8.s8.s32)
+/// - m16n8k16 (f32.f16.f16.f32 & f16.f16.f16.f16 & f32.bf16.bf16.f32 & s32.s8.s8.s32)
 /// - m16n8k32 (s32.s8.s8.s32)
 /// Here, m, n & k define the shapes of A, B & C matrices respectively
 /// (A = [m x k], B = [k x n], C = [m x n]).
@@ -2669,6 +2669,66 @@ void mma(volatile void **d_mat_frag, void *a_mat_frag, void *b_mat_frag,
           *d[2] += static_cast<CDType>(ra[j + 4]) * static_cast<CDType>(rb[j]);
           *d[3] +=
               static_cast<CDType>(ra[j + 4]) * static_cast<CDType>(rb[j + 4]);
+        }
+      }
+    } else if constexpr (std::is_same_v<CDType, sycl::half>) {
+      // Init D matrix fragment with C matrix fragment
+      sycl::half *d0 = const_cast<sycl::half *>(d[0]);
+      sycl::half *d1 = d0 + 1;
+      sycl::half *d2 = const_cast<sycl::half *>(d[1]);
+      sycl::half *d3 = d2 + 1;
+      *d0 = c[0];
+      *d1 = c[1];
+      *d2 = c[2];
+      *d3 = c[3];
+
+      // Each sub-group is responsible for computing a fragment size of 16*8
+      // elements of matrix D.
+      // Each work item computes 4 elements of matrix D by gathering
+      // their corresponding row & col matrix fragments of length k (8)
+      // from A & B matrices respectively using below mapping logic:
+      // row0 = (lane >> 2)    & row1 = (lane >> 2) + 8
+      // col0 = (lane % 4) * 2 & col1 = (lane % 4) * 2 + 1
+      // As each row & col fragment of A & B matrices is distributed across
+      // 4 work items, each iteration of below loop loads a partial fragment
+      // of matrix A (row) and matrix B (col) using the row & col offsets.
+      for (int i = 0; i < 4; i++) {
+        typename MMAType<ABType>::PackType recv_a[4], recv_b[4];
+
+        // Load partial fragment from row0 of matrix A ({a0, a1})
+        recv_a[0] = dpct::select_from_sub_group(sg, a[0], row_load_offset + i);
+        // Load partial fragment from row0 of matrix A ({a2, a3})
+        recv_a[1] = dpct::select_from_sub_group(sg, a[2], row_load_offset + i);
+        // Load partial fragment from row1 of matrix A ({a0, a1})
+        recv_a[2] = dpct::select_from_sub_group(sg, a[1], row_load_offset + i);
+        // Load partial fragment from row1 of matrix A ({a2, a3})
+        recv_a[3] = dpct::select_from_sub_group(sg, a[3], row_load_offset + i);
+
+        // Load partial fragment from col0 of matrix B ({b0, b1})
+        recv_b[0] = dpct::select_from_sub_group(sg, b[0], col_load_offset + i);
+        // Load partial fragment from col0 of matrix B ({b2, b3})
+        recv_b[1] = dpct::select_from_sub_group(sg, b[1], col_load_offset + i);
+        // Load partial fragment from col1 of matrix B ({b0, b1})
+        recv_b[2] =
+            dpct::select_from_sub_group(sg, b[0], col_load_offset + 4 + i);
+        // Load partial fragment from col1 of matrix B ({b2, b3})
+        recv_b[3] =
+            dpct::select_from_sub_group(sg, b[1], col_load_offset + 4 + i);
+
+        auto ra = reinterpret_cast<ABType *>(recv_a);
+        auto rb = reinterpret_cast<ABType *>(recv_b);
+
+        // Each work item calculates a partial product of A & B matrix fragments
+        // and adds it to the corresponding D matrix fragment
+        // d0 += row0{ a0, a1, a2, a3 } * col0{ b0, b1, b2, b3 }
+        // d1 += row0{ a0, a1, a2, a3 } * col1{ b0, b1, b2, b3 }
+        // d2 += row1{ a0, a1, a2, a3 } * col0{ b0, b1, b2, b3 }
+        // d3 += row1{ a0, a1, a2, a3 } * col1{ b0, b1, b2, b3 }
+        for (int j = 0; j < 4; j++) {
+          *d0 += ra[j] * rb[j];
+          *d1 += ra[j] * rb[j + 4];
+          *d2 += ra[j + 4] * rb[j];
+          *d3 += ra[j + 4] * rb[j + 4];
         }
       }
     } else if constexpr (std::is_integral_v<ABType>) {
